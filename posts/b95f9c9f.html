@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="HashMap 是无序的，TreeMap 可以按照 key 进行排序，那有木有 Map 是可以维护插入的顺序的呢？接下来我们一起来看下 LinkedHashMap。 LinkedHashMap 本身是继承 HashMap 的，所以它拥有 HashMap 的所有特性，再此基础上，还提供了两大特性：  按照插入顺序进行访问； 实现了访问最少最先删除功能，其目的是把很久都没有访问的 key 自动删除。">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Java容器源码】LinkedHashMap源码分析">
+<meta property="og:url" content="https://yzhblog.work/posts/b95f9c9f.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="HashMap 是无序的，TreeMap 可以按照 key 进行排序，那有木有 Map 是可以维护插入的顺序的呢？接下来我们一起来看下 LinkedHashMap。 LinkedHashMap 本身是继承 HashMap 的，所以它拥有 HashMap 的所有特性，再此基础上，还提供了两大特性：  按照插入顺序进行访问； 实现了访问最少最先删除功能，其目的是把很久都没有访问的 key 自动删除。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200910140313621.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T07:09:32.494Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Java容器源码】LinkedHashMap源码分析">
+<meta name="twitter:description" content="HashMap 是无序的，TreeMap 可以按照 key 进行排序，那有木有 Map 是可以维护插入的顺序的呢？接下来我们一起来看下 LinkedHashMap。 LinkedHashMap 本身是继承 HashMap 的，所以它拥有 HashMap 的所有特性，再此基础上，还提供了两大特性：  按照插入顺序进行访问； 实现了访问最少最先删除功能，其目的是把很久都没有访问的 key 自动删除。">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20200910140313621.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/b95f9c9f.html">
+
+
+
+
+
+  <title>【Java容器源码】LinkedHashMap源码分析 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/b95f9c9f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Java容器源码】LinkedHashMap源码分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-26T20:46:25+08:00">
+                2020-02-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java集合源码/" itemprop="url" rel="index">
+                    <span itemprop="name">Java集合源码</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.7k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>HashMap 是无序的，TreeMap 可以按照 key 进行排序，那有木有 Map 是可以维护插入的顺序的呢？接下来我们一起来看下 LinkedHashMap。</p>
+<p>LinkedHashMap 本身是继承 HashMap 的，所以它拥有 HashMap 的所有特性，再此基础上，还提供了两大特性：</p>
+<ul>
+<li>按照插入顺序进行访问；</li>
+<li>实现了访问最少最先删除功能，其目的是把很久都没有访问的 key 自动删除。</li>
+</ul>
+<a id="more"></a>
+<h1 id="1-结构"><a href="#1-结构" class="headerlink" title="1.结构"></a>1.结构</h1><p>LinkedHashMap 继承关系，核心成员变量，主要构造函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// LinkedHashMap继承了HashMap</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedHashMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">HashMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;</span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 链表头</span></span><br><span class="line">    <span class="keyword">transient</span> LinkedHashMap.Entry&lt;K,V&gt; head;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 链表尾</span></span><br><span class="line">    <span class="comment">// 如果head=tail=null，则链表为空</span></span><br><span class="line">    <span class="keyword">transient</span> LinkedHashMap.Entry&lt;K,V&gt; tail;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">//--------------------------------Node-----------------------------------------</span></span><br><span class="line">    <span class="comment">// 在LinkedHashMap的节点叫Entry，继承HashMap的Node</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">HashMap</span>.<span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">        <span class="comment">// 为数组的每个元素增加了 before 和 after 属性</span></span><br><span class="line">        Entry&lt;K,V&gt; before, after;</span><br><span class="line">        <span class="comment">// 但是构造函数没变，没有将链表的before和after加进去</span></span><br><span class="line">        Entry(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">            <span class="keyword">super</span>(hash, key, value, next);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 控制LRU是否开启的元素之一，表示是否允许在访问（get）后，将当前节点移动到链表尾部，默认是false</span></span><br><span class="line">    <span class="comment">// 注：另一个开启元素是put时的删除策略是否允许删除头节点，默认返回false</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> accessOrder;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//-------------------------------构造函数-------------------------------------</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashMap</span><span class="params">(<span class="keyword">int</span> initialCapacity, <span class="keyword">float</span> loadFactor)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(initialCapacity, loadFactor);</span><br><span class="line">        accessOrder = <span class="keyword">false</span>; <span class="comment">// 将accessOrder置为false</span></span><br><span class="line">    &#125;	</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashMap</span><span class="params">(<span class="keyword">int</span> initialCapacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(initialCapacity);</span><br><span class="line">        accessOrder = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">        accessOrder = <span class="keyword">false</span>;</span><br><span class="line">    &#125; </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 可以通过此构造方法设置 accessOrder，即要开启LRU策略必须通过该构造函数</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashMap</span><span class="params">(<span class="keyword">int</span> initialCapacity, <span class="keyword">float</span> loadFactor, <span class="keyword">boolean</span> accessOrder)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(initialCapacity, loadFactor);</span><br><span class="line">        <span class="keyword">this</span>.accessOrder = accessOrder;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>从上述 Map 新增的属性可以看到，LinkedHashMap 的数据结构很像是把 LinkedList 的每个元素换成了 HashMap 的 Node，像是两者的结合体，也正是因为增加了这些结构，从而能把 Map 的元素都串联起来，形成一个链表，而链表就可以保证顺序了，就可以维护元素插入进来的顺序。</p>
+<p>LinkedHashMap 是通过双向链表和散列表这两种数据结构组合实现的，其中的“Linked”实际上是指的是双向链表，并非指用链表法解决散列冲突。</p>
+<p><img src="https://img-blog.csdnimg.cn/20200910140313621.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h1 id="2-方法解析-amp-api"><a href="#2-方法解析-amp-api" class="headerlink" title="2.方法解析&amp;api"></a>2.方法解析&amp;api</h1><h2 id="2-1-增加元素时实现LRU"><a href="#2-1-增加元素时实现LRU" class="headerlink" title="2.1 增加元素时实现LRU"></a>2.1 增加元素时实现LRU</h2><p>LinkedHashMap 本身是没有 put 方法实现的，由于继承了HashMap，所以会调用HashMap的 put 与 putVal 方法。但仅仅这样是不够的还要考虑LinkedHashMap的2个特性</p>
+<ol>
+<li>LinkedHashMap要有链表特性，所以还要将新加入的节点尾插到链表中</li>
+<li>LinkedHashMap可以实现LRU，原因是已经实现链表，但需要考虑以下两个问题：<ol>
+<li>具体实现策略是什么？要从 get 和 put 两方面入手<ul>
+<li>get：当每访问一个节点（get）后，就将当前节点置于链表尾部<ul>
+<li>重置于尾部的原因：新节点尾插到链表，意味着尾部本来就新</li>
+<li>这也等同于越往前的节点越久，且没访问</li>
+</ul>
+</li>
+<li>put：当插入一个节点（put）后，且满足所有删除条件，就删除头节点<ul>
+<li>这里的一定条件其实就是删除策略，一般需要用户自定义，比如size&gt;3等</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如何设置开启执行LRU？同样要从get和put入手，但默认是关闭的<ul>
+<li>get：要将 accessOrder 置为 true，表示同意get过的节点移到链表最后，默认是false，需构造时开启</li>
+<li>put：removeEldestEntry方法要能返回true，表示删除策略允许删除，默认是false，一般需要重写<br>注：其实还有两个因素 evict=true（put时默认），队列不为空（一般不涉及）</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="put"><a href="#put" class="headerlink" title="put()"></a>put()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> putVal(hash(key), key, value, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="putVal"><a href="#putVal" class="headerlink" title="putVal()"></a>putVal()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// evict:决定是否删除最少访问元素，默认true</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, <span class="keyword">boolean</span> onlyIfAbsent, <span class="keyword">boolean</span> evict)</span> </span>&#123;</span><br><span class="line">       .......</span><br><span class="line">        <span class="comment">// 调用newNode新增节点，但在LInkedHashMap中，重写了newNode方法，因为节点</span></span><br><span class="line">        tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">       ......</span><br><span class="line">        <span class="comment">// 在HashMap中是空实现，但linkedListMap中具体实现了</span></span><br><span class="line">       afterNodeInsertion(evict);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>这里本质是依赖倒置的设计原则，上层定义接口，下层实现</p>
+<h3 id="newNode"><a href="#newNode" class="headerlink" title="newNode()"></a>newNode()</h3><p>重写HashMap的newNode方法，新增节点Entry，并调用 linkNodeLast 追加到链表的尾部<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Node&lt;K,V&gt; <span class="title">newNode</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; e)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 新增节点，这里是new LinkedHash.Entry</span></span><br><span class="line">    LinkedHashMap.Entry&lt;K,V&gt; p = <span class="keyword">new</span> LinkedHashMap.Entry&lt;K,V&gt;(hash, key, value, e);</span><br><span class="line">    <span class="comment">// 追加到链表的尾部</span></span><br><span class="line">    linkNodeLast(p);</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="linkNodeLast"><a href="#linkNodeLast" class="headerlink" title="linkNodeLast()"></a>linkNodeLast()</h3><p>因为LinkedHashMap还有链表特性，所以不能只是HashMap那样添加到哈希表上，而是还要添加到链表上<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 入参是新创建的节点</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">linkNodeLast</span><span class="params">(LinkedHashMap.Entry&lt;K,V&gt; p)</span> </span>&#123;</span><br><span class="line">    LinkedHashMap.Entry&lt;K,V&gt; last = tail; <span class="comment">// 暂存tail    </span></span><br><span class="line">    tail = p; <span class="comment">// 将tail置为新节点p</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (last == <span class="keyword">null</span>) <span class="comment">// last 为空，说明链表为空，所以还要将head设为新节点p</span></span><br><span class="line">        head = p;    </span><br><span class="line">    <span class="keyword">else</span> &#123; <span class="comment">// 链表非空，直接建立新增节点和上个尾节点之间的前后关系即可</span></span><br><span class="line">        p.before = last;</span><br><span class="line">        last.after = p;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="afterNodeInsertion"><a href="#afterNodeInsertion" class="headerlink" title="afterNodeInsertion()"></a>afterNodeInsertion()</h3><p>afterNodeInsertion方法在HashMap中是空实现，在LinkedHashMap中是为了实现LRU策略。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">afterNodeInsertion</span><span class="params">(<span class="keyword">boolean</span> evict)</span> </span>&#123; </span><br><span class="line">    LinkedHashMap.Entry&lt;K,V&gt; first;</span><br><span class="line">    <span class="comment">// 要删除头节点要满足三个条件</span></span><br><span class="line">    <span class="comment">// 1.evict=true，在put方法中默认是true</span></span><br><span class="line">    <span class="comment">// 2.队列不为空，但一般不牵扯这个问题，因为节点加入后才会执行该方法</span></span><br><span class="line">    <span class="comment">// 3.删除策略策略允许删除，默认false</span></span><br><span class="line">    <span class="keyword">if</span> (evict &amp;&amp; (first = head) != <span class="keyword">null</span> &amp;&amp; removeEldestEntry(first)) &#123;</span><br><span class="line">        K key = first.key;</span><br><span class="line">        removeNode(hash(key), key, <span class="keyword">null</span>, <span class="keyword">false</span>, <span class="keyword">true</span>); <span class="comment">// removeNode 删除头节点</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="removeEldestEntry"><a href="#removeEldestEntry" class="headerlink" title="removeEldestEntry()"></a>removeEldestEntry()</h3><p>removeEldestEntry一般用于自定义删除策略，返回true表示执行删除头结点，返回false表示不删除</p>
+<ul>
+<li>该方法一般需要用户重写，比如 return size&gt;3时删除</li>
+<li>在LinkedHashMap中提供了默认实现，即直接返回false（不删除，也可以理解成默认无法执行lru）<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;K,V&gt; eldest)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="2-2-获取元素时实现LRU"><a href="#2-2-获取元素时实现LRU" class="headerlink" title="2.2 获取元素时实现LRU"></a>2.2 获取元素时实现LRU</h2><h3 id="get"><a href="#get" class="headerlink" title="get()"></a>get()</h3><p>LinkedHashMap重写了HashMap的get方法：</p>
+<ol>
+<li>获取具体节点还是调用HashMap的getNode方法</li>
+<li>只不过在获取到node后，加入了移动node到队尾以实现LRU的操作<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">        Node&lt;K,V&gt; e;</span><br><span class="line">        <span class="comment">// 调用 HashMap.getNode()获取具体节点</span></span><br><span class="line">        <span class="keyword">if</span> ((e = getNode(hash(key), key)) == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">// 如果设置了 LRU 策略</span></span><br><span class="line">        <span class="keyword">if</span> (accessOrder)</span><br><span class="line">        <span class="comment">// 这个方式把当前 key 移动到队尾</span></span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">        <span class="keyword">return</span> e.value;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>不仅仅是 get 方法，执行 getOrDefault、compute、computeIfAbsent、computeIfPresent、merge 方法时，也会不断的把经常访问的节点移动到队尾，那么靠近队头的节点，自然就是很少被访问的元素了。</p>
+<h3 id="afterNodeAccess"><a href="#afterNodeAccess" class="headerlink" title="afterNodeAccess()"></a>afterNodeAccess()</h3><p>将访问的节点移到队尾<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">afterNodeAccess</span><span class="params">(Node&lt;K,V&gt; e)</span> </span>&#123; <span class="comment">// move node to last</span></span><br><span class="line">        LinkedHashMap.Entry&lt;K,V&gt; last;</span><br><span class="line">        <span class="comment">// accessOrder 为 true，并且 e 不为队尾的时候</span></span><br><span class="line">        <span class="keyword">if</span> (accessOrder &amp;&amp; (last = tail) != e) &#123;</span><br><span class="line">            LinkedHashMap.Entry&lt;K,V&gt; p =</span><br><span class="line">                (LinkedHashMap.Entry&lt;K,V&gt;)e, b = p.before, a = p.after;</span><br><span class="line">            p.after = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (b == <span class="keyword">null</span>)</span><br><span class="line">                head = a;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                b.after = a;</span><br><span class="line">            <span class="keyword">if</span> (a != <span class="keyword">null</span>)</span><br><span class="line">                a.before = b;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                last = b;</span><br><span class="line">            <span class="keyword">if</span> (last == <span class="keyword">null</span>)</span><br><span class="line">                head = p;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                p.before = last;</span><br><span class="line">                last.after = p;</span><br><span class="line">            &#125;</span><br><span class="line">            tail = p;</span><br><span class="line">            ++modCount;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="LRU示例"><a href="#LRU示例" class="headerlink" title="LRU示例"></a>LRU示例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAccessOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 构建 LinkedHashMap，这里必须使用唯一的能设置accessOrder的构造函数</span></span><br><span class="line">  LinkedHashMap&lt;Integer, Integer&gt; map = <span class="keyword">new</span> LinkedHashMap&lt;Integer, Integer&gt;(<span class="number">4</span>,<span class="number">0.75f</span>,<span class="keyword">true</span>) &#123;</span><br><span class="line">  <span class="comment">// 注：可以在构造函数后初始化（必须加大括号）或重写方法（直接重写）， new A() &#123; &#123;初始化&#125; / 重写方法 &#125;;</span></span><br><span class="line">    &#123; </span><br><span class="line">      put(<span class="number">10</span>, <span class="number">10</span>); <span class="comment">// 注：调用容器具体函数初始化时，必须再加&#123;&#125;</span></span><br><span class="line">      put(<span class="number">9</span>, <span class="number">9</span>);</span><br><span class="line">      put(<span class="number">20</span>, <span class="number">20</span>);</span><br><span class="line">      put(<span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="comment">// 覆写了删除策略的方法，允许返回true；即当已经有大于3个槽点被使用时，开始删除链表头结点</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;Integer, Integer&gt; eldest)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> size() &gt; <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  log.info(<span class="string">"初始化：&#123;&#125;"</span>,JSON.toJSONString(map));</span><br><span class="line">  Assert.assertNotNull(map.get(<span class="number">9</span>));</span><br><span class="line">  log.info(<span class="string">"map.get(9)：&#123;&#125;"</span>,JSON.toJSONString(map));</span><br><span class="line">  Assert.assertNotNull(map.get(<span class="number">20</span>));</span><br><span class="line">  log.info(<span class="string">"map.get(20)：&#123;&#125;"</span>,JSON.toJSONString(map));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打印出的结果如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">初始化：&#123;9:9,20:20,1:1&#125;</span><br><span class="line">map.get(9)：&#123;20:20,1:1,9:9&#125;</span><br><span class="line">map.get(20)：&#123;1:1,9:9,20:20&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，map 初始化的时候，我们放进去四个元素，但结果只有三个元素，10 不见了，这个主要是因为我们覆写了 removeEldestEntry 方法，我们实现了如果 map 中元素个数大于 3 时，我们就把队头的元素删除，当 put(1, 1) 执行的时候，正好把队头的 10 删除，这个体现了达到我们设定的删除策略时，会自动的删除头节点。</p>
+<p>当我们调用 map.get(9) 方法时，元素 9 移动到队尾，调用 map.get(20) 方法时， 元素 20 被移动到队尾，这个体现了经常被访问的节点会被移动到队尾。</p>
+<h2 id="2-3-迭代器：基于链表"><a href="#2-3-迭代器：基于链表" class="headerlink" title="2.3 迭代器：基于链表"></a>2.3 迭代器：基于链表</h2><p>Map 对 key、value 和 entity（节点） 都提供了迭代器。这些迭代器都是通过map.~Set().iterator()进行调用</p>
+<ul>
+<li>迭代key：LinkedHashMap –keySet()–&gt; LinkedKeySet –iterator()–&gt; LinkedKeyIterator</li>
+<li>迭代value：LinkedHashMap –values()–&gt; LInkedValues–iterator()–&gt; LinkedValueIterator</li>
+<li>迭代key：LinkedHashMap –entrySet()–&gt; LinkedEntrySet–iterator()–&gt; LinkedEntryIterator</li>
+</ul>
+<h3 id="Linked-Iterator"><a href="#Linked-Iterator" class="headerlink" title="Linked~~Iterator"></a>Linked~~Iterator</h3><p>虽然是不同的迭代器，但是它们本质上却没有区别：</p>
+<ol>
+<li>都继承了LinkedHashIterator</li>
+<li>都只有一个方法：next()，而且里面调用的都是 LinkedHashIterator.nextNode()，只不过最后在node中取值不同<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedKeyIterator</span> <span class="keyword">extends</span> <span class="title">LinkedHashIterator</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">K</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">next</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> nextNode().getKey(); &#125; <span class="comment">// 调用父类nextNode方法，返回node中的Key</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedValueIterator</span> <span class="keyword">extends</span> <span class="title">LinkedHashIterator</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">next</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> nextNode().value; &#125; <span class="comment">// 调用父类nextNode方法，返回node中的value</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedEntryIterator</span> <span class="keyword">extends</span> <span class="title">LinkedHashIterator</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> Map.<span class="function">Entry&lt;K,V&gt; <span class="title">next</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> nextNode(); &#125; <span class="comment">// 调用父类nextNode方法，直接返回node</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="LinkedHashIterator"><a href="#LinkedHashIterator" class="headerlink" title="LinkedHashIterator"></a>LinkedHashIterator</h3><p>LinkedHashIterator和HashIterator的比较</p>
+<ol>
+<li>不同点：nextNode方法，也即迭代策略<ul>
+<li>HashIterator的迭代策略是：逐桶遍历，可理解成外层是遍历数组，内层是遍历链表（红黑树）</li>
+<li>LinkedHashIterator：只用按照链表从头到尾遍历所有node即可</li>
+</ul>
+</li>
+<li>相同点：hasNext方法和remove方法完全相同，所以下面代码也就没有列举这两个方法</li>
+</ol>
+<p>但是对于LinkedHashMap而言，他继承了HashMap，所以这两种迭代器都能使用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedHashIterator</span> </span>&#123;</span><br><span class="line">     </span><br><span class="line">        LinkedHashMap.Entry&lt;K,V&gt; next; <span class="comment">// 下一个节点</span></span><br><span class="line">        LinkedHashMap.Entry&lt;K,V&gt; current; <span class="comment">// 当前节点</span></span><br><span class="line">        <span class="keyword">int</span> expectedModCount;  <span class="comment">// 目标操作数（即开始迭代前的操作数）</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 初始化时，默认从头节点开始访问</span></span><br><span class="line">        LinkedHashIterator() &#123;</span><br><span class="line">            next = head;</span><br><span class="line">            expectedModCount = modCount;</span><br><span class="line">            current = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">     	</span><br><span class="line">     	<span class="comment">// 核心方法nextNode()，根据链表进行迭代！！</span></span><br><span class="line">     	<span class="keyword">final</span> LinkedHashMap.<span class="function">Entry&lt;K,V&gt; <span class="title">nextNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            LinkedHashMap.Entry&lt;K,V&gt; e = next;</span><br><span class="line">            <span class="comment">// 校验 如果迭代过程中对Map进行操作，报错</span></span><br><span class="line">            <span class="keyword">if</span> (modCount != expectedModCount)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ConcurrentModificationException();</span><br><span class="line">            <span class="keyword">if</span> (e == <span class="keyword">null</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException();</span><br><span class="line">            current = e;</span><br><span class="line">            <span class="comment">// 通过链表的 after 结构，找到下一个迭代的节点</span></span><br><span class="line">            next = e.after; </span><br><span class="line">            <span class="keyword">return</span> e;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/b95f9c9f.html" title="【Java容器源码】LinkedHashMap源码分析">https://yzhblog.work/posts/b95f9c9f.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/782d99ab.html" rel="next" title="【Java容器源码】HashMap源码分析&死锁问题（JDK7）">
+                <i class="fa fa-chevron-left"></i> 【Java容器源码】HashMap源码分析&死锁问题（JDK7）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/b9a5a371.html" rel="prev" title="【Java容器源码】TreeMap源码分析">
+                【Java容器源码】TreeMap源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-结构"><span class="nav-text">1.结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-方法解析-amp-api"><span class="nav-text">2.方法解析&amp;api</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-增加元素时实现LRU"><span class="nav-text">2.1 增加元素时实现LRU</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#put"><span class="nav-text">put()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#putVal"><span class="nav-text">putVal()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#newNode"><span class="nav-text">newNode()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linkNodeLast"><span class="nav-text">linkNodeLast()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#afterNodeInsertion"><span class="nav-text">afterNodeInsertion()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#removeEldestEntry"><span class="nav-text">removeEldestEntry()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-获取元素时实现LRU"><span class="nav-text">2.2 获取元素时实现LRU</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#get"><span class="nav-text">get()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#afterNodeAccess"><span class="nav-text">afterNodeAccess()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LRU示例"><span class="nav-text">LRU示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-迭代器：基于链表"><span class="nav-text">2.3 迭代器：基于链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linked-Iterator"><span class="nav-text">Linked~~Iterator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LinkedHashIterator"><span class="nav-text">LinkedHashIterator</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

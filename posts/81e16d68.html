@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="优化器就是对我们的SQL语句进行分析，生成执行计划。 问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 slow query log    .">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">
+<meta property="og:url" content="https://yzhblog.work/posts/81e16d68.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="优化器就是对我们的SQL语句进行分析，生成执行计划。 问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 slow query log    .">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103221300455.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103223445436.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/202011032240068.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103225423871.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020110323092670.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103231618955.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103231947669.png#pic_center">
+<meta property="og:updated_time" content="2020-11-25T15:11:13.316Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">
+<meta name="twitter:description" content="优化器就是对我们的SQL语句进行分析，生成执行计划。 问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 slow query log    .">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201103221300455.png#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/81e16d68.html">
+
+
+
+
+
+  <title>【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/81e16d68.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-10T00:00:00+08:00">
+                2019-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据存储/" itemprop="url" rel="index">
+                    <span itemprop="name">数据存储</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.6k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>优化器就是对我们的SQL语句进行分析，生成执行计划。</p>
+<p>问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 <a href="https://dev.mysql.com/doc/refman/5.7/en/slow-query-log.html" target="_blank" rel="noopener">slow query log</a>    .</p>
+<a id="more"></a>
+<h2 id="1-开启慢日志"><a href="#1-开启慢日志" class="headerlink" title="1.开启慢日志"></a>1.开启慢日志</h2><p>因为开启慢查询日志是有代价的（跟bin log、optimizer-trace一样），所以它默认是关闭的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;slow_query%&apos;;</span><br><span class="line">set GLOBAL slow_query_log=&quot;ON&quot;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201103221300455.png#pic_center" alt="在这里插入图片描述"></p>
+<p>除了这个开关，还有一个参数，控制执行超过多长时间的SQL才记录到慢日志，默认是10秒。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;%long_query%&apos;;  -- 默认10s</span><br><span class="line"></span><br><span class="line">-- 可以直接动态修改参数（重启后失效）：</span><br><span class="line">set @@ global.slow_query_log=1; -- 1 开启，0 关闭，重启后失效 </span><br><span class="line">set @@ global.long_query_time=3; -- mysql 默认的慢查询时间是 10 秒，另开一个窗口后才会查到最新值 ​ </span><br><span class="line"></span><br><span class="line">show variables like &apos;%long_query%&apos;;</span><br><span class="line">show variables like &apos;%slow_query%&apos;;</span><br></pre></td></tr></table></figure>
+<p>或者修改配置文件my.cnf。以下配置定义了慢查询日志的开关、慢查询的时间、日志文件的存放路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">slow_query_log=ON </span><br><span class="line">long_query_time=2 </span><br><span class="line">slow_query_log_file=/var/lib/mysql/localhost-slow.log</span><br></pre></td></tr></table></figure>
+<h2 id="2-慢日志分析"><a href="#2-慢日志分析" class="headerlink" title="2.慢日志分析"></a>2.慢日志分析</h2><p>模拟慢查询：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT SLEEP(10); -- 过10s后再查询，所以后面的sql语句都会进入慢查询日志</span><br><span class="line">SELECT * FROM user_innodb WHERE name=&apos;张三&apos;;</span><br></pre></td></tr></table></figure>
+<h3 id="2-1-日志内容"><a href="#2-1-日志内容" class="headerlink" title="2.1 日志内容"></a>2.1 日志内容</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show global status like &apos;slow_queries&apos;; -- 查看有多少慢查询 </span><br><span class="line">show variables like &apos;%slow_query%&apos;; -- 获取慢日志目录</span><br></pre></td></tr></table></figure>
+<p>然后在服务器上打开相应日志文件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /var/lib/mysql/bab8d9419ec6-slow.log</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://img-blog.csdnimg.cn/20201103223445436.png#pic_center" alt="在这里插入图片描述"></p>
+<p>有了慢查询日志，怎么去分析统计呢？比如SQL语句的出现的慢查询次数最多，平均每次执行了多久？</p>
+<h3 id="2-2-分析工具：mysqldumpslow"><a href="#2-2-分析工具：mysqldumpslow" class="headerlink" title="2.2 分析工具：mysqldumpslow"></a>2.2 分析工具：<a href="https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html" target="_blank" rel="noopener">mysqldumpslow</a></h3><p>MySQL提供了mysqldumpslow 的工具，在MySQL的bin目录下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldumpslow --help</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/202011032240068.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>例如：查询用时最多的20条慢SQL：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldumpslow -s t -t 20 -g &apos;select&apos; /var/lib/mysql/bab8d9419ec6-slow.log &gt; /data/slow.log</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201103225423871.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" width="70%"></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Count</td>
+<td>代表这个SQL执行了多少次</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>代表执行的时间，括号里面是累计时间</td>
+</tr>
+<tr>
+<td>Lock</td>
+<td>表示锁定的时间，括号是累计</td>
+</tr>
+<tr>
+<td>Rows</td>
+<td>表示返回的记录数，括号是累计</td>
+</tr>
+</tbody>
+</table>
+<p>除了慢查询日志之外，还有一个 SHOW PROFILE工具可以使用。</p>
+<h3 id="2-3-分析工具：SHOW-PROFILE"><a href="#2-3-分析工具：SHOW-PROFILE" class="headerlink" title="2.3 分析工具：SHOW PROFILE"></a>2.3 分析工具：<a href="https://dev.mysql.com/doc/refman/5.7/en/show-profile.html" target="_blank" rel="noopener">SHOW PROFILE</a></h3><p>SHOW PROFILE 是谷歌高级架构师JeremyCole贡献给MySQL社区的，可以查看SQL语句执行的时候使用的资源，比如CPU、IO的消耗情况。在SQL中输入help profile可以得到详细的帮助信息。</p>
+<ol>
+<li>查看是否开启</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select @@profiling;</span><br><span class="line">set @@profiling=1;</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>查看 profile 统计 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show profiles; -- 命令最后带一个s</span><br><span class="line">show profile;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/2020110323092670.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>5.7E-5，小数点左移5位，代表0.000057秒。也可以根据ID查看执行详细信息，在后面带上for query + ID。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show profile for query 1;</span><br></pre></td></tr></table></figure>
+<p>除了慢日志和show profile，如果要分析出当前数据库中执行的慢的SQL，还可以通过查看运行线程状态和服务器运行信息、存储引擎信息来分析。</p>
+<h2 id="3-其他系统命令"><a href="#3-其他系统命令" class="headerlink" title="3.其他系统命令"></a>3.其他系统命令</h2><h3 id="3-1-查看运行线程：show-processlist"><a href="#3-1-查看运行线程：show-processlist" class="headerlink" title="3.1 查看运行线程：show processlist"></a>3.1 查看运行线程：<a href="https://dev.mysql.com/doc/refman/5.7/en/show-processlist.html" target="_blank" rel="noopener">show processlist</a></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show processlist;</span><br></pre></td></tr></table></figure>
+<p>这是很重要的一个命令，用于显示用户运行线程。可以根据id号kill线程。也可以查表，效果一样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from information_schema.processlist;</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://img-blog.csdnimg.cn/20201103231618955.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<table>
+<thead>
+<tr>
+<th>列</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Id</td>
+<td>线程的唯一标志，可以根据它 kill 线程</td>
+</tr>
+<tr>
+<td>User</td>
+<td>启动这个线程的用户，普通用户只能看到自己的线程</td>
+</tr>
+<tr>
+<td>Host</td>
+<td>哪个 IP 端口发起的连接</td>
+</tr>
+<tr>
+<td>db</td>
+<td>操作的数据库</td>
+</tr>
+<tr>
+<td>Command</td>
+<td>线程的命令 <a href="https://dev.mysql.com/doc/refman/5.7/en/thread-commands.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/thread-commands.html</a></td>
+</tr>
+<tr>
+<td>Time</td>
+<td>操作持续时间，单位秒</td>
+</tr>
+<tr>
+<td>State</td>
+<td>线程状态，比如查询可能有 copyingtotmptable，Sortingresult，Sendingdata <a href="https://dev.mysql.com/doc/refman/5.7/en/general-thread-states.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/general-thread-states.html</a></td>
+</tr>
+<tr>
+<td>Info</td>
+<td>SQL 语句的前 100 个字符，如果要查看完整的 SQL 语句，用 SHOW FULL PROCESSLIST</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-2-服务器运行状态：show-status"><a href="#3-2-服务器运行状态：show-status" class="headerlink" title="3.2 服务器运行状态：show status"></a>3.2 服务器运行状态：show status</h3><p>SHOW STATUS 用于查看 MySQL 服务器运行状态（重启后会清空），有 session 和 global 两种作用域，格式：参数-值。可以用like带通配符过滤。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW GLOBAL STATUS LIKE &apos;com_select&apos;;-- 查看 select 次数</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201103231947669.png#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="3-3-存储引擎运行信息：show-engine"><a href="#3-3-存储引擎运行信息：show-engine" class="headerlink" title="3.3 存储引擎运行信息：show engine "></a>3.3 存储引擎运行信息：<a href="https://dev.mysql.com/doc/refman/5.7/en/show-engine.html" target="_blank" rel="noopener">show engine </a></h3><p>show engine用来显示存储引擎的当前运行信息，包括事务持有的表锁、行锁信息；事务的锁等待情况；线程信号量等待；文件IO请求；buffer pool统计信息。</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show engine innodb status;</span><br></pre></td></tr></table></figure>
+<p>如果需要将监控信息输出到错误信息error log中（15秒钟一次），可以开启输出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;innodb_status_output%&apos;; -- 开启输出：</span><br><span class="line">SET GLOBAL innodb_status_output=ON; </span><br><span class="line">SET GLOBALinnodb_status_output_locks=ON;</span><br></pre></td></tr></table></figure>
+<p>我们现在已经知道了这么多分析服务器状态、存储引擎状态、线程运行信息的命令，如果让你去写一个数据库监控系统，你会怎么做？其实很多开源的慢查询日志监控工具，他们的原理其实也都是读取的系统的变量和状态。现在我们已经知道哪些SQL慢了，为什么慢呢？慢在哪里？</p>
+<p>MySQL提供了一个执行计划的工具（优化器最终生成的就是一个执行计划），其他数据库，例如Oracle也有类似的功能。通过EXPLAIN 我们可以模拟优化器执行SQL 查询语句的过程，来知道 MySQL 是怎么处理一条SQL语句的。通过这种方式我们可以分析语句或者表的性能瓶颈。关于EXPLAIN请看<a href>下一篇</a>..</p>
+<h2 id="4-SQL优化建议"><a href="#4-SQL优化建议" class="headerlink" title="4.SQL优化建议"></a>4.SQL优化建议</h2><p>当我们的SQL语句比较复杂，有多个关联和子查询的时候，就要分析SQL语句有没有改写的方法。举个简单的例子，一模一样的数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-- 大偏移量的 limit</span><br><span class="line">SELECT * FROM user_innodb LIMIT 900000,10;</span><br><span class="line">​</span><br><span class="line">-- 改成先过滤 ID，再 limit </span><br><span class="line">SELECT * FROM user_innodb WHERE id&gt;=900000 LIMIT 10;</span><br></pre></td></tr></table></figure></p>
+<p>对于具体的 SQL 语句的优化，MySQL官网也提供了很多建议。所以，下面就简单列举工作中可能会用到的几条。</p>
+<h3 id="4-1-使用预编译"><a href="#4-1-使用预编译" class="headerlink" title="4.1 使用预编译"></a>4.1 使用预编译</h3><p>程序中通常是根据用户的输入来动态执行SQL，这时应该尽量使用参数化SQL,这样不仅可以避免SQL注入漏洞 攻击，最重要数据库会对这些参数化SQL进行预编译，这样第一次执行的时候DBMS会为这个SQL语句进行查询优化 并且执行预编译，这样以后再执行这个SQL的时候就直接使用预编译的结果，这样可以大大提高执行的速度。</p>
+<h3 id="4-2-使用表别名"><a href="#4-2-使用表别名" class="headerlink" title="4.2 使用表别名"></a>4.2 使用表别名</h3><p>当在SQL语句中连接多个表时，请使用表的别名并把别名前缀于每个列名上。这样就可以减少解析的时间并减少哪些有列名歧义引起的语法错误。</p>
+<h3 id="4-3-多条SQL语句压缩到一句SQL中"><a href="#4-3-多条SQL语句压缩到一句SQL中" class="headerlink" title="4.3  多条SQL语句压缩到一句SQL中"></a>4.3  多条SQL语句压缩到一句SQL中</h3><p>每次执行SQL的时候都要建立网络连接、进行权限校验、进行SQL语句的查询优化、发送执行结果，这个过程是非常耗时的，因此应该尽量避免过多的执行SQL语句，能够压缩到一句SQL执行的语句就不要用多条来执行。</p>
+<h3 id="4-4-关于in和exists"><a href="#4-4-关于in和exists" class="headerlink" title="4.4 关于in和exists"></a>4.4 关于in和exists</h3><p>在A表中查出所有B表的记录，<code>in</code> 和 <code>exists</code>（注：<code>exists</code>返回的是true / false）都可以实现，但一般需要根据两表大小关系判断具体使用哪个：</p>
+<ul>
+<li>A &gt; B : <code>select * from A where id in (select id from B)</code></li>
+<li>A &lt; B : <code>select * from A where exists(select 1 from B.id = A.id)</code></li>
+</ul>
+<h3 id="4-5-union-all-替换-union"><a href="#4-5-union-all-替换-union" class="headerlink" title="4.5 union all 替换 union"></a>4.5 union all 替换 union</h3><p>当SQL语句需要union两个查询结果集合时，即使检索结果中不会有重复的记录，如果使用union这两个结果集，同样会尝试进行合并，然后在输出最终结果前进行排序。</p>
+<p>因此如果可以判断检索结果中不会有重复的记录时候，应该用union all，这样效率就会因此得到提高。</p>
+<h3 id="4-6-where-替换-having"><a href="#4-6-where-替换-having" class="headerlink" title="4.6 where 替换 having"></a>4.6 where 替换 having</h3><p>避免使用HAVING字句，因为HAVING只会在检索出所有记录之后才对结果集进行过滤，而where则是在聚合前刷选记录，如果能通过where字句限制记录的数目，那就能减少这方面的开销。</p>
+<p>HAVING中的条件一般用于聚合函数的过滤，除此之外，应该将条件写在where字句中。</p>
+<h3 id="4-7-只在必要的情况下才使用事务begin-transaction"><a href="#4-7-只在必要的情况下才使用事务begin-transaction" class="headerlink" title="4.7 只在必要的情况下才使用事务begin transaction"></a>4.7 只在必要的情况下才使用事务begin transaction</h3><p>SQL Server中<strong>一句SQL语句默认就是一个事务</strong>，在该语句执行完成后也是默认commit的。其实，这就是begin tran的一个最小化的形式，好比在每句语句开头隐含了一个begin tran，结束时隐含了一个commit。 </p>
+<p>有些情况下，我们需要显式声明begin tran，比如做“插、删、改”操作需要同时修改几个表，要求要么几个表都修改成功，要么都不成功。begin tran 可以起到这样的作用，它可以把若干SQL语句套在一起执行，最后再一起commit。 好处是保证了数据的一致性，但任何事情都不是完美无缺的。Begin tran付出的代价是在提交之前，所有SQL语句锁住的资源都不能释放，直到commit掉。 </p>
+<p>可见，如果Begin tran套住的SQL语句太多，那数据库的性能就糟糕了。在该大事务提交之前，必然会阻塞别的语句，造成block很多。 </p>
+<p>Begin tran使用的原则是，在保证数据一致性的前提下，begin tran 套住的SQL语句越少越好！有些情况下可以采用触发器同步数据，不一定要用begin tran。</p>
+<h3 id="4-8-考虑使用“临时表”暂存中间结果"><a href="#4-8-考虑使用“临时表”暂存中间结果" class="headerlink" title="4.8 考虑使用“临时表”暂存中间结果"></a>4.8 考虑使用“临时表”暂存中间结果</h3><p>简化SQL语句的重要方法就是采用临时表暂存中间结果，但是，临时表的好处远远不止这些，将临时结果暂存在临时表，后面的查询就在tempdb中了，这可以避免程序中多次扫描主表，也大大减少了程序执行中“共享锁”阻塞“更新锁”，减少了阻塞，提高了并发性能。但是也得避免频繁创建和删除临时表，以减少系统表资源的消耗。</p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/81e16d68.html" title="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">https://yzhblog.work/posts/81e16d68.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/255a4d73.html" rel="next" title="【MySQL】性能调优（一）：建立连接。配置优化及架构优化">
+                <i class="fa fa-chevron-left"></i> 【MySQL】性能调优（一）：建立连接。配置优化及架构优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/9155ad63.html" rel="prev" title="【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解">
+                【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-开启慢日志"><span class="nav-text">1.开启慢日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-慢日志分析"><span class="nav-text">2.慢日志分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-日志内容"><span class="nav-text">2.1 日志内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-分析工具：mysqldumpslow"><span class="nav-text">2.2 分析工具：mysqldumpslow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-分析工具：SHOW-PROFILE"><span class="nav-text">2.3 分析工具：SHOW PROFILE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-其他系统命令"><span class="nav-text">3.其他系统命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-查看运行线程：show-processlist"><span class="nav-text">3.1 查看运行线程：show processlist</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-服务器运行状态：show-status"><span class="nav-text">3.2 服务器运行状态：show status</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-存储引擎运行信息：show-engine"><span class="nav-text">3.3 存储引擎运行信息：show engine </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-SQL优化建议"><span class="nav-text">4.SQL优化建议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-使用预编译"><span class="nav-text">4.1 使用预编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-使用表别名"><span class="nav-text">4.2 使用表别名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-多条SQL语句压缩到一句SQL中"><span class="nav-text">4.3  多条SQL语句压缩到一句SQL中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-关于in和exists"><span class="nav-text">4.4 关于in和exists</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-union-all-替换-union"><span class="nav-text">4.5 union all 替换 union</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-where-替换-having"><span class="nav-text">4.6 where 替换 having</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-只在必要的情况下才使用事务begin-transaction"><span class="nav-text">4.7 只在必要的情况下才使用事务begin transaction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-考虑使用“临时表”暂存中间结果"><span class="nav-text">4.8 考虑使用“临时表”暂存中间结果</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

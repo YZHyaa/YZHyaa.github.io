@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="1.信号量信号量是用来协调不同进程间的数据对象的，而最主要的应用是共享内存方式的进程间通信。本质上，信号量是一个计数器，它用来记录对某个资源（如共享内存）的存取状况。一般说来，为了获得共享资源，进程需要执行下列操作：  测试控制该资源的信号量　 若此信号量的值为正，则允许进行使用该资源。进程将信号量减1　　 若此信号量为0，则该资源目前不可用，进程进入睡眠状态，直至信号量值大于0，进程被唤醒，转入">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Java并发编程】锁机制（一）：锁机制在Linux的实现（了解）">
+<meta property="og:url" content="https://yzhblog.work/posts/c66bcb3.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="1.信号量信号量是用来协调不同进程间的数据对象的，而最主要的应用是共享内存方式的进程间通信。本质上，信号量是一个计数器，它用来记录对某个资源（如共享内存）的存取状况。一般说来，为了获得共享资源，进程需要执行下列操作：  测试控制该资源的信号量　 若此信号量的值为正，则允许进行使用该资源。进程将信号量减1　　 若此信号量为0，则该资源目前不可用，进程进入睡眠状态，直至信号量值大于0，进程被唤醒，转入">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201102151436772.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T10:41:05.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Java并发编程】锁机制（一）：锁机制在Linux的实现（了解）">
+<meta name="twitter:description" content="1.信号量信号量是用来协调不同进程间的数据对象的，而最主要的应用是共享内存方式的进程间通信。本质上，信号量是一个计数器，它用来记录对某个资源（如共享内存）的存取状况。一般说来，为了获得共享资源，进程需要执行下列操作：  测试控制该资源的信号量　 若此信号量的值为正，则允许进行使用该资源。进程将信号量减1　　 若此信号量为0，则该资源目前不可用，进程进入睡眠状态，直至信号量值大于0，进程被唤醒，转入">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201102151436772.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/c66bcb3.html">
+
+
+
+
+
+  <title>【Java并发编程】锁机制（一）：锁机制在Linux的实现（了解） | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/c66bcb3.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Java并发编程】锁机制（一）：锁机制在Linux的实现（了解）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-20T00:00:00+08:00">
+                2019-11-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java并发编程/" itemprop="url" rel="index">
+                    <span itemprop="name">Java并发编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.7k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  13
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-信号量"><a href="#1-信号量" class="headerlink" title="1.信号量"></a>1.信号量</h2><p>信号量是用来协调不同进程间的数据对象的，而最主要的应用是共享内存方式的进程间通信。本质上，<strong>信号量是一个计数器</strong>，它用来记录对某个资源（如共享内存）的存取状况。一般说来，为了获得共享资源，进程需要执行下列操作：</p>
+<ol>
+<li>测试控制该资源的信号量　</li>
+<li>若此信号量的值为正，则允许进行使用该资源。进程将信号量减1　　</li>
+<li>若此信号量为0，则该资源目前不可用，进程进入睡眠状态，直至信号量值大于0，进程被唤醒，转入步骤 1　　</li>
+<li>当进程不再使用一个信号量控制的资源时，信号量值加1。如果此时有进程正在睡眠等待此信号量，则唤醒此进程</li>
+</ol>
+<p>维护信号量状态的是Linux内核操作系统而不是用户进程。我们可以从头文件/usr/src/linux/include/linux/sem.h 中看到内核用来维护信号量状态的各个结构的定义。信号量是一个数据集合，用户可以单独使用这一集合的每个元素。要调用的第一个函数是semget，用以获得一个信号量ID。</p>
+<a id="more"></a>
+<p>Linux2.6.26下定义的信号量结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> &#123;</span></span><br><span class="line">    <span class="keyword">spinlock_t</span> lock;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> count;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">wait_list</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>从以上信号量的定义中，可以看到信号量底层使用到了spin lock的锁定机制，这个spinlock主要用来确保对count成员的原子性的操作(count–)和测试(count &gt; 0)。</p>
+<h3 id="1-1-信号量P操作"><a href="#1-1-信号量P操作" class="headerlink" title="1.1 信号量P操作"></a>1.1 信号量P操作</h3><p>P操作就是其实就是wait，等待拿锁。相关函数如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 当信号申请不到时会进程会休眠</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">down</span><span class="params">(struct semaphore *sem)</span></span>; </span><br><span class="line"><span class="comment">// 如果当进程因申请不到信号量而进入睡眠后，能被信号打断,但这时候这个函数的返回值不为0</span></span><br><span class="line"><span class="comment">// 上面所说的信号是指进程间通信的信号，比如我们的Ctrl+C</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">down_interruptible</span><span class="params">(struct semaphore *sem)</span></span>; </span><br><span class="line"><span class="comment">// 尝试去获得一个信号量，如果没有获得，函数立刻返回1，而不会让当前进程进入睡眠状态</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">down_trylock</span><span class="params">(struct semaphore *sem)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>down_interruptible 的源码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">down_interruptible</span><span class="params">(struct semaphore *sem)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">long</span> flags;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">  		</span><br><span class="line">  		<span class="comment">// 保证是在原子操作的前提下，以确保别的进程能否获得该信号量</span></span><br><span class="line">        spin_lock_irqsave(&amp;sem-&gt;lock, flags);</span><br><span class="line">        <span class="comment">// 先测试count是否大于0，如果是说明可以获得信号量，这种情况下需要先将count--</span></span><br><span class="line">        <span class="keyword">if</span> (likely(sem-&gt;count &gt; <span class="number">0</span>))</span><br><span class="line">                sem-&gt;count--;</span><br><span class="line">        <span class="comment">// 如果没有获得信号量，当前进程利用struct semaphore 中 wait_list 加入等待队列，开始睡眠</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">                result = __down_interruptible(sem);</span><br><span class="line">        spin_unlock_irqrestore(&amp;sem-&gt;lock, flags);</span><br><span class="line">  		</span><br><span class="line">  		<span class="comment">// 函数返回，其调用者开始进入临界区</span></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于需要休眠的情况，在__down_interruptible()函数中，会构造一个struct semaphore_waiter类型的变量（struct semaphore_waiter定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">semaphore_waiter</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> *<span class="title">task</span>;</span></span><br><span class="line">    <span class="keyword">int</span> up;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>将当前进程赋给task，并利用其list成员将该变量的节点加入到以sem中的wait_list为头部的一个列表中，假设有多个进程在sem上调用down_interruptible，则sem的wait_list上形成的队列如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/20201102151436772.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>注：将一个进程阻塞，一般的经过是先把进程放到等待队列中，接着改变进程的状态，比如设为TASK_INTERRUPTIBLE(不可中断休眠），然后调用调度函数schedule()，后者将会把当前进程从cpu的运行队列中摘下</p>
+</blockquote>
+<h3 id="1-2-信号量的V操作"><a href="#1-2-信号量的V操作" class="headerlink" title="1.2 信号量的V操作"></a>1.2 信号量的V操作</h3><p>V操作就是notify，唤醒在等待的进程。相关函数如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void up(struct semaphore *sem)；</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">up</span><span class="params">(struct semaphore *sem)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> flags;</span><br><span class="line">    spin_lock_irqsave(&amp;sem-&gt;lock, flags);</span><br><span class="line">    <span class="comment">// 如果没有其他线程等待在目前即将释放的信号量上，那么只需将count++即可</span></span><br><span class="line">    <span class="keyword">if</span> (likely(list_empty(&amp;sem-&gt;wait_list)))</span><br><span class="line">            sem-&gt;count++;</span><br><span class="line">    <span class="comment">// 如果有其他线程正因为等待该信号量而睡眠，那么调用__up</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">            __up(sem);</span><br><span class="line">    spin_unlock_irqrestore(&amp;sem-&gt;lock, flags);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>__up的定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> noinline <span class="keyword">void</span> __sched __up(struct semaphore *sem)</span><br><span class="line">&#123;	</span><br><span class="line">	<span class="comment">// 首先获得sem所在的wait_list为头部的链表的第一个有效节点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">semaphore_waiter</span> *<span class="title">waiter</span> = <span class="title">list_first_entry</span>(&amp;<span class="title">sem</span>-&gt;<span class="title">wait_list</span>, <span class="title">struct</span> <span class="title">semaphore_waiter</span>, <span class="title">list</span>);</span></span><br><span class="line">    <span class="comment">// 然后从链表中将其删除</span></span><br><span class="line">    list_del(&amp;waiter-&gt;<span class="built_in">list</span>);</span><br><span class="line">    waiter-&gt;up = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 然后唤醒该节点上睡眠的进程</span></span><br><span class="line">    wake_up_process(waiter-&gt;task);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由此可见，对于sem上的每次down_interruptible调用，都会在sem的wait_list链表尾部加入一新的节点。对于sem上的每次up调用，都会删除掉wait_list链表中的第一个有效节点，并唤醒睡眠在该节点上的进程。</p>
+<h3 id="1-3-信号量的使用"><a href="#1-3-信号量的使用" class="headerlink" title="1.3 信号量的使用"></a>1.3 信号量的使用</h3><p>信号量使用流程：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1.分配信号量对象</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> <span class="title">sema</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.初始化为互斥信号量</span></span><br><span class="line">init_MUTEX(&amp;sema);</span><br><span class="line">或者：</span><br><span class="line">DECLARE_MUTEX(sema);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3.访问临界区之前获取信号量</span></span><br><span class="line">down(&amp;sema); <span class="comment">// 如果获取到信号量，立即返回。如果信号量不可用，进程将在此休眠，并且休眠的状态是[不可中断的休眠状态 TASK_UNINTERRUPTIBLE]</span></span><br><span class="line">或者</span><br><span class="line">down_interruptible(&amp;sema); <span class="comment">// 如果信号量不可用，进程将进入[可中断的休眠状态 TASK_INTERRUPTIBLE]，如果返回0表示正常获取信号，如果返回非0，表示接受到了信号</span></span><br><span class="line">或者</span><br><span class="line">down_trylock(); <span class="comment">// 获取信号，如果信号量不可用，返回非0，如果信号量可用，返回0；不会引起休眠，可以在中断上下文使用。返回值也要做判断</span></span><br><span class="line">  </span><br><span class="line"><span class="comment">// 4.访问临界区：临界区可以休眠</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 5.释放信号量</span></span><br><span class="line">up(&amp;sema);  <span class="comment">// 不仅仅释放信号量，然后唤醒休眠的进程，让这个进程去获取信号量来访问临界区</span></span><br></pre></td></tr></table></figure></p>
+<p>下面举一个生产者消费者的例子：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">item buffer[n]; <span class="comment">// n个缓冲区组成的数组;</span></span><br><span class="line"><span class="keyword">int</span> in = <span class="number">0</span>, out = <span class="number">0</span>; <span class="comment">// in: 输入指针, out: 输出指针;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 信号量不允许直接参与运算, 故都要定义;</span></span><br><span class="line">semaphore mutex = <span class="number">1</span>; <span class="comment">// mutex: 互斥信号量, 生产者进程和消费者进程都只能互斥访问缓冲区;</span></span><br><span class="line">semaphore full = <span class="number">0</span>;  <span class="comment">// full: 资源信号量, 满缓冲区的数量;</span></span><br><span class="line">semaphore empty = n; <span class="comment">// empty: 资源信号量, 空缓冲区的数量;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 生产者程序;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Producer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">do</span> &#123;</span><br><span class="line">      生产者生产一个产品nextp;</span><br><span class="line">      P(empty); <span class="comment">// 申请一个空缓冲区;</span></span><br><span class="line">      P(mutex); <span class="comment">// 申请临界资源;</span></span><br><span class="line">      buffer[in] = nextp; <span class="comment">// 将产品添加到缓冲区;</span></span><br><span class="line">      in = (in + <span class="number">1</span>) % n;  <span class="comment">// 类似于循环队列;</span></span><br><span class="line">      V(mutex); <span class="comment">// 释放临界资源;</span></span><br><span class="line">      V(full);  <span class="comment">// 释放一个满缓冲区;</span></span><br><span class="line">  &#125; <span class="keyword">while</span> (TRUE);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 消费者程序;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Producer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">do</span> &#123;</span><br><span class="line">      P(full);  <span class="comment">// 申请一个满缓冲区;</span></span><br><span class="line">      P(mutex); <span class="comment">// 申请临界资源;</span></span><br><span class="line">      nextc = buffer[out]; <span class="comment">// 将产品从缓冲区取出;</span></span><br><span class="line">      out = (out + <span class="number">1</span>) % n; <span class="comment">// 类似于循环队列;</span></span><br><span class="line">      V(mutex); <span class="comment">// 释放临界资源;</span></span><br><span class="line">      V(empty); <span class="comment">// 释放一个空缓冲区;</span></span><br><span class="line">      消费者将一个产品nextc消费; </span><br><span class="line"> &#125; <span class="keyword">while</span> (TRUE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是：应<strong>先执行对资源信号量的申请，然后再对互斥信号量进行申请操作</strong>，否则会因起死锁。</p>
+<p>首先缓冲区有n个，每个都有满（full）和和空（empty）的两种状态，临界区只有一个，控制权为mutex,值为1</p>
+<ol>
+<li>如果生产者首先拿到的是缓冲区的控制权，那么其他的生产者和消费者就拿不到这个控制权了</li>
+<li>接着这个生产者去申请一个空的缓冲区，如果此时这些个缓冲区刚好是满的，那么这个申请必然失败</li>
+<li>那么消费者还能消费吗？他拿不到临界区的控制权，无法消费，也就没有空的缓冲区腾出来，生产者申请空缓冲区也必然不成功，此时就是一个死锁的状态了。</li>
+</ol>
+<p>更多互斥量示例可以参考<a href="https://blog.csdn.net/weixin_37650458/article/details/86566693?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.add_param_isCf&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.add_param_isCf" target="_blank" rel="noopener">这篇文章</a>…</p>
+<h2 id="2-互斥量"><a href="#2-互斥量" class="headerlink" title="2 互斥量"></a>2 互斥量</h2><p>互斥体实现了“互相排斥”（mutual exclusion）同步的简单形式（所以名为互斥体(mutex)）。互斥体禁止多个线程同时进入受保护的代码“临界区”（critical section）。因此，在任意时刻，只有一个线程被允许进入这样的代码保护区。</p>
+<p>任何线程在进入临界区之前，必须获取（acquire）与此区域相关联的互斥体的所有权。如果已有另一线程拥有了临界区的互斥体，其他线程就不能再进入其中。这些线程必须等待，直到当前的属主线程释放（release）该互斥体。</p>
+<p>Linux 2.6.26中mutex的定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mutex</span> &#123;</span></span><br><span class="line">        <span class="comment">/* 1: unlocked, 0: locked, negative: locked, possible waiters */</span></span><br><span class="line">        <span class="keyword">atomic_t</span>                  count;</span><br><span class="line">        <span class="keyword">spinlock_t</span>                wait_lock;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>          <span class="title">wait_list</span>;</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_DEBUG_MUTEXES</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread_info</span>        *<span class="title">owner</span>;</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">char</span>                *name;</span><br><span class="line">        <span class="keyword">void</span>                      *magic;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_DEBUG_LOCK_ALLOC</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">lockdep_map</span>         <span class="title">dep_map</span>;</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>对比前面的struct semaphore，struct mutex除了增加了几个作为debug用途的成员变量外，和semaphore几乎长得一样。但是mutex的引入主要是为了提供互斥机制，以避免多个进程同时在一个临界区中运行。</p>
+<ul>
+<li>如果静态声明一个count=1的semaphore变量，可以使用<code>DECLARE_MUTEX(name)</code></li>
+<li>如果要定义一个静态mutex型变量，应该使用<code>DEFINE_MUTEX</code></li>
+</ul>
+<p>如果在程序运行期要初始化一个mutex变量，可以使用mutex_init（mutex），mutex_init是个宏，在该宏定义的内部，会调用__mutex_init函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> mutex_init(mutex) \</span></span><br><span class="line"><span class="keyword">do</span> &#123; \</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">lock_class_key</span> __<span class="title">key</span>;</span> \</span><br><span class="line">    \</span><br><span class="line">    __mutex_init((mutex), #mutex, &amp;__key); \</span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br><span class="line">  </span><br><span class="line"><span class="keyword">void</span> __mutex_init(struct mutex *lock, <span class="keyword">const</span> <span class="keyword">char</span> *name, struct lock_class_key *key)</span><br><span class="line">&#123;</span><br><span class="line">    atomic_set(&amp;lock-&gt;count, <span class="number">1</span>);</span><br><span class="line">    spin_lock_init(&amp;lock-&gt;wait_lock);</span><br><span class="line">    INIT_LIST_HEAD(&amp;lock-&gt;wait_list);</span><br><span class="line">    debug_mutex_init(lock, name, key);</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从__mutex_init的定义可以看出，在使用mutex_init宏来初始化一个mutex变量时，应该使用mutex的指针型。</p>
+<h3 id="2-1-互斥量的PV操作"><a href="#2-1-互斥量的PV操作" class="headerlink" title="2.1 互斥量的PV操作"></a>2.1 互斥量的PV操作</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">mutex_lock</span><span class="params">(struct mutex *lock)</span></span>;</span><br><span class="line"><span class="keyword">void</span> __<span class="function">sched <span class="title">mutex_unlock</span><span class="params">(struct mutex *lock)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>从原理上讲，mutex实际上是count=1情况下的semaphore，所以其PV操作应该和semaphore是一样的。但是在实际的Linux代码上，出于性能优化的角度，并非只是单纯的重用down_interruptible和up的代码。</p>
+<p>以ARM平台的mutex_lock为例，实际上是将mutex_lock分成两部分实现：fast path和slow path，主要是基于这样一个事实：在绝大多数情况下，试图获得互斥体的代码总是可以成功获得。所以Linux的代码针对这一事实用ARM V6上的LDREX和STREX指令来实现fast path以期获得最佳的执行性能。</p>
+<p>mutux底层支持：</p>
+<ul>
+<li><p>Linux：底层的pthread mutex采用futex(2)（fast userspace mutex）实现，不必每次加锁、解锁都陷入系统调用（从用户态切换到内核态）。</p>
+<blockquote>
+<p>futex(2)：快速用户态互斥锁（fast userspace mutex），在非竞态（或非锁争用，表示申请即能立即拿到锁而不用等待）的情况下，futex操作完全在用户态下进行，内核态只负责处理竞态（或锁争用，表示申请了但有其它线程提前拿到了锁，需要等待锁被释放后才能拿到）下的操作（调用相应的系统调用来仲裁），futex有两个主要的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;futex_wait(addr, val) <span class="comment">// 检查*addr == val ?，若相等则将当前线程放入等待队列addr中随眠（陷入到内核态等待唤醒），否则调用失&gt;败并返回错误（依旧处于用户态）</span></span><br><span class="line">&gt;futex_wake(addr, val) <span class="comment">// 唤醒val个处于等待队列addr中的线程（从内核态回到用户态</span></span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>因此采用futex(2)的互斥锁不必每次加解锁都从用户态切换到内核态，效率较高.</p>
+</blockquote>
+</li>
+<li>Windows：底层的CRITICAL_SECTION嵌入了一小段自旋锁，如果不能立即拿到锁，它先会自旋一小段时间，如果还拿不到，才挂起当前线程.</li>
+</ul>
+<h3 id="2-2-互斥量的使用"><a href="#2-2-互斥量的使用" class="headerlink" title="2.2 互斥量的使用"></a>2.2 互斥量的使用</h3><p>互斥量使用流程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;pthread.h&gt; // 以下方法都是成功返回0，失败返回-1</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pthread_mutex_init</span><span class="params">(<span class="keyword">pthread_mutex_t</span> *mutex,pthread_mutexattr *attr)</span></span>;  <span class="comment">// 初始化锁</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pthread_mutex_lock</span><span class="params">(<span class="keyword">pthread_mutex_t</span> *mutex)</span></span>;   <span class="comment">// 对资源加锁，阻塞。</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pthread_mutex_trylock</span><span class="params">(<span class="keyword">pthread_mutex_t</span>*mutex)</span></span>; <span class="comment">// 对资源加锁，非阻塞</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 临界区...</span></span><br><span class="line"><span class="comment">// 临界区...</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pthread_mutex_unlock</span><span class="params">(<span class="keyword">pthread_mutex_t</span> *mutex)</span></span>;  <span class="comment">// 对资源解锁</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pthread_mutex_destroy</span><span class="params">(<span class="keyword">pthread_mutex_t</span> *mutex)</span></span>;  <span class="comment">// 销毁锁</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-3-互斥量和信号量区别"><a href="#2-3-互斥量和信号量区别" class="headerlink" title="2.3 互斥量和信号量区别"></a>2.3 互斥量和信号量区别</h3><ul>
+<li>概念上的区别：<ul>
+<li>信号量：是进程间（线程间）同步用的，一个进程（线程）完成了某一个动作就通过信号量告诉别的进程（线程），别的进程（线程）再进行某些动作。有二值和多值信号量之分。</li>
+<li>互斥锁：是线程间互斥用的，一个线程占用了某一个共享资源，那么别的线程就无法访问，直到这个线程离开，其他的线程才开始可以使用这个共享资源。可以把互斥锁看成二值信号量。</li>
+</ul>
+</li>
+<li>上锁时：<ul>
+<li>信号量: 只要信号量的value大于0，其他线程就可以sem_wait成功，成功后信号量的value减一。若value值不大于0，则sem_wait阻塞，直到sem_post释放后value值加一。</li>
+<li>互斥锁: 只要被锁住，其他任何线程都不可以访问被保护的资源。如果没有锁，获得资源成功，否则进行阻塞等待资源可用。</li>
+</ul>
+</li>
+<li>使用场所：         信号量主要适用于进程间通信，当然，也可用于线程间通信。而互斥锁只能用于线程间通信。</li>
+</ul>
+<blockquote>
+<p><strong>信号量/互斥体和自旋锁的区别?</strong><br><br>信号量/互斥体允许进程睡眠属于睡眠锁，自旋锁则不允许调用者睡眠，而是让其循环等待（忙等），所以有以下区别应用 :</p>
+<ol>
+<li>信号量和读写信号量适合于保持时间较长的情况，它们会导致调用者睡眠，因而自旋锁适合于保持时间非常短的情况</li>
+<li>自旋锁可以用于中断，不能用于进程上下文(会引起死锁)。而信号量不允许使用在中断中，而可以用于进程上下文</li>
+<li>自旋锁保持期间是抢占失效的，自旋锁被持有时，内核不能被抢占，而信号量和读写信号量保持期间是可以被抢占的</li>
+</ol>
+<p>另外需要注意的是:</p>
+<ol>
+<li>信号量锁保护的临界区可包含可能引起阻塞的代码，而自旋锁则绝对要避免用来保护包含这样代码的临界区，因为阻塞意味着要进行进程的切换，如果进程被切换出去后，另一进程企图获取本自旋锁，死锁就会发生。</li>
+<li>在你占用信号量的同时不能占用自旋锁，因为在你等待信号量时可能会睡眠，而在持有自旋锁时是不允许睡眠的。</li>
+</ol>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/c66bcb3.html" title="【Java并发编程】锁机制（一）：锁机制在Linux的实现（了解）">https://yzhblog.work/posts/c66bcb3.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/a50927c4.html" rel="next" title="【Java杂记】枚举：枚举类详解及开发应用示例">
+                <i class="fa fa-chevron-left"></i> 【Java杂记】枚举：枚举类详解及开发应用示例
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/7c7e3ea8.html" rel="prev" title="【Java并发编程】锁机制（三）：synchronized优化方案&使用注意">
+                【Java并发编程】锁机制（三）：synchronized优化方案&使用注意 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-信号量"><span class="nav-text">1.信号量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-信号量P操作"><span class="nav-text">1.1 信号量P操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-信号量的V操作"><span class="nav-text">1.2 信号量的V操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-信号量的使用"><span class="nav-text">1.3 信号量的使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-互斥量"><span class="nav-text">2 互斥量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-互斥量的PV操作"><span class="nav-text">2.1 互斥量的PV操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-互斥量的使用"><span class="nav-text">2.2 互斥量的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-互斥量和信号量区别"><span class="nav-text">2.3 互斥量和信号量区别</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

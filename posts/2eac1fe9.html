@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="大家想一下，如果要解决读一致性的问题，保证一个事务中前后两次读取数据结果一致，实现事务隔离，应该怎么做？因为在InnoDB里面，所有的活动都是运行在事务里面的，如果autocommit=1，每个SQL语句都是一个事务，所以这个问题也可以这么问：MySQL如何实现并发控制？ 总体上来说，我们有两大类的方案：LBCC和MVCC。">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【MySQL】事务与锁（四）：并发控制方案（LBCC、MVCC）及死锁问题分析">
+<meta property="og:url" content="https://yzhblog.work/posts/2eac1fe9.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="大家想一下，如果要解决读一致性的问题，保证一个事务中前后两次读取数据结果一致，实现事务隔离，应该怎么做？因为在InnoDB里面，所有的活动都是运行在事务里面的，如果autocommit=1，每个SQL语句都是一个事务，所以这个问题也可以这么问：MySQL如何实现并发控制？ 总体上来说，我们有两大类的方案：LBCC和MVCC。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031220404772.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031220350575.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031220506114.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031220558951.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031220818485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031220830734.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020103122122411.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031221239283.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201101033659597.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201101033739673.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201101033750411.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201101033841330.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201101033934714.png#pic_center">
+<meta property="og:updated_time" content="2020-11-25T15:10:33.883Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【MySQL】事务与锁（四）：并发控制方案（LBCC、MVCC）及死锁问题分析">
+<meta name="twitter:description" content="大家想一下，如果要解决读一致性的问题，保证一个事务中前后两次读取数据结果一致，实现事务隔离，应该怎么做？因为在InnoDB里面，所有的活动都是运行在事务里面的，如果autocommit=1，每个SQL语句都是一个事务，所以这个问题也可以这么问：MySQL如何实现并发控制？ 总体上来说，我们有两大类的方案：LBCC和MVCC。">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201031220404772.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/2eac1fe9.html">
+
+
+
+
+
+  <title>【MySQL】事务与锁（四）：并发控制方案（LBCC、MVCC）及死锁问题分析 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/2eac1fe9.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【MySQL】事务与锁（四）：并发控制方案（LBCC、MVCC）及死锁问题分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-05T00:00:00+08:00">
+                2019-10-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据存储/" itemprop="url" rel="index">
+                    <span itemprop="name">数据存储</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.2k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>大家想一下，如果要解决读一致性的问题，保证一个事务中前后两次读取数据结果一致，实现事务隔离，应该怎么做？因为在InnoDB里面，所有的活动都是运行在事务里面的，如果autocommit=1，每个SQL语句都是一个事务，所以这个问题也可以这么问：MySQL如何实现并发控制？</p>
+<p>总体上来说，我们有两大类的方案：LBCC和MVCC。</p>
+<a id="more"></a>
+<h2 id="1-方案一：LBCC"><a href="#1-方案一：LBCC" class="headerlink" title="1.方案一：LBCC"></a>1.方案一：LBCC</h2><p>第一种，我既然要保证前后两次读取数据一致，那么我读取数据的时候，锁定我要操作的数据，不允许其他的事务修改就行了。这种方案我们叫做基于锁的并发控制Lock Based Concurrency Control（LBCC）。</p>
+<p>如果仅仅是基于锁来实现事务隔离，一个事务读取的时候不允许其他时候修改，那就意味着不支持并发的读写操作，而我们的大多数应用都是读多写少的，这样会极大地影响操作数据的效率。</p>
+<p>锁的相关内容请参考：<a href="https://blog.csdn.net/weixin_43935927/article/details/109410420" target="_blank" rel="noopener">【MySQL】锁粒度？表锁，行锁。锁模式？共享锁，排他锁，意向锁。锁算法？记录锁，间隙锁，临键锁</a>..</p>
+<h2 id="2-方案二：MVCC"><a href="#2-方案二：MVCC" class="headerlink" title="2.方案二：MVCC"></a>2.方案二：MVCC</h2><p>所以我们还有另一种解决方案，如果要让一个事务前后两次读取的数据保持一致，那么我们可以在修改数据的时候给它建立一个备份或者叫快照，后面再来读取这个快照就行了。这种方案我们叫做多版本的并发控制 Multi Version Concurrency Control（MVCC）。</p>
+<h3 id="2-1-MVCC是什么"><a href="#2-1-MVCC是什么" class="headerlink" title="2.1 MVCC是什么"></a>2.1 MVCC是什么</h3><p>MVCC的核心思想是： 我可以查到在我这个事务开始之前已经存在的数据，即使它在后面被修改或者删除了。在我这个事务之后新增的数据，我是查不到的。</p>
+<p>这个快照什么时候创建？读取数据的时候，怎么保证能读取到这个快照而不是最新的数据？这个怎么实现呢？</p>
+<p>InnoDB为每行记录都实现了两个隐藏字段：</p>
+<ul>
+<li>DB_TRX_ID，6字节：插入或更新行的最后一个事务的事务ID，事务编号是自动递增的（我们把它理解为创建版本号，在数据新增或者修改为新数据的时候，记录当前事务ID）。</li>
+<li>DB_ROLL_PTR，7字节：回滚指针（我们把它理解为删除版本号，数据被删除或记录为旧数据的时候，记录当前事务ID）。我们把这两个事务ID理解为版本号。 </li>
+</ul>
+<h3 id="2-2-MVCC示例"><a href="#2-2-MVCC示例" class="headerlink" title="2.2 MVCC示例"></a>2.2 MVCC示例</h3><p>1.第一个事务，初始化数据。此时数据表中，创建版本是当前事务ID，删除版本为空。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031220404772.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>​    ==&gt; 第二个事务，执行第1次查询。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031220350575.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>读取到两条原始数据，这个时候事务ID是2。</p>
+</blockquote>
+<p>2.第三个事务，插入数据。此时的数据，多了一条tom，它的创建版本号是当前事务编号3。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031220506114.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>==&gt; 第二个事务，执行第2次查询。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031220558951.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>MVCC的查找规则：只能查找创建时间小于等于当前事务ID的数据，和删除时间大于当前事务ID的行（或未删除）。<br>==&gt; 当前事务ID=2，所以只能查找新增事务ID&lt;2的数据。也就是不能查到在我的事务开始之后插入的数据，wangwu的创建ID大于2，所以还是只能查到两条数据。</p>
+</blockquote>
+<p>3.第四个事务，删除数据，删除了id=2 jack这条记录。此时的数据，李四的删除版本被记录为当前事务ID(4)，其他数据不变。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031220818485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>==&gt; 第二个事务，执行第3次查询。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031220830734.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>查找规则：只能查找创建时间小于等于当前事务ID的数据，和删除时间大于当前事务ID的行（或未删除）。<br>==&gt; 当前事务ID=2，所以只能查找删除事务ID&gt;2的数据。也就是，可以查到在我事务开始之后删除的数据，所以jack依然可以查出来。所以还是这两条数据。</p>
+</blockquote>
+<p>4.第五个事务，执行更新操作，这个事务事务ID是5： </p>
+<p><img src="https://img-blog.csdnimg.cn/2020103122122411.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>==&gt; 第二个事务，执行第4次查询： </p>
+<p><img src="https://img-blog.csdnimg.cn/20201031221239283.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>查找规则：只能查找创建时间小于等于当前事务ID的数据，和删除时间大于当前事务ID的行（或未删除）。<br>==&gt; 当前事务ID=2，所以就是可以查找新增事务ID&lt;2和删除事务ID&gt;2的数据。因为更新后的数据 zhaoliu 创建版本大于 2，代表是在事务之后增加的，查不出来。而旧数据 zhangsan的删除版本大于2，代表是在事务之后删除的，可以查出来。</p>
+</blockquote>
+<p>通过以上演示我们能看到，通过版本号的控制，无论其他事务是插入、修改、删除，第一个事务查询到的数据都没有变化。</p>
+<blockquote>
+<p>上面演示的直接select都是<strong>快照读</strong>，读取的是记录数据的可见版本（可能是过期的数据），不用加锁。而insert/delete/update在操作数据前的查找是<strong>当前读</strong>，读取的是记录数据的最新版本，并且当前读返回的记录都会加上锁，保证其他事务不会再并发的修改这条记录。</p>
+</blockquote>
+<h2 id="3-最终方案：LBCC-MVCC"><a href="#3-最终方案：LBCC-MVCC" class="headerlink" title="3.最终方案：LBCC+MVCC"></a>3.最终方案：LBCC+MVCC</h2><p>在InnoDB中，MVCC是通过Undo log实现的。Oracle、Postgres等等其他数据库都有MVCC的实现。需要注意，<strong>在InnoDB中，MVCC和锁是协同使用的，这两种方案并不是互斥的</strong>。</p>
+<blockquote>
+<p>那MVCC与锁是什么关系呢？在InnoDB中，锁和MVCC都是用于并发控制。MVCC诞生的原因就是改善基于锁的方式带来的效率低的问题。使得读写之间互不阻塞，提高了单纯的基于锁的并发效率。</p>
+<p><br>那这两者是如何协同保证并发安全的？不同的事务隔离级别会有差异：</p>
+<ol>
+<li>Read Uncommited：RU隔离级别，不加锁。</li>
+<li>Read Commited：RC隔离级别下<pre><code>* 普通的select都是快照读，使用MVCC实现
+ * 加锁的select都使用记录锁，因为没有Gap Lock。
+</code></pre>  注：除了两种特殊情况——外键约束检查(foreign-key constraint checking)以及重复键检查(duplicate-key checking)时会使用间隙锁封锁区间。所以RC会出现幻读的问题。<ol start="3">
+<li>Repeatable Read：RR隔离级别下<ul>
+<li>普通的 select使用快照读(snapshotread)，底层使用MVCC来实现。</li>
+<li>加锁的 select(select … in share mode / select … for update) 以及更新操作 update, delete 等语句使用当前读（current read），底层使用记录锁、或者间隙锁、临键锁。 </li>
+</ul>
+</li>
+<li>Serializable：Serializable 所有的 select 语句都会被隐式的转化为 select … in share mode，会和update、delete互斥。</li>
+</ol>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>所以，事务隔离级别怎么选？<br><br>RU 和 Serializable 肯定不能用。为什么有些公司要用 RC，或者说网上有些文章推荐有RC？RC和RR主要有几个区别：</p>
+<ol>
+<li>RR的间隙锁会导致锁定范围的扩大。</li>
+<li>条件列未使用到索引，RR锁表，RC锁行。</li>
+<li>RC的“半一致性”（semi-consistent）读可以增加update操作的并发性。</li>
+</ol>
+<p>在RC中，一个update语句，如果读到一行已经加锁的记录，此时InnoDB返回记录最近提交的版本，由MySQL上层判断此版本是否满足 update的where条件。若满足(需要更新)，则MySQL会重新发起一次读操作，此时会读取行的最新版本(并加锁)。</p>
+<p><br>实际上，如果能够正确地使用锁（避免不使用索引去加锁），只锁定需要的数据，用默认的RR级别就可以了。</p>
+</blockquote>
+<h2 id="4-死锁问题分析"><a href="#4-死锁问题分析" class="headerlink" title="4.死锁问题分析"></a>4.死锁问题分析</h2><blockquote>
+<p>在我们使用锁的时候，有一个问题是需要注意和避免的，我们知道，排它锁有互斥的特性。一个事务或者说一个线程持有锁的时候，会阻止其他的线程获取锁，这个时候会造成阻塞等待，如果循环等待，会有可能造成死锁。这个问题我们需要从几个方面来分析，一个是锁为什么不释放，第二个是被阻塞了怎么办，第三个死锁是怎么发生的，怎么避免。</p>
+</blockquote>
+<h3 id="4-1-锁的释放与阻塞"><a href="#4-1-锁的释放与阻塞" class="headerlink" title="4.1 锁的释放与阻塞"></a>4.1 锁的释放与阻塞</h3><p>锁什么时候释放？事务结束（commit，rollback）或客户端连接断开。</p>
+<p>如果一个事务一直未释放锁，其他事务会被阻塞多久？会不会永远等待下去？如果是，在并发访问比较高的情况下，如果大量事务因无法立即获得所需的锁而挂起，会占用大量计算机资源，造成严重性能问题，甚至拖跨数据库。[Err] 1205 - Lock wait timeout exceeded; try restarting transaction。MySQL有一个参数来控制获取锁的等待时间，默认是50秒。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show VARIABLES like &apos;innodb_lock_wait_timeout&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201101033659597.png#pic_center" alt="在这里插入图片描述"></p>
+<p>对于死锁，是无论等多久都不能获取到锁的，这种情况，也需要等待50秒钟吗？那不是白白浪费了50秒钟的时间吗？我们先来看一下什么时候会发生死锁。</p>
+<h3 id="4-2-死锁的发生和检测"><a href="#4-2-死锁的发生和检测" class="headerlink" title="4.2 死锁的发生和检测"></a>4.2 死锁的发生和检测</h3><p>死锁简单说就是，线程1拿A锁等B锁，同时线程2拿B锁等A锁。死锁演示如下： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Transaction1</th>
+<th style="text-align:left">Transaction2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Begin;</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">SELECT * FROM t2 where id=1 FOR UPDATE;</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">Begin;</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">DELETE FROM t2 WHERE id=4;</td>
+</tr>
+<tr>
+<td style="text-align:left">UPDATE t2 SET name=’4d’ WHERE id=4;</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">DELETE FORM t2 WHERE id=1;</td>
+</tr>
+</tbody>
+</table>
+<p>在第一个事务中，检测到了死锁，马上退出了，第二个事务获得了锁，不需要等待50秒：</p>
+<p><img src="https://img-blog.csdnimg.cn/20201101033739673.png#pic_center" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/20201101033750411.png#pic_center" alt="在这里插入图片描述"></p>
+<p>为什么可以直接检测到呢？是因为死锁的发生需要满足一定的条件，所以在发生死锁时，InnoDB一般都能通过算法（wait-for graph）自动检测到。</p>
+<p>那么死锁需要满足什么条件？死锁的产生条件：因为锁本身是互斥的，</p>
+<ol>
+<li>同一时刻只能有一个事务持有这把锁</li>
+<li>其他的事务需要在这个事务释放锁之后才能获取锁，而不可以强行剥夺</li>
+<li>当多个事务形成等待环路的时候，即发生死锁</li>
+</ol>
+<p>举例：理发店有两个总监。一个负责剪头的Tony总监，一个负责洗头的Kelvin总监。</p>
+<ol>
+<li>Tony不能同时给两个人剪头，这个就叫互斥。</li>
+<li>Tony在给别人在剪头的时候，你不能让他停下来帮你剪头，这个叫不能强行剥夺。</li>
+<li>如果Tony的客户对Kelvin总监说：你不帮我洗头我怎么剪头？Kelvin的客户对Tony总监说：你不帮我剪头我怎么洗头？这个就叫形成等待环路。</li>
+</ol>
+<p>如果锁一直没有释放，就有可能造成大量阻塞或者发生死锁，造成系统吞吐量下降，这时候就要查看是哪些事务持有了锁。</p>
+<h3 id="4-3-查看锁日志信息"><a href="#4-3-查看锁日志信息" class="headerlink" title="4.3 查看锁日志信息"></a>4.3 查看锁日志信息</h3><p>SHOW STATUS命令中，包括了一些行锁的信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show status like &apos;innodb_row_lock_%&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201101033841330.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ul>
+<li>Innodb_row_lock_current_waits：当前正在等待锁定的数量； </li>
+<li>Innodb_row_lock_time ：从系统启动到现在锁定的总时间长度，单位 ms； </li>
+<li>Innodb_row_lock_time_avg ：每次等待所花平均时间；</li>
+<li>Innodb_row_lock_time_max：从系统启动到现在等待最长的一次所花的时间； Innodb_row_lock_waits ：从系统启动到现在总共等待的次数。</li>
+</ul>
+<p>SHOW命令是一个概要信息。InnoDB还提供了三张表来分析事务与锁的情况：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from information_schema.INNODB_TRX; -- 当前运行的所有事务 ，还有具体的语句</span><br><span class="line">select * from information_schema.INNODB_LOCKS; -- 当前出现的锁</span><br><span class="line">select * from information_schema.INNODB_LOCK_WAITS; -- 锁等待的对应关系</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201101033934714.png#pic_center" alt="在这里插入图片描述"></p>
+<p>找出持有锁的事务之后呢？如果一个事务长时间持有锁不释放，可以 kill 事务对应的线程 ID，也就是INNODB_TRX表中的trx_mysql_thread_id，例如执行kill 1314，kill 1316。</p>
+<p>当然，死锁的问题不能每次都靠kill线程来解决，这是治标不治本的行为。我们应该尽量在应用端，也就是在编码的过程中避免。有哪些可以避免死锁的方法呢？</p>
+<h3 id="4-4-死锁的避免"><a href="#4-4-死锁的避免" class="headerlink" title="4.4 死锁的避免"></a>4.4 死锁的避免</h3><ol>
+<li>在程序中，操作多张表时，尽量以相同的顺序来访问（避免形成等待环路）</li>
+<li>批量操作单张表数据的时候，先对数据进行排序（避免形成等待环路）</li>
+<li>申请足够级别的锁，如果要操作数据，就申请排它锁</li>
+<li>尽量使用索引访问数据，避免没有where条件的操作，避免锁表</li>
+<li>如果可以，大事务化成小事务</li>
+<li>使用等值查询而不是范围查询查询数据，命中记录，避免间隙锁对并发的影响</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/2eac1fe9.html" title="【MySQL】事务与锁（四）：并发控制方案（LBCC、MVCC）及死锁问题分析">https://yzhblog.work/posts/2eac1fe9.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/e2df609d.html" rel="next" title="【MySQL】事务与锁（三）：行锁到底锁住的是什么？记录？字段？索引？">
+                <i class="fa fa-chevron-left"></i> 【MySQL】事务与锁（三）：行锁到底锁住的是什么？记录？字段？索引？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/255a4d73.html" rel="prev" title="【MySQL】性能调优（一）：建立连接。配置优化及架构优化">
+                【MySQL】性能调优（一）：建立连接。配置优化及架构优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-方案一：LBCC"><span class="nav-text">1.方案一：LBCC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-方案二：MVCC"><span class="nav-text">2.方案二：MVCC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-MVCC是什么"><span class="nav-text">2.1 MVCC是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-MVCC示例"><span class="nav-text">2.2 MVCC示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-最终方案：LBCC-MVCC"><span class="nav-text">3.最终方案：LBCC+MVCC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-死锁问题分析"><span class="nav-text">4.死锁问题分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-锁的释放与阻塞"><span class="nav-text">4.1 锁的释放与阻塞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-死锁的发生和检测"><span class="nav-text">4.2 死锁的发生和检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-查看锁日志信息"><span class="nav-text">4.3 查看锁日志信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-死锁的避免"><span class="nav-text">4.4 死锁的避免</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

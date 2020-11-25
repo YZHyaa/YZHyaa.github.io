@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="使用EXPLAIN关键字可以模拟优化器执行SQL语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是结构的性能瓶颈，另外  explain extend + show warnings：可以查看mysql优化后的sql语句 explain partitions：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分区。  在看执">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解">
+<meta property="og:url" content="https://yzhblog.work/posts/9155ad63.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="使用EXPLAIN关键字可以模拟优化器执行SQL语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是结构的性能瓶颈，另外  explain extend + show warnings：可以查看mysql优化后的sql语句 explain partitions：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分区。  在看执">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020110414180439.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104141848196.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104141904925.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104141928679.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104141948172.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020110414200640.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142029582.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142041680.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142300533.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142319828.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142339350.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142352330.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142406901.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142438747.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142449180.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142501138.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142514151.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142524683.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142534242.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142548504.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142600244.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142629996.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201104142640724.png#pic_center">
+<meta property="og:updated_time" content="2020-11-25T15:11:42.647Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解">
+<meta name="twitter:description" content="使用EXPLAIN关键字可以模拟优化器执行SQL语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是结构的性能瓶颈，另外  explain extend + show warnings：可以查看mysql优化后的sql语句 explain partitions：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分区。  在看执">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/2020110414180439.png#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/9155ad63.html">
+
+
+
+
+
+  <title>【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/9155ad63.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-11T00:00:00+08:00">
+                2019-10-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据存储/" itemprop="url" rel="index">
+                    <span itemprop="name">数据存储</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.6k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>使用EXPLAIN关键字可以模拟优化器执行SQL语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是结构的性能瓶颈，另外</p>
+<ul>
+<li>explain extend + show warnings：可以查看mysql优化后的sql语句</li>
+<li>explain partitions：相比 explain 多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分区。</li>
+</ul>
+<p>在看执行计划前，我们先创建三张表。一张课程表，一张老师表，一张老师联系方式表（三张表没有任何索引）：</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">-- 课程表</span><br><span class="line">DROP TABLE IF EXISTS course;</span><br><span class="line">CREATE TABLE `course`(</span><br><span class="line">    `cid` int(3) DEFAULT NULL,</span><br><span class="line">    `cname` varchar(20) DEFAULT NULL, </span><br><span class="line">    `tid` int(3) DEFAULT NULL  </span><br><span class="line">)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</span><br><span class="line"></span><br><span class="line">-- 老师表</span><br><span class="line">DROP TABLE IF EXISTS teacher; </span><br><span class="line">CREATE TABLE `teacher`(</span><br><span class="line">    `tid` int(3) DEFAULT NULL,</span><br><span class="line">    `tname` varchar(20) DEFAULT NULL, </span><br><span class="line">    `tcid`int(3) DEFAULT NULL </span><br><span class="line">)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</span><br><span class="line"></span><br><span class="line">-- 老师联系方式表</span><br><span class="line">DROP TABLE IF EXISTS teacher_contact; </span><br><span class="line">CREATE TABLE `teacher_contact`(</span><br><span class="line">    `tcid` int(3) DEFAULT NULL, </span><br><span class="line">    `phone` varchar(200) DEFAULT NULL</span><br><span class="line">)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</span><br><span class="line"></span><br><span class="line">INSERT INTO `course` VALUES(&apos;1&apos;,&apos;mysql&apos;,&apos;1&apos;);</span><br><span class="line">INSERT INTO `course` VALUES(&apos;2&apos;,&apos;jvm&apos;,&apos;1&apos;);</span><br><span class="line">INSERT INTO `course` VALUES(&apos;3&apos;,&apos;juc&apos;,&apos;2&apos;);</span><br><span class="line">INSERT INTO `course` VALUES(&apos;4&apos;,&apos;spring&apos;,&apos;3&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `teacher` VALUES(&apos;1&apos;,&apos;zhangsan&apos;,&apos;1&apos;); </span><br><span class="line">INSERT INTO `teacher` VALUES(&apos;2&apos;,&apos;lisi&apos;,&apos;2&apos;); </span><br><span class="line">INSERT INTO `teacher` VALUES(&apos;3&apos;,&apos;wangwu&apos;,&apos;3&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `teacher_contact` VALUES(&apos;1&apos;,&apos;13688888888&apos;); </span><br><span class="line">INSERT INTO `teacher_contact` VALUES(&apos;2&apos;,&apos;18166669999&apos;); </span><br><span class="line">INSERT INTO `teacher_contact` VALUES(&apos;3&apos;,&apos;17722225555&apos;);</span><br></pre></td></tr></table></figure>
+<p>explain的结果有很多的字段，下面的篇幅我们会逐一分析。先确认一下环境：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select version(); </span><br><span class="line">show variables like &apos;%engine%&apos;;</span><br></pre></td></tr></table></figure>
+<h2 id="1-id：查询序列编号"><a href="#1-id：查询序列编号" class="headerlink" title="1.id：查询序列编号"></a>1.id：查询序列编号</h2><p><strong>1.id值不同</strong></p>
+<p>id值不同的时候，先查询id值大的（先大后小）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-- 查询 mysql 课程的老师手机号 </span><br><span class="line">EXPLAIN SELECT tc.phone FROM teacher_contact tc WHERE tcid=(</span><br><span class="line">    SELECT tcid FROM teacher t WHERE t.tid=(</span><br><span class="line">        SELECT c.tid FROM course c WHERE c.cname=&apos;mysql&apos;</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>查询顺序：course c –&gt; teacher t –&gt; teacher_contact tc。</p>
+<p><img src="https://img-blog.csdnimg.cn/2020110414180439.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>2.id值相同</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- 查询课程 ID 为 2，或者联系表 ID 为 3 的老师</span><br><span class="line">EXPLAIN SELECT t.tname, c.cname, tc.phone </span><br><span class="line">FROM teacher t,course c,teacher_contact tc </span><br><span class="line">WHERE t.tid=c.tid AND t.tcid=tc.tcid AND(c.cid=2 OR tc.tcid=3);</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104141848196.png#pic_center" alt="在这里插入图片描述"></p>
+<p>id值相同时，表的查询顺序是从上往下顺序执行。例如这次查询的id都是1，查询的顺序是：teacher t（3条）–&gt; course c（4条）–&gt; teacher_contact tc（3条）。</p>
+<p>现在给teacher表插入3条数据，然后再执行上面的查询语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `teacher` VALUES(4,&apos;james&apos;,4); </span><br><span class="line">INSERT INTO `teacher` VALUES(5,&apos;tom&apos;,5); </span><br><span class="line">INSERT INTO `teacher` VALUES(6,&apos;seven&apos;,6); </span><br><span class="line"></span><br><span class="line">-- 测试完后删除</span><br><span class="line">DELETE FROM teacher where tid in(4,5,6);</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104141904925.png#pic_center" alt="在这里插入图片描述"></p>
+<p>id也都是1，但是从上往下查询顺序变成了： teacher_contact tc（3条）–&gt; teacher t（6条）–&gt; course c（4条）。</p>
+<blockquote>
+<p>为什么数据量不同的时候顺序会发生变化呢？这个是由笛卡尔积决定的。</p>
+<p>举例：假如有a、b、c三张表，分别有2、3、4条数据，如果做三张表的联合查询，当查询顺序是 a→b→c 的时候，它的笛卡尔积是：<code>2*3*4=6*4=24</code>。如果查询顺序是 c→b→a，它的笛卡尔积是<code>4*3*2=12*2=24</code></p>
+<p>因为MySQL要把查询的结果，包括中间结果和最终结果都保存到内存，所以MySQL会优先选择中间结果数据量比较小的顺序进行查询。所以最终联表查询的顺序是a→b→c。这个就是为什么teacher表插入数据以后查询顺序会发生变化。（小表驱动大表的思想）</p>
+</blockquote>
+<p>如果ID有相同也有不同，就是ID不同的先大后小，ID相同的从上往下。 </p>
+<h2 id="2-select-type：查询类型"><a href="#2-select-type：查询类型" class="headerlink" title="2.select type：查询类型"></a>2.select type：查询类型</h2><p>下面列举了一些常见的查询类型：</p>
+<p><strong>1.简单查询</strong></p>
+<p>SIMPLE，简单查询，不包含子查询，不包含关联查询union。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM teacher;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104141928679.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>2.子查询型</strong></p>
+<ul>
+<li>PRIMARY：子查询SQL语句中的主查询，也就是最外面的那层查询。<ul>
+<li>SUBQUERY：子查询中所有的内层查询都是SUBQUERY类型的。where后的子查询</li>
+<li>DERIVED：MySQL会将结果存放在一个临时表中，也称为派生表。from后的子查询</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-- 查询 mysql 课程的老师手机号 </span><br><span class="line">EXPLAIN SELECT tc.phone </span><br><span class="line">FROM (SELECT * FROM teacher_contact) tc </span><br><span class="line">WHERE tcid=(</span><br><span class="line">    SELECT tcid FROM teacher t WHERE t.tid=(</span><br><span class="line">        SELECT c.tid FROM course c WHERE c.cname=&apos;mysql&apos;</span><br><span class="line">    )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104141948172.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>3.并查询型</strong></p>
+<ul>
+<li>UNION：用到了UNION查询（对于关联查询，先执行右边的 table（UNION），再执行左边的 table）</li>
+<li>UNIONRESULT：主要是显示哪些表之间存在UNION 查询。&lt;union2,3&gt;代表 id=2 和id=3 的查询存在UNION</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-- 查询 ID 为 1 或 2 的老师教授的课程 </span><br><span class="line">EXPLAIN SELECT cr.cname </span><br><span class="line">FROM( </span><br><span class="line">    SELECT * FROM course WHERE tid=1 </span><br><span class="line">UNION </span><br><span class="line">    SELECT * FROM course WHERE tid=2</span><br><span class="line">)cr;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/2020110414200640.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>这里并没有列举全部（其它：DEPENDENT UNION、DEPENDENT SUBQUERY、MATERIALIZED、UNCACHEABLE SUBQUERY、UNCACHEABLE UNION）。</p>
+</blockquote>
+<h2 id="3-table：查询的表"><a href="#3-table：查询的表" class="headerlink" title="3.table：查询的表"></a>3.table：查询的表</h2><p>访问的哪个表，注意以下三种特殊情况：</p>
+<ul>
+<li><code>&lt;derivenN&gt;</code>：当 from 子句中有子查询时，表示当前查询依赖 id=N 的查询</li>
+<li><code>&lt;union1,2&gt;</code>：当有 union 时，UNION RESULT 的 table 列的值为，1和2表示参与 union 的 select 行id</li>
+<li>NULL：mysql能够在优化阶段分解查询语句，在执行阶段用不着再访问表或索引。例如：在索引列中选取最小值，可以单独查找索引来完成，不需要在执行时访问表</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20201104142029582.png#pic_center" alt="在这里插入图片描述"></p>
+<h2 id="4-type：连接类型"><a href="#4-type：连接类型" class="headerlink" title="4.type：连接类型"></a>4.type：连接类型</h2><p>在常用的链接类型中：system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; all。以上访问类型除了all，都能用到索引。一般保证达到range，最好是ref。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-- 为teacher表的tcid（第三个字段）创建普通索引。</span><br><span class="line">ALTER TABLE teacher ADD INDEX idx_tcid(tcid);</span><br><span class="line"></span><br><span class="line">-- 为 teacher_contact 表的 tcid（第一个字段）创建一个索引。</span><br><span class="line">ALTER TABLE teacher_contact ADD PRIMARY KEY(tcid);</span><br></pre></td></tr></table></figure>
+<p><strong>1.const</strong></p>
+<p>主键索引或者唯一索引，只能查到一条数据的SQL。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-- 查询id为1的teacher联系方式</span><br><span class="line">EXPLAIN SELECT * FROM teacher_contact WHERE tcid=1;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142041680.png#pic_center" alt="在这里插入图片描述"><br><strong>2.system</strong></p>
+<p>system 是 const 的一种特例。表中只有一行数据，且使用唯一索引（primary key / unique key）查询。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM (SELECT * FROM `teacher_contact` where tcid=1)tmp;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142300533.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>3.eq_ref</strong></p>
+<p>通常出现在多表的联查（join），primary / unique key被作为连接部分（on），所以对于前表的每一个结果，都只能匹配到后表的一行结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN select t.tcid from teacher t LEFT JOIN teacher_contact tc ON t.tcid=tc.tcid;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142319828.png#pic_center" alt="在这里插入图片描述"></p>
+<p>简单查询不会出现该类型。eq_ref是除const之外最好的访问类型。</p>
+<blockquote>
+<p>小结：以上三种system，const，eq_ref，都是可遇而不可求的，基本上很难优化到这个状态。</p>
+</blockquote>
+<p><strong>4.ref</strong></p>
+<p>使用非唯一索引查询，或者关联操作只使用了索引的最左前缀，可能匹配到多行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-- 使用tcid上的普通索引查询</span><br><span class="line">explain SELECT * FROM teacher where tcid=3;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142339350.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>5.range</strong></p>
+<p>索引范围扫描。如果where后面是 between and 或 &lt;或 &gt; 或 &gt;= 或 &lt;=或in这些， type类型就为range。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM teacher_contact WHERE tcid&gt;=1;</span><br><span class="line">EXPLAIN SELECT * FROM teacher_contact WHERE tcid BETWEEN 1 AND 2;</span><br><span class="line">EXPLAIN SELECT * FROM teacher_contact WHERE tcid IN (1,2,3);</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142352330.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>6.index</strong></p>
+<p>扫描全表索引（Full Index Scan)，这通常比ALL快一些。（index是从(<em>覆盖</em>)索引中读取的，而all是从硬盘中读取）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT tcid FROM teacher;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142406901.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>7.ALL</strong></p>
+<p>Full Table Scan，如果没有索引或者没有用到索引，type就是ALL。代表全表扫描。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM teacher;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142438747.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>8.Null</strong></p>
+<p>不用访问表或者索引就能得到结果，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN select 1 from dual where 1=1;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142449180.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>一般来说，需要保证查询至少达到range级别，最好能达到ref。ALL（全表扫描）和index（查询全部索引）都是需要优化的。</p>
+</blockquote>
+<h2 id="5-possible-keys、key、key-len：索引信息"><a href="#5-possible-keys、key、key-len：索引信息" class="headerlink" title="5.possible_keys、key、key_len：索引信息"></a>5.possible_keys、key、key_len：索引信息</h2><ul>
+<li>possible_keys: 可能使用的索引</li>
+<li>keys: 实际使用的索引，可能出现由于数据较少possible_keys有值，keys=NULL，因为mysql内部优化为全表扫描</li>
+<li>key_len：索引的长度（使用的字节数）。<ul>
+<li>跟索引字段的类型、长度有关</li>
+<li>对于联合索引而言，可以推算出使用了什么索引列</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-- 给Course表创建一个联合索引</span><br><span class="line">ALTER TABLE course ADD INDEX idx_cname_tid(cname,tid);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM course WHERE tid=1;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142501138.png#pic_center" alt="在这里插入图片描述"></p>
+<p>key_len是5，这个5怎么来的呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- 字符串:</span><br><span class="line">  - char（n）：n</span><br><span class="line">  - varchar（n）：3n+2 （2字节用来保存长度）</span><br><span class="line">- 数值类型:</span><br><span class="line">  - tinyint：1</span><br><span class="line">  - smallint：2</span><br><span class="line">  - int：4</span><br><span class="line">  - bigint：8</span><br><span class="line">- 时间类型:</span><br><span class="line">  - date：3</span><br><span class="line">  - timestamp：4</span><br><span class="line">  - datatime：8</span><br><span class="line">- 若允许NULL还有一位用来记录</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注：如果数值类型不采用默认长度，而是自己指定了长度，就需要2个字节保存。所以上面的5=指定的3+保存长度的2。</p>
+</blockquote>
+<h2 id="6-ref、rows"><a href="#6-ref、rows" class="headerlink" title="6.ref、rows"></a>6.ref、rows</h2><ul>
+<li>ref：这一列显示了在key列记录的索引中，表查找值所用到的列或常量，常见的有：const（常量），字段名（例：film.id）</li>
+<li>rows：读取并检测的行数，不是结果集数。是一个预估值，一般来说行数越少越好。</li>
+</ul>
+<blockquote>
+<p>还有一个字段 filtered，这个字段表示存储引擎返回的数据在server层过滤后，剩下多少满足查询的记录数量的比例，它是一个百分比。 </p>
+</blockquote>
+<h2 id="7-Extra：额外信息"><a href="#7-Extra：额外信息" class="headerlink" title="7.Extra：额外信息"></a>7.Extra：额外信息</h2><p><strong>1.Using index</strong></p>
+<p>覆盖索引 + 相应索引查找</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT tcid FROM teacher;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142514151.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>2.Using where</strong></p>
+<p>无覆盖索引 + 无索引查找 / 所用索引非前导列</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM teacher WHERE tname=&apos;张三&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142524683.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>3.Using index；Using where</strong></p>
+<p>覆盖索引 + 无索引查找（其实是<a href="https://blog.csdn.net/weixin_43935927/article/details/109361168" target="_blank" rel="noopener">索引下推</a>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT tid FROM course WHERE cname=&apos;jvm&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142534242.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>4.NULL</strong></p>
+<p>无覆盖索引 + 索引查找</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM teacher WHERE tcid=1;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142548504.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>5.Using index condition</strong></p>
+<p>联合索引下，只使用了部分索引列</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM course WHERE tid&gt;1;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142600244.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>6.Using temporary</strong></p>
+<p>创建了临时表。一般需要索引去优化，例如创建复合索引。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN select DISTINCT(tid) from teachert; -- distinct 非索引列</span><br><span class="line">EXPLAIN select tname from teacher group by tname; -- group by 非索引列</span><br><span class="line">EXPLAIN select t.tid from teacher t join course c on t.tid=c.tid group by t.tid; -- 使用join的时候，group任意列</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142629996.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>7.Using filesort</strong></p>
+<p>不能使用索引来排序，数据都查出来后排序，用到了额外的排序（跟磁盘或文件没有关系）。需优化。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN select * from teacher order by(tname);</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201104142640724.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>总结一下：模拟优化器执行SQL查询语句的过程， 来知道MySQL是怎么处理一条SQL语句的。通过这种方式我们可以分析语句或者表的性能瓶颈。分析出问题之后，就是对SQL语句的具体优化。比如怎么用到索引，怎么减少锁的阻塞等待…</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/9155ad63.html" title="【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解">https://yzhblog.work/posts/9155ad63.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/81e16d68.html" rel="next" title="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">
+                <i class="fa fa-chevron-left"></i> 【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/2f12df41.html" rel="prev" title="【MySQL】性能调优（四）：存储引擎。建表一些细节及Sever层优化">
+                【MySQL】性能调优（四）：存储引擎。建表一些细节及Sever层优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-id：查询序列编号"><span class="nav-text">1.id：查询序列编号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-select-type：查询类型"><span class="nav-text">2.select type：查询类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-table：查询的表"><span class="nav-text">3.table：查询的表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-type：连接类型"><span class="nav-text">4.type：连接类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-possible-keys、key、key-len：索引信息"><span class="nav-text">5.possible_keys、key、key_len：索引信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-ref、rows"><span class="nav-text">6.ref、rows</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Extra：额外信息"><span class="nav-text">7.Extra：额外信息</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

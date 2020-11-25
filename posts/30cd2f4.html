@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="MySQL的发展历史和版本分支：    时间 里程碑     1996 年 MySQL1.0 发布。它的历史可以追溯到 1979 年，作者 Monty 用 BASIC 设计的一个报表工具。   1996 年 10 月 3.11.1 发布。MySQL 没有 2.x 版本。   2000 年 ISAM 升级成 MyISAM 引擎。MySQL 开源。   2003 年 MySQL4.0 发布，集成 In">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【MySQL】运行原理（一）：查询sql的执行过程及MySQL架构分析">
+<meta property="og:url" content="https://yzhblog.work/posts/30cd2f4.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="MySQL的发展历史和版本分支：    时间 里程碑     1996 年 MySQL1.0 发布。它的历史可以追溯到 1979 年，作者 Monty 用 BASIC 设计的一个报表工具。   1996 年 10 月 3.11.1 发布。MySQL 没有 2.x 版本。   2000 年 ISAM 升级成 MyISAM 引擎。MySQL 开源。   2003 年 MySQL4.0 发布，集成 In">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020102800202620.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002120829.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002141158.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002200728.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020102800221538.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002228816.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002243322.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002300565.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002316203.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002331810.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002343384.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020102800240345.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002422667.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002449410.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028002946243.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003003604.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003027646.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003052421.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020102800312146.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003138355.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003200148.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003628153.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020102800324656.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003419736.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201028003451790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T15:01:51.996Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【MySQL】运行原理（一）：查询sql的执行过程及MySQL架构分析">
+<meta name="twitter:description" content="MySQL的发展历史和版本分支：    时间 里程碑     1996 年 MySQL1.0 发布。它的历史可以追溯到 1979 年，作者 Monty 用 BASIC 设计的一个报表工具。   1996 年 10 月 3.11.1 发布。MySQL 没有 2.x 版本。   2000 年 ISAM 升级成 MyISAM 引擎。MySQL 开源。   2003 年 MySQL4.0 发布，集成 In">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/2020102800202620.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/30cd2f4.html">
+
+
+
+
+
+  <title>【MySQL】运行原理（一）：查询sql的执行过程及MySQL架构分析 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/30cd2f4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【MySQL】运行原理（一）：查询sql的执行过程及MySQL架构分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-15T00:00:00+08:00">
+                2019-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据存储/" itemprop="url" rel="index">
+                    <span itemprop="name">数据存储</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  6.9k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  24
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MySQL的发展历史和版本分支：</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>里程碑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1996 年</td>
+<td>MySQL1.0 发布。它的历史可以追溯到 1979 年，作者 Monty 用 BASIC 设计的一个报表工具。</td>
+</tr>
+<tr>
+<td>1996 年 10 月</td>
+<td>3.11.1 发布。MySQL 没有 2.x 版本。</td>
+</tr>
+<tr>
+<td>2000 年</td>
+<td>ISAM 升级成 MyISAM 引擎。MySQL 开源。</td>
+</tr>
+<tr>
+<td>2003 年</td>
+<td>MySQL4.0 发布，集成 InnoDB 存储引擎</td>
+</tr>
+<tr>
+<td>2005 年</td>
+<td>MySQL5.0 版本发布，提供了视图、存储过程等功能。</td>
+</tr>
+<tr>
+<td>2008 年</td>
+<td>MySQLAB 公司被 Sun 公司收购，进入 SunMySQL 时代。</td>
+</tr>
+<tr>
+<td>2009 年</td>
+<td>Oracle 收购 Sun 公司，进入 OracleMySQL 时代。</td>
+</tr>
+<tr>
+<td>2010 年</td>
+<td>MySQL5.5 发布，InnoDB 成为默认的存储引擎。</td>
+</tr>
+<tr>
+<td>2016 年</td>
+<td>MySQL 发布 8.0.0 版本。为什么没有 6、7？5.6 可以当成 6.x，5.7 可以当 成 7.x。</td>
+</tr>
+</tbody>
+</table>
+<p>因为MySQL是开源的（也有收费版本），所以在MySQL稳定版本的基础上也发展出来了很多的分支，就像Linux一样，有Ubuntu、RedHat、CentOS、 Fedora 、Debian等等。大家最熟悉的应该是MariaDB，因为CentOS7里面自带了一个MariaDB。它是怎么来的呢？Oracle收购MySQL之后，MySQL创始人之一Monty担心MySQL数据库发展的未来（开发缓慢，封闭，可能会被闭源），就创建了一个分支MariaDB，默认使用全新的Maria存储引擎，它是原MyISAM存储引擎的升级版本。</p>
+<a id="more"></a>
+<p>其他流行分支：</p>
+<ul>
+<li>Percona Server 是MySQL重要的分支之一，它基于InnoDB存储引擎的基础上，提升了性能和易管理性，最后形成了增强版的XtraDB引擎，可以用来更好地发挥服务器硬件上的性能。</li>
+<li>国内也有一些MySQL的分支或者自研的存储引擎，比如网易的InnoSQL，极数云舟的ArkDB。</li>
+</ul>
+<p>我们操作数据库有各种各样的方式，比如Linux 系统中的命令行，比如数据库工具Navicat，比如程序，例如Java语言的JDBC API或者ORM框架。但大家有没有思考过，当我们的工具或者程序连接到数据库之后，实际上发生了什么事情？它的内部是怎么工作的？</p>
+<hr>
+<p>下面以数据查询为例，来看下MySQL的工作流程是什么样的：</p>
+<p><img src="https://img-blog.csdnimg.cn/2020102800202620.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>我们的程序或者工具要操作数据库，第一步要做什么事情？跟数据库建立连接。</p>
+<h2 id="1-与数据库建立连接"><a href="#1-与数据库建立连接" class="headerlink" title="1.与数据库建立连接"></a>1.与数据库建立连接</h2><p>首先，MySQL必须要运行一个服务，监听默认的3306端口。在我们开发系统跟第三方对接的时候，必须要弄清楚的有两件事。</p>
+<ul>
+<li>第一个就是通信协议，比如我们是用HTTP还是WebService还是TCP？</li>
+<li>第二个是消息格式，比如我们用XML格式，还是JSON格式，还是定长格式？报文头长度多少，包含什么内容，每个字段的详细含义？</li>
+</ul>
+<h3 id="1-1-通信类型和连接方式"><a href="#1-1-通信类型和连接方式" class="headerlink" title="1.1 通信类型和连接方式"></a>1.1 通信类型和连接方式</h3><p>MySQL是支持多种通信协议的，可以使用同步/异步的方式，支持长连接/短连接。这里我们拆分来看。</p>
+<p><strong>通信类型：同步或者异步</strong></p>
+<ul>
+<li><p>同步通信的特点：</p>
+<ul>
+<li>同步通信依赖于被调用方，受限于被调用方的性能。也就是说，应用操作数据库，线程会阻塞，等待数据库的返回</li>
+<li>一般只能做到一对一，很难做到一对多的通信</li>
+</ul>
+</li>
+<li><p>异步跟同步相反：</p>
+<ul>
+<li>异步可以避免应用阻塞等待，但是不能节省SQL执行的时间</li>
+<li>如果异步存在并发，每一个SQL的执行都要单独建立一个连接，避免数据混乱。但是这样会给服务端带来巨大的压力（一个连接就会创建一个线程，线程间切换会占用大量CPU资源）。另外异步通信还带来了编码的复杂度，所以一般不建议使用。如果要异步，必须使用连接池，排队从连接池获取连接而不是创建新连接</li>
+</ul>
+<p>一般来说我们连接数据库都是同步连接。</p>
+</li>
+</ul>
+<p><strong>连接方式：长连接或者短连接</strong></p>
+<p>MySQL既支持短连接，也支持长连接。短连接就是操作完毕以后，马上close 掉。长连接可以保持打开，减少服务端创建和释放连接的消耗，后面的程序访问的时候还可以使用这个连接。一般我们会在连接池中使用长连接。</p>
+<p>保持长连接会消耗内存。长时间不活动的连接，MySQL服务器会断开。那这个超时时间怎么查看呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show global variables like &apos;wait_timeout&apos;; -- 非交互式超时时间，如 JDBC 程序 </span><br><span class="line">show global variables like&apos; interactive_timeout&apos;; -- 交互式超时时间，如数据库工具</span><br></pre></td></tr></table></figure>
+<p>执行结果如下图。默认都是28800秒，8小时</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002120829.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-TkdvrRHQ-1603815339151)(Untitled.assets/image-20201027132844956.png)\]"></p>
+<hr>
+<p>我们怎么查看MySQL当前有多少个连接？可以用show status命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show global status like &apos;Thread%&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028002141158.png#pic_center" alt="在这里插入图片描述"></p>
+<ul>
+<li>Threads_cached：缓存中的线程连接数</li>
+<li>Threads_connected：当前打开的连接数</li>
+<li>Threads_created：为处理连接创建的线程数</li>
+<li>Threads_running：非睡眠状态的连接数，通常指并发连接数</li>
+</ul>
+<hr>
+<p>有了连接数，怎么知道当前连接的状态？可以使用show processlist命令，（root用户）查看SQL的执行状态。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW PROCESSLIST;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028002200728.png#pic_center" alt="在这里插入图片描述"></p>
+<p>从上面的Threads_connected可以看到当前有4个连接，所以这里的显示了4个连接状态。那Command这一列是什么意思呢？一些常见的状态： </p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sleep</td>
+<td>线程正在等待客户端，以向它发送一个新语句</td>
+</tr>
+<tr>
+<td>Query</td>
+<td>线程正在执行查询或往客户端发送数据</td>
+</tr>
+<tr>
+<td>Locked</td>
+<td>该查询被其它查询锁定</td>
+</tr>
+<tr>
+<td>Copying to tmp tableondisk</td>
+<td>临时结果集合大于 tmp_table_size。线程把临时表从存储器内部格式改 变为磁盘模式，以节约存储器</td>
+</tr>
+<tr>
+<td>Sendingdata</td>
+<td>线程正在为 SELECT 语句处理行，同时正在向客户端发送数据</td>
+</tr>
+<tr>
+<td>Sortingforgroup</td>
+<td>线程正在进行分类，以满足 GROUPBY 要求</td>
+</tr>
+<tr>
+<td>Sortingfororder</td>
+<td>线程正在进行分类，以满足 ORDERBY 要求</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>还有个问题，MySQL服务允许的最大连接数是多少呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;max_connections&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/2020102800221538.png#pic_center" alt="在这里插入图片描述"></p>
+<p>在5.7版本中默认是151个，最大可以设置成16384（2^14）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set global max_connections=1000;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028002228816.png#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="1-2-MySQL支持哪些通信协议"><a href="#1-2-MySQL支持哪些通信协议" class="headerlink" title="1.2 MySQL支持哪些通信协议"></a>1.2 MySQL支持哪些通信协议</h3><p>第一种是Unix Socket。比如我们在Linux服务器上，如果没有指定-h参数，它就用socket方式登录。如下图（省略<br>了-S /var/lib/mysql/mysql.sock）</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002243322.png#pic_center" alt="在这里插入图片描述"></p>
+<p>它不用通过网络协议，也可以连接到MySQL的服务器，它需要用到服务器上的一个物理文件（/var/lib/mysql/mysql.sock）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select @@socket;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>如果有参数-h指定主机，就会用第二种方式，TCP/IP协议。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h192.168.8.211 -uroot -p123456</span><br></pre></td></tr></table></figure>
+<p>我们的编程语言的连接模块都是用 TCP 协议连接到 MySQL 服务器的，比如 mysql-connector-java-x.x.xx.jar。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002300565.png#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="1-3-MySQL采用什么通信方式"><a href="#1-3-MySQL采用什么通信方式" class="headerlink" title="1.3 MySQL采用什么通信方式"></a>1.3 MySQL采用什么通信方式</h3><p>通信方式分为以下三种：</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002316203.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ul>
+<li>单工：在两台计算机通信的时候，数据的传输是单向的。比如遥控器</li>
+<li>半双工：在两台计算机之间，数据传输是双向的，你可以给我发送，我也可以给你发送，但是在这个通讯连接里面，同一时间只能有一台服务器在发送数据，也就是你要给我发的话，也必须等我发给你完了之后才能给我发。比如对讲机</li>
+<li>全双工：数据的传输是双向的，并且可以同时传输。比如打电话</li>
+</ul>
+<p>那MySQL应该采用哪种通信方式呢？半双工的通信方式，因为客户端与服务端肯定是双向通信的，而且要么是客户端向服务端发送数据，要么是服务端向客户端发送数据，这两个动作不能同时发生。</p>
+<p>客户端发送SQL语句给服务端的时候，（在一次连接里面）数据是不能分成小块发送的，不管你的SQL语句有多大，都是一次性发送。比如我们用MyBatis动态SQL生成了一个批量插入的语句， 插入10万条数据， values后面跟了一长串的内容，或者where条件in里面的值太多，会出现问题。这个时候我们必须要调整MySQL服务器配置 max_allowed_packet 参数的值（默认是4M），把它调大，否则就会报错。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002331810.png#pic_center" alt="在这里插入图片描述"></p>
+<p>另一方面，对于服务端来说，也是一次性发送所有的数据，不能因为你已经取到了想要的数据就中断操作，这个时候会对网络和内存产生大量消耗。所以，我们一定要在程序里面避免不带limit 的这种操作，比如一次把所有满足条件的数据全部查出来，一定要先count一下。如果数据量的话，可以分批查询。</p>
+<p>执行一条查询语句，客户端跟服务端建立连接之后呢？下一步要做什么？</p>
+<h2 id="2-查询缓存"><a href="#2-查询缓存" class="headerlink" title="2.查询缓存"></a>2.查询缓存</h2><p>MySQL内部自带了一个缓存模块。缓存的作用我们应该很清楚了，把数据以KV的形式放到内存里面，可以加快数据的读取速度，也可以减少服务器处理的时间。但是MySQL的缓存我们好像比较陌生，从来没有去配置过，也不知道它什么时候生效？假如 t_user 表有500万行数据，没有索引。我们在没有索引的字段上执行同样的查询，大家觉得第二次会快吗？</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002343384.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>可以看到MySQL缓存是默认关闭的。默认关闭的意思就是不推荐使用，为什么MySQL不推荐使用它自带的缓存呢？</p>
+<p>主要是因为MySQL自带的缓存的应用场景有限，需要满足以下两个要求：</p>
+<ul>
+<li>它要求SQL语句必须一模一样，中间多一个空格，字母大小写不同都被认为是不同的的SQL。</li>
+<li>表里面任何一条数据发生变化的时候，这张表所有缓存都会失效，所以对于有大量数据更新的应用，也不适合。</li>
+</ul>
+<p>所以缓存这一块，我们还是交给ORM框架（比如MyBatis默认开启了一级缓存），或者独立的缓存服务，比如Redis来处理更合适。在MySQL 8.0中，查询缓存已经被移除了。</p>
+<p>我们没有使用缓存的话，就会跳过缓存的模块，下一步我们要做什么呢？</p>
+<h2 id="3-语法解析和预处理"><a href="#3-语法解析和预处理" class="headerlink" title="3. 语法解析和预处理"></a>3. 语法解析和预处理</h2><p>这里我会有一个疑问，为什么我的一条SQL语句能够被识别呢？假如我随便执行一个字符串penyuyan，服务器报了一个1064的错： </p>
+<p><img src="https://img-blog.csdnimg.cn/2020102800240345.png#pic_center" alt="在这里插入图片描述"></p>
+<p>它是怎么知道我输入的内容是错误的？这个就是MySQL的Parser解析器和Preprocessor预处理模块。这一步主要做的事情是对语句基于SQL语法进行词法和语法分析和语义的解析。</p>
+<h3 id="3-1-词法分析"><a href="#3-1-词法分析" class="headerlink" title="3.1 词法分析"></a>3.1 词法分析</h3><p>词法分析就是把一个完整的SQL语句打碎成一个个的单词。比如一个简单的SQL语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select username from t_user where id = 1;</span><br></pre></td></tr></table></figure>
+<p>它会打碎成8个符号，每个符号是什么类型，从哪里开始到哪里结束。</p>
+<h3 id="3-2-语法分析"><a href="#3-2-语法分析" class="headerlink" title="3.2 语法分析"></a>3.2 语法分析</h3><p>第二步就是语法分析，语法分析会对SQL做一些语法检查，比如单引号有没有闭合，然后根据MySQL定义的语法规则，根据SQL语句生成一个数据结构。这个数据结构我们把它叫做解析树（select_lex）。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002422667.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>任何数据库的中间件，比如 Mycat，Sharding-JDBC（用到了Druid Parser），都必须要有词法和语法分析功能，在市面上也有很多的开源的词法解析的工具（比如LEX，Yacc）。</p>
+<h3 id="3-3-预处理器"><a href="#3-3-预处理器" class="headerlink" title="3.3 预处理器"></a>3.3 预处理器</h3><p>问题：如果我写了一个词法和语法都正确的SQL，但是表名或者字段不存在，会在哪里报错？是在数据库的执行层还是解析器？比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from penyuyan;</span><br></pre></td></tr></table></figure>
+<p>解析器可以分析语法，但是它怎么知道数据库里面有什么表，表里面有什么字段呢？实际上还是在解析的时候报错，解析SQL的环节里面有个预处理器。它会检查生成的解析树，解决解析器无法解析的语义。比如，它会检查表和列名是否存在，检查名字和别名，保证没有歧义。预处理之后得到一个新的解析树。</p>
+<h2 id="4-查询优化得到执行计划"><a href="#4-查询优化得到执行计划" class="headerlink" title="4.查询优化得到执行计划"></a>4.查询优化得到执行计划</h2><p>得到解析树之后，是不是执行SQL语句了呢？这里我们有一个问题，一条SQL语句是不是只有一种执行方式？或者说数据库最终执行的SQL是不是就是我们发送的SQL？</p>
+<p>这个答案是否定的。一条SQL语句是可以有很多种执行方式的，最终返回相同的结果，他们是等价的。但是如果有这么多种执行方式，这些执行方式怎么得到的？最终选择哪一种去执行？根据什么判断标准去选择？</p>
+<p>这个就是MySQL的查询优化器的模块（Query Optimizer）。</p>
+<h3 id="4-1-什么是优化器？"><a href="#4-1-什么是优化器？" class="headerlink" title="4.1 什么是优化器？"></a>4.1 什么是优化器？</h3><p>查询优化器的目的就是根据解析树生成不同的执行计划（ExecutionPlan），然后选择一种最优的执行计划。MySQL里面使用的是基于开销（cost）的优化器，哪种执行计划开销最小，就用哪种。可以使用这个命令查看查询的开销：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show status like &apos;Last_query_cost&apos;;</span><br></pre></td></tr></table></figure>
+<p>mysql官网关于这里的<a href="https://dev.mysql.com/doc/refman/5.7/en/server-status-variables.html" target="_blank" rel="noopener">参考</a>，想了解更多的同学可以看看</p>
+<h3 id="4-2-优化器可以做什么？"><a href="#4-2-优化器可以做什么？" class="headerlink" title="4.2 优化器可以做什么？"></a>4.2 优化器可以做什么？</h3><p>MySQL的优化器能处理哪些优化类型呢？举两个简单的例子：</p>
+<ol>
+<li>当我们对多张表进行关联查询的时候，以哪个表的数据作为基准表</li>
+<li>有多个索引可以使用的时候，选择哪个索引</li>
+</ol>
+<p>实际上，对于每一种数据库来说，优化器的模块都是必不可少的，他们通过复杂的算法实现尽可能优化查询效率的目标。如果对于优化器的细节感兴趣，可以看看《数据库查询优化器的艺术-原理解析与SQL性能优化》。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028002449410.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>但是优化器也不是万能的，并不是再垃圾的SQL语句都能自动优化，也不是每次都能选择到最优的执行计划，大家在编写SQL语句的时候还是要注意。</p>
+<p>如果我们想知道优化器是怎么工作的，它生成了几种执行计划，每种执行计划的cost是多少，应该怎么做？</p>
+<h3 id="4-3-优化器得到执行计划的过程？"><a href="#4-3-优化器得到执行计划的过程？" class="headerlink" title="4.3 优化器得到执行计划的过程？"></a>4.3 优化器得到执行计划的过程？</h3><p>首先，我们要启用优化器的追踪（默认是关闭的）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SHOW VARIABLES LIKE &apos;optimizer_trace&apos;; </span><br><span class="line">set optimizer_trace = &apos;enabled=on&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028002946243.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>注意，开启这开关是会消耗性能的，因为它要把优化分析的结果写到表里面，所以不要轻易开启，或者查看完之后关闭它（改成off）。接着我们执行一个SQL语句，优化器会生成执行计划（下面是一个两表联查）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT d.username,i.phone from user_info i,user_detail d WHERE i.id=d.user_id;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028003003604.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-oSXC0mOj-1603815339177)(Untitled.assets/image-20201027153751514.png)\]"></p>
+<p>这个时候优化器分析的过程已经记录到系统表里面了，我们可以查询</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from information_schema.optimizer_trace\G;</span><br></pre></td></tr></table></figure>
+<p>如果是直接在Navicat中执行，那么得到结果只是短短一行数据，并没有完整的执行计划</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028003027646.png#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-Aps4PSkV-1603815339179)(Untitled.assets/image-20201027154026350.png)\]"></p>
+<p>所以，此处应该是在命令行中执行：</p>
+<p><img src="https://img-blog.csdnimg.cn/20201028003052421.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-GjjuxeGM-1603815339180)(Untitled.assets/image-20201027164718018.png)\]"></p>
+<p>得到的优化器分析的过程是一个JSON类型的数据，主要分成三部分，准备阶段、优化阶段和执行阶段。</p>
+<p><img src="https://img-blog.csdnimg.cn/2020102800312146.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-lZdHzaii-1603815339181)(Untitled.assets/image-20201027165927031.png)\]"></p>
+<p>那具体的优化计划在哪呢？在优化阶段（”join_optimization”）中的 considered_execution_plans </p>
+<p><img src="https://img-blog.csdnimg.cn/20201028003138355.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-pz0FOjyN-1603815339183)(Untitled.assets/image-20201027170451709.png)\]"></p>
+<p>最后，分析完记得关掉它：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">set optimizer_trace=&quot;enabled=off&quot;; </span><br><span class="line">SHOWVARIABLESLIKE&apos;optimizer_trace&apos;;</span><br></pre></td></tr></table></figure>
+<p>优化完之后，得到一个什么东西呢？</p>
+<h3 id="4-4-如何查看最终执行计划？"><a href="#4-4-如何查看最终执行计划？" class="headerlink" title="4.4 如何查看最终执行计划？"></a>4.4 如何查看最终执行计划？</h3><p>优化器最终会把解析树变成一个查询执行计划，查询执行计划是一个数据结构。</p>
+<p>当然，这个执行计划是不是一定是最优的执行计划呢？不一定，因为MySQL也有可能覆盖不到所有的执行计划。我们怎么查看MySQL的执行计划呢？比如多张表关联查询，先查询哪张表？在执行查询的时候可能用到哪些索引，实际上用到了什么索引？</p>
+<p>MySQL提供了一个执行计划的工具。我们在SQL语句前面加上EXPLAIN，就可以看到执行计划的信息。</p>
+<h2 id="5-存储引擎，存储数据"><a href="#5-存储引擎，存储数据" class="headerlink" title="5.存储引擎，存储数据"></a>5.存储引擎，存储数据</h2><p>得到执行计划以后，SQL语句是不是终于可以执行了？问题又来了：</p>
+<ol>
+<li>从逻辑的角度来说，我们的数据是放在哪里的，或者说放在一个什么结构里面？</li>
+<li>执行计划在哪里执行？是谁去执行？</li>
+</ol>
+<h3 id="5-1-存储引擎基本介绍"><a href="#5-1-存储引擎基本介绍" class="headerlink" title="5.1 存储引擎基本介绍"></a>5.1 存储引擎基本介绍</h3><p>我们先回答第一个问题：在关系型数据库里面，数据是放在什么结构里面的？放在表Table里面的，我们可以把这个表理解成Excel电子表格的形式。所以我们的表在存储数据的同时，还要组织数据的存储结构，这个存储结构就是由我们的存储引擎决定的，所以我们也可以把存储引擎叫做表类型。</p>
+<p>在MySQL里面，支持多种存储引擎，他们是可以替换的，所以叫做插件式的存储引擎。为什么要搞这么多存储引擎呢？一种还不够用吗？这个问题先留着。</p>
+<h3 id="5-2-查看存储引擎"><a href="#5-2-查看存储引擎" class="headerlink" title="5.2 查看存储引擎"></a>5.2 查看存储引擎</h3><p>比如我们数据库里面已经存在的表，我们怎么查看它们的存储引擎呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show table status from `forum`; --forum是指定数据库名</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028003200148.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-InyXfWHT-1603815339184)(Untitled.assets/image-20201027171707820.png)\]"></p>
+<p>另外，还通过DDL建表语句来查看。</p>
+<p>在MySQL里面，我们创建的每一张表都可以指定它的存储引擎，而不是一个数据库只能使用一个存储引擎。存储引擎的使用是以表为单位的。而且，创建表之后还可以修改存储引擎。</p>
+<p>我们说一张表使用的存储引擎决定我们存储数据的结构，那在服务器上它们是怎么存储的呢？我们先要找到数据库存放数据的路径：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;datadir&apos;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028003628153.png#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-drfIrsP1-1603815339187)(Untitled.assets/image-20201027172157794.png)\]"></p>
+<p>默认情况下，每个数据库有一个自己文件夹，以forum数据库为例。</p>
+<p><img src="https://img-blog.csdnimg.cn/2020102800324656.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-knZMp5Cv-1603815339189)(Untitled.assets/image-20201027172605747.png)\]"></p>
+<p>任何一个存储引擎都有一个frm文件，这个是表结构定义文件。不同的存储引擎存放数据的方式不一样，产生的文件也不一样，innodb 是 1 个，memory没有，myisam是两个。</p>
+<p>这些存储引擎的差别在哪呢？</p>
+<h3 id="5-3-存储引擎比较"><a href="#5-3-存储引擎比较" class="headerlink" title="5.3 存储引擎比较"></a>5.3 存储引擎比较</h3><p>MyISAM 和InnoDB 是我们用得最多的两个存储引擎，在 MySQL 5.5 版本之前，默认的存储引擎是MyISAM，它是MySQL自带的。我们创建表的时候不指定存储引擎，它就会使用MyISAM作为存储引擎。MyISAM的前身是ISAM（IndexedSequentialAccessMethod：利用索引，顺序存取数据的方法）。</p>
+<p>5.5版本之后默认的存储引擎改成了InnoDB，它是第三方公司为MySQL开发的。为什么要改呢？最主要的原因还是InnoDB 支持事务，支持行级别的锁，对于业务一致性要求高的场景来说更适合。</p>
+<blockquote>
+<p>这个里面又有Oracle和MySQL公司的一段恩怨情仇。</p>
+<p><br>InnoDB本来是InnobaseOy公司开发的， 它和MySQLAB公司合作开源了InnoDB的代码。但是没想到MySQL的竞争对手Oracle把InnobaseOy收购了。后来08年Sun公司（开发Java语言的Sun）收购了MySQLAB，09年Sun公司又被 Oracle 收购了，所以 MySQL，InnoDB 又是一家了。有人觉得 MySQL 越来越像Oracle，其实也是这个原因。</p>
+</blockquote>
+<hr>
+<p>那么除了这两个我们最熟悉的存储引擎，数据库还支持其他哪些常用的存储引擎呢？我们可以用这个命令查看数据库对存储引擎的支持情况：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show engines;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201028003419736.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-Su09LV1i-1603815339190)(Untitled.assets/image-20201027173124782.png)\]"></p>
+<p>其中有存储引擎的描述和对事务、XA协议和Savepoints的支持。</p>
+<ul>
+<li>XA协议用来实现分布式事务（分为本地资源管理器，事务管理器）。</li>
+<li>Savepoints用来实现子事务（嵌套事务）。创建了一个Savepoints之后，事务就可以回滚到这个点，不会影响到创建Savepoints之前的操作。</li>
+</ul>
+<hr>
+<p>这些数据库支持的存储引擎，分别有什么特性呢？</p>
+<ul>
+<li><p><strong>MyISAM</strong>（3 个文件）</p>
+<blockquote>
+<p>应用范围比较小。表级锁定限制了读/写的性能，因此在Web 和数据仓库配置中，它通常用于只读或以读为主的工作。</p>
+</blockquote>
+<ul>
+<li>支持表级别的锁（插入和更新会锁表）。不支持事务</li>
+<li><p>拥有较高的插入（insert）和查询（select）速度</p>
+</li>
+<li><p>存储了表的行数（count速度更快）。（怎么快速向数据库插入100万条数据？我们有一种先用MyISAM插入数据，然后修改存储引擎为InnoDB的操作）</p>
+</li>
+<li><p>适用：只读之类的数据分析的项目</p>
+</li>
+</ul>
+</li>
+<li><p><strong>InnoDB</strong>（2 个文件）</p>
+<blockquote>
+<p>mysql5.7中的默认存储引擎。 InnoDB是一个事务安全（与ACID兼容）的MySQL存储引擎，它具有提交、回滚和崩溃恢复功能来保护用户数据。InnoDB行级锁（不升级为更粗粒度的锁）和Oracle风格的一致非锁读提高了多用户并发性和性能。InnoDB将用户数据存储在聚集索引中，以减少基于主键的常见查询的I/O。为了保持数据完整性，InnoDB还支持外键引用完整性约束。</p>
+</blockquote>
+<ul>
+<li>支持事务，支持外键，因此数据的完整性、一致性更高</li>
+<li>支持行级别的锁和表级别的锁</li>
+<li>支持读写并发，写不阻塞读（MVCC）</li>
+<li><p>特殊的索引存放方式，可以减少IO，提升查询效率</p>
+</li>
+<li><p>适用：经常更新的表，存在并发读写或者有事务处理的业务系统</p>
+</li>
+</ul>
+</li>
+<li><p><strong>Memory</strong>（1 个文件）</p>
+<pre><code>&gt; 将所有数据存储在RAM中，以便在需要快速查找非关键数据的环境中快速访问。这个引擎以前被称为堆引擎。其使用案例正在减少； InnoDB及其缓冲池内存区域提供了一种通用、持久的方法来将大部分或所有数据保存在内存中，而ndbcluster为大型分布式数据集提供了快速的键值查找。
+</code></pre><ul>
+<li>把数据放在内存里面，读写的速度很快，但是数据库重启或者崩溃，数据会全部消失。只适合做临时表。</li>
+<li>将表中的数据存储到内存中</li>
+</ul>
+</li>
+<li><p><strong>CSV</strong>（3 个文件）</p>
+<blockquote>
+<p>它的表实际上是带有逗号分隔值的文本文件。 csv表允许以csv格式导入或转储数据，以便与读写相同格式的脚本和应用程序交换数据。因为csv 表没有索引，所以通常在正常操作期间将数据保存在innodb表中，并且只在导入或导出阶段使用csv表。</p>
+</blockquote>
+<p> 不允许空行，不支持索引。格式通用，可以直接编辑，适合在不同数据库之间导入导出。</p>
+</li>
+<li><p><strong>Archive</strong>（2 个文件）</p>
+<blockquote>
+<p>这些紧凑的未索引的表用于存储和检索大量很少引用的历史、存档或安全审计信息。</p>
+</blockquote>
+<p> 不支持索引，不支持update delete.</p>
+</li>
+</ul>
+<p>这是MySQL里面常见的一些存储引擎，我们看到了，不同的存储引擎提供的特性都不一样，它们有不同的存储机制、索引方式、锁定水平等功能。我们在不同的业务场景中对数据操作的要求不同，就可以选择不同的存储引擎来满足我们的需求，这个就是MySQL支持这么多存储引擎的原因。</p>
+<h3 id="5-4-如何选择存储引擎？"><a href="#5-4-如何选择存储引擎？" class="headerlink" title="5.4 如何选择存储引擎？"></a>5.4 如何选择存储引擎？</h3><ul>
+<li>如果对数据一致性要求比较高，需要事务支持，可以选择InnoDB。</li>
+<li>如果数据查询多更新少，对查询性能要求比较高，可以选择MyISAM。</li>
+<li>如果需要一个用于查询的临时表，可以选择Memory。</li>
+<li>如果所有的存储引擎都不能满足你的需求，并且技术能力足够，可以根据官网内部<a href="https://dev.mysql.com/doc/internals/en/custom-engine.html" target="_blank" rel="noopener">手册</a>用C语言开发一个存储引擎</li>
+</ul>
+<h2 id="6-执行引擎，返回结果"><a href="#6-执行引擎，返回结果" class="headerlink" title="6.执行引擎，返回结果"></a>6.执行引擎，返回结果</h2><p>OK，存储引擎分析完了，它是我们存储数据的形式，继续第二个问题，是谁使用执行计划去操作存储引擎呢？这就是我们的执行引擎，它利用存储引擎提供的相应的API来完成操作。为什么我们修改了表的存储引擎，操作方式不需要做任何改变？因为不同功能的存储引擎实现的API是相同的。</p>
+<p>最后把数据返回给客户端，即使没有结果也要返回。</p>
+<h2 id="gt-MySQL架构"><a href="#gt-MySQL架构" class="headerlink" title="==&gt; MySQL架构"></a>==&gt; MySQL架构</h2><p>基于上面分析的流程，我们一起来梳理一下MySQL的内部模块。</p>
+<h3 id="1-模块详解"><a href="#1-模块详解" class="headerlink" title="1.模块详解"></a>1.模块详解</h3><p><img src="https://img-blog.csdnimg.cn/20201028003451790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="\[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-X8355hj5-1603815339191)(MySQL执行一条SQL的流程.assets/image-20201027175312083.png)\]"></p>
+<ol>
+<li>Connector：用来支持各种语言和SQL的交互，比如PHP，Python，Java的 JDBC</li>
+<li>Management Serveices &amp; Utilities：系统管理和控制工具，包括备份恢复、MySQL复制、集群等等</li>
+<li>Connection Pool：连接池，管理需要缓冲的资源，包括用户密码权限线程等等</li>
+<li>SQL Interface：用来接收用户的SQL命令，返回用户需要的查询结果</li>
+<li>Parser：用来解析SQL语句</li>
+<li>Optimizer：查询优化器</li>
+<li>CacheandBuffer：查询缓存，除了行记录的缓存之外，还有表缓存，Key缓存，权限缓存等等</li>
+<li>Pluggable Storage Engines：插件式存储引擎，它提供API给服务层使用，跟具体的文件打交道</li>
+</ol>
+<h3 id="2-架构分层"><a href="#2-架构分层" class="headerlink" title="2.架构分层"></a>2.架构分层</h3><p>总体上，我们可以把MySQL分成三层，跟客户端对接的连接层，真正执行操作的服务层，和跟硬件打交道的存储引擎层（参考MyBatis：接口、核心、基础）。</p>
+<ol>
+<li><p>连接层</p>
+<p> 我们的客户端要连接到MySQL服务器3306端口，必须要跟服务端建立连接，那么管理所有的连接，验证客户端的身份和权限，这些功能就在连接层完成。</p>
+</li>
+<li><p>服务层</p>
+<p> 连接层会把SQL语句交给服务层，这里面又包含一系列的流程：比如查询缓存的判断、根据SQL调用相应的接口，对我们的SQL语句进行词法和语法的解析（比如关键字怎么识别，别名怎么识别，语法有没有错误等等）。</p>
+<p> 然后就是优化器，MySQL底层会根据一定的规则对我们的 SQL语句进行优化，最后再交给执行器去执行。</p>
+</li>
+<li><p>存储引擎</p>
+<p> 存储引擎就是我们的数据真正存放的地方，在MySQL里面支持不同的存储引擎。再往下就是内存或者磁盘。</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/30cd2f4.html" title="【MySQL】运行原理（一）：查询sql的执行过程及MySQL架构分析">https://yzhblog.work/posts/30cd2f4.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/c1b2b188.html" rel="next" title="【必备算法】基础：复杂度分析">
+                <i class="fa fa-chevron-left"></i> 【必备算法】基础：复杂度分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/ba45c11.html" rel="prev" title="【MySQL】运行原理（二）：InnoDB 内存结构、磁盘结构及update sql执行过程分析">
+                【MySQL】运行原理（二）：InnoDB 内存结构、磁盘结构及update sql执行过程分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-与数据库建立连接"><span class="nav-text">1.与数据库建立连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-通信类型和连接方式"><span class="nav-text">1.1 通信类型和连接方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-MySQL支持哪些通信协议"><span class="nav-text">1.2 MySQL支持哪些通信协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-MySQL采用什么通信方式"><span class="nav-text">1.3 MySQL采用什么通信方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-查询缓存"><span class="nav-text">2.查询缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-语法解析和预处理"><span class="nav-text">3. 语法解析和预处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-词法分析"><span class="nav-text">3.1 词法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-语法分析"><span class="nav-text">3.2 语法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-预处理器"><span class="nav-text">3.3 预处理器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-查询优化得到执行计划"><span class="nav-text">4.查询优化得到执行计划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-什么是优化器？"><span class="nav-text">4.1 什么是优化器？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-优化器可以做什么？"><span class="nav-text">4.2 优化器可以做什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-优化器得到执行计划的过程？"><span class="nav-text">4.3 优化器得到执行计划的过程？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-如何查看最终执行计划？"><span class="nav-text">4.4 如何查看最终执行计划？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-存储引擎，存储数据"><span class="nav-text">5.存储引擎，存储数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-存储引擎基本介绍"><span class="nav-text">5.1 存储引擎基本介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-查看存储引擎"><span class="nav-text">5.2 查看存储引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-存储引擎比较"><span class="nav-text">5.3 存储引擎比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-如何选择存储引擎？"><span class="nav-text">5.4 如何选择存储引擎？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-执行引擎，返回结果"><span class="nav-text">6.执行引擎，返回结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gt-MySQL架构"><span class="nav-text">==&gt; MySQL架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-模块详解"><span class="nav-text">1.模块详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-架构分层"><span class="nav-text">2.架构分层</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

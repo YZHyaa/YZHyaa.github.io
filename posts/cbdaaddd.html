@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="1.正则表达式正则表达式用于字符串格式匹配，构造正则的实质是造句。下面我们就来看看正则的表达式的基本语法… 1.1 基本语法1.字符匹配    字符语法 语法解释 语法例子     . 匹配任意字符 ‘….’匹配A$ 5,不匹配换行；   \d 匹配数字（0~9） ‘\d’匹配8,不匹配12；   \D 匹配非数字 ‘\D’匹配c,不匹配3；   \w 匹配任意单字符 ‘\w\w’ 匹配A3,不匹">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Java杂记】正则表达式：基本语法及Java中使用（Pattern&amp;amp;Matcher）">
+<meta property="og:url" content="https://yzhblog.work/posts/cbdaaddd.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="1.正则表达式正则表达式用于字符串格式匹配，构造正则的实质是造句。下面我们就来看看正则的表达式的基本语法… 1.1 基本语法1.字符匹配    字符语法 语法解释 语法例子     . 匹配任意字符 ‘….’匹配A$ 5,不匹配换行；   \d 匹配数字（0~9） ‘\d’匹配8,不匹配12；   \D 匹配非数字 ‘\D’匹配c,不匹配3；   \w 匹配任意单字符 ‘\w\w’ 匹配A3,不匹">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-11-25T13:24:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Java杂记】正则表达式：基本语法及Java中使用（Pattern&amp;amp;Matcher）">
+<meta name="twitter:description" content="1.正则表达式正则表达式用于字符串格式匹配，构造正则的实质是造句。下面我们就来看看正则的表达式的基本语法… 1.1 基本语法1.字符匹配    字符语法 语法解释 语法例子     . 匹配任意字符 ‘….’匹配A$ 5,不匹配换行；   \d 匹配数字（0~9） ‘\d’匹配8,不匹配12；   \D 匹配非数字 ‘\D’匹配c,不匹配3；   \w 匹配任意单字符 ‘\w\w’ 匹配A3,不匹">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/cbdaaddd.html">
+
+
+
+
+
+  <title>【Java杂记】正则表达式：基本语法及Java中使用（Pattern&amp;Matcher） | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/cbdaaddd.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Java杂记】正则表达式：基本语法及Java中使用（Pattern&amp;Matcher）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-30T00:00:00+08:00">
+                2020-04-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java杂记/" itemprop="url" rel="index">
+                    <span itemprop="name">Java杂记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-正则表达式"><a href="#1-正则表达式" class="headerlink" title="1.正则表达式"></a>1.正则表达式</h2><p>正则表达式用于<strong>字符串格式匹配</strong>，构造正则的实质是<strong>造句</strong>。下面我们就来看看正则的表达式的基本语法…</p>
+<h3 id="1-1-基本语法"><a href="#1-1-基本语法" class="headerlink" title="1.1 基本语法"></a>1.1 基本语法</h3><p><strong>1.字符匹配</strong></p>
+<table>
+<thead>
+<tr>
+<th>字符语法</th>
+<th>语法解释</th>
+<th>语法例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.</td>
+<td>匹配任意字符</td>
+<td>‘….’匹配A$ 5,不匹配换行；</td>
+</tr>
+<tr>
+<td>\d</td>
+<td>匹配数字（0~9）</td>
+<td>‘\d’匹配8,不匹配12；</td>
+</tr>
+<tr>
+<td>\D</td>
+<td>匹配非数字</td>
+<td>‘\D’匹配c,不匹配3；</td>
+</tr>
+<tr>
+<td>\w</td>
+<td>匹配任意单字符</td>
+<td>‘\w\w’ 匹配A3,不匹配@3；</td>
+</tr>
+<tr>
+<td>\W</td>
+<td>匹配非单字符</td>
+<td>‘\W’匹配@,不匹配c；</td>
+</tr>
+<tr>
+<td>\s</td>
+<td>匹配空白字符</td>
+<td>‘\d\s\d’匹配3 d,不匹配abc；</td>
+</tr>
+<tr>
+<td>\S</td>
+<td>匹配非空字符</td>
+<td>‘\S\S\S’匹配A#4,不匹配3 d；</td>
+</tr>
+<tr>
+<td>[…]</td>
+<td>匹配括号中任意字符</td>
+<td>[b-d]匹配b、c、d, 不匹配e；</td>
+</tr>
+<tr>
+<td>[^…]</td>
+<td>匹配非括号字符</td>
+<td>[^b-z]匹配a,不匹配b-z的字符；</td>
+</tr>
+</tbody>
+</table>
+<a id="more"></a>
+<p><strong>2.重复匹配</strong></p>
+<p>重复匹配是对其前一个字符的重复次数，若要多个字符重复可以加(  )</p>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>*</td>
+<td>匹配前一个字符出现0次或者无限次，即可有可无</td>
+</tr>
+<tr>
+<td>+</td>
+<td>匹配前一个字符出现1次或者无限次，即至少1次</td>
+</tr>
+<tr>
+<td>?</td>
+<td>匹配前一个字符出现1次或者0次，即至多1次</td>
+</tr>
+<tr>
+<td>{m}</td>
+<td>匹配前一个字符出现m次</td>
+</tr>
+<tr>
+<td>{m,}</td>
+<td>匹配前一个字符至少出现m次</td>
+</tr>
+<tr>
+<td>{m,n}</td>
+<td>匹配前一个字符出现从m到n次</td>
+</tr>
+</tbody>
+</table>
+<p><strong>3.边界符</strong></p>
+<ul>
+<li><code>()</code>：表示分组<ul>
+<li>将( )内容作为一个整体，配合数量匹配；如(abc)+，匹配至少一个abc </li>
+<li>提取指定匹配内容；如在匹配的日期字符串中，提取小时</li>
+</ul>
+</li>
+<li><code>^</code>：开始位置</li>
+<li><code>$</code>：结束位置</li>
+</ul>
+<p><strong>4.转义字符</strong></p>
+<ul>
+<li><p>对于正则中已经有的字符，使用其字面义时要转义</p>
+<ul>
+<li><code>\.</code></li>
+<li><code>\*</code></li>
+<li><code>\[ \]</code></li>
+</ul>
+</li>
+<li><p>另外还有代表指定意义的转义字符</p>
+<ul>
+<li><code>\n</code>：换行</li>
+<li><code>\t</code>：制表符</li>
+<li><code>\f</code>：换页</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-2-正则示例"><a href="#1-2-正则示例" class="headerlink" title="1.2 正则示例"></a>1.2 正则示例</h3><ol>
+<li><p><code>/^[0-9]{1,20}$/</code></p>
+<p>表示字符串全部由数字组成，即是匹配当前字符串是否是由全数字组成</p>
+<ul>
+<li>[0-9] 表示字符的范围是0到9</li>
+<li>{1,20}表示字符串长度至少为1，最多为20，字符串出现次数的范围</li>
+</ul>
+</li>
+<li><p><code>/^[a-zA-Z]{1}([a-zA-Z0-9._]){5,15}$/</code></p>
+<p>可以用来验证登录名，首字母为字母，长度为至少6最多16</p>
+<ul>
+<li><code>^[a-zA-Z]{1}</code> 表示最开始的第一个首字母为字母</li>
+<li><code>([a-zA-Z0-9._]){5,15}</code> 这是首字母后面的即是从第二个字母开始，要求至少再有5个最多15个，由字母数字以及指定特殊字符组成的字符串</li>
+</ul>
+</li>
+<li><p><code>/^[1][3|4|5|8][0-9]\d{8}$/</code></p>
+<p>可以用来验证手机号码，首字母为1，长度11，首尾都是数字</p>
+<ul>
+<li><code>^[1]</code> 第一个数字为1</li>
+<li><code>[3|4|5|8]</code> 第二个数字为 3或者4或者5或者8</li>
+<li><code>[0-9]</code> 第三个数字为0-9任一个</li>
+<li><code>\d{8}</code> 匹配一个数字范围是0-9，匹配8次，所以至少要有8个数字。加起来就是11个</li>
+</ul>
+</li>
+<li><p><code>/^(\w){6,20}$/</code></p>
+<p>验证密码</p>
+<ul>
+<li>\w 匹配任何非单词字符 等价于“<code>[^A-Za-z0-9_]</code>”</li>
+<li>(\w){6,20} 匹配任何非单词字符，最少6个最多20个</li>
+</ul>
+</li>
+</ol>
+<h2 id="2-Java：Pattern-gt-Matcher"><a href="#2-Java：Pattern-gt-Matcher" class="headerlink" title="2.Java：Pattern -&gt; Matcher"></a>2.Java：Pattern -&gt; Matcher</h2><p>上面我们认识了正则表达式，那在Java中如何通过正则进行字符串格式匹配呢？答：通过 Pattern 和 Matcher 两个类。</p>
+<h3 id="使用流程"><a href="#使用流程" class="headerlink" title="使用流程"></a>使用流程</h3><ol>
+<li>将String类型的正则表达式传入Pattern.compile()，生成Pattern对象，表示编译后的表达式</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// compile是编译的意思，入参正则表达式</span></span><br><span class="line">Pattern pattern = Pattern.compile(<span class="string">"\d\d\d"</span>);</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><p>通过 Pattern.matcher(目标字符串)，返回Matcher，然后再通过Matcher进行一系列匹配操作</p>
+<p>注：一个正则可以匹配多个字符串，相应的一个Pattern可以有多个Matcher实例</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// match是匹配的意思，入参是要与正则匹配的目标字符串</span></span><br><span class="line">Matcher matcher = pattern.matcher(<span class="string">"a12345bb"</span>);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>然后就可以调用 Matcher 的 matches，find 等方法对该字符串进行格式匹配。具体如下…<h3 id="2-1-matches-：整体匹配"><a href="#2-1-matches-：整体匹配" class="headerlink" title="2.1 matches()：整体匹配"></a>2.1 matches()：整体匹配</h3>整体匹配：尝试对整个目标字符展开匹配检测,也就是只有整个目标字符串完全匹配时才返回真值.</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Pattern pattern = Pattern.compile(<span class="string">"\\?&#123;2&#125;"</span>);</span><br><span class="line">Matcher matcher = pattern.matcher(<span class="string">"??"</span>);</span><br><span class="line"><span class="keyword">boolean</span> matches = matcher.matches();<span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">matcher = pattern.matcher(<span class="string">"?"</span>);</span><br><span class="line">matches = matcher.matches(); <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-2-find-：局部匹配"><a href="#2-2-find-：局部匹配" class="headerlink" title="2.2 find()：局部匹配"></a>2.2 find()：局部匹配</h3><p>局部匹配：对字符串进行匹配,匹配到的字符串可以在任何位置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">"\\d+"</span>);</span><br><span class="line">Matcher m = p.matcher(<span class="string">"22bb23"</span>);</span><br><span class="line">m.find(); <span class="comment">// 返回true</span></span><br><span class="line"></span><br><span class="line">Matcher m2 = p.matcher(<span class="string">"aa2223"</span>);</span><br><span class="line">m2.find(); <span class="comment">// 返回true</span></span><br><span class="line"></span><br><span class="line">Matcher m3 = p.matcher(<span class="string">"aa2223bb"</span>);</span><br><span class="line">m3.find(); <span class="comment">// 返回true</span></span><br><span class="line"></span><br><span class="line">Matcher m4 = p.matcher(<span class="string">"aabb"</span>);</span><br><span class="line">m4.find(); <span class="comment">// 返回false</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-3-lookingAt-：头部匹配"><a href="#2-3-lookingAt-：头部匹配" class="headerlink" title="2.3 lookingAt() ：头部匹配"></a>2.3 lookingAt() ：头部匹配</h3><p>头部匹配：对前面的字符串进行匹配,只有匹配到的字符串在最前面才会返回true</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">"\\d+"</span>);</span><br><span class="line">Matcher m = p.matcher(<span class="string">"22bb23"</span>);</span><br><span class="line"><span class="keyword">boolean</span> match = m.lookingAt();<span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">m = p.matcher(<span class="string">"bb2233"</span>);</span><br><span class="line">match= m.lookingAt(); <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-4-group-amp-start-amp-end"><a href="#2-4-group-amp-start-amp-end" class="headerlink" title="2.4 group() &amp; start() &amp; end()"></a>2.4 group() &amp; start() &amp; end()</h3><ul>
+<li>String group() 返回匹配到的子字符串，若要获取局部内容，可通过分组实现</li>
+<li>int start() 返回当前匹配到的字符串在原目标字符串中的位置</li>
+<li>int end() 返回当前匹配的字符串的最后一个字符在原目标字符串中的索引位置.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">"\\d+"</span>);</span><br><span class="line">Matcher m = p.matcher(<span class="string">"aa22bb23"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> start = m.start();<span class="comment">//2</span></span><br><span class="line">String group = m.group();<span class="comment">//22</span></span><br><span class="line"><span class="keyword">int</span> end = m.end();<span class="comment">//4</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">"^\\[(.*)\\](\\s\\-\\s(.*))?"</span>);</span><br><span class="line">Matcher m = pattern.matcher(msg);</span><br><span class="line"><span class="keyword">if</span>(m.matches())&#123;</span><br><span class="line">    <span class="comment">// 根据索引获取局部分组内容</span></span><br><span class="line">    String header = m.group(<span class="number">1</span>);</span><br><span class="line">    String content = m.group(<span class="number">3</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>最后，还要明白个问题，String 中也有个 matches 方法，跟上面的 Pattern 和 Matcher 有什么关系呢？这还要从源码中找答案：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// String中的matches方法</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(String regex)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 实际也是调用Matcher.matches方法进行全匹配</span></span><br><span class="line">    <span class="keyword">return</span> Pattern.matches(regex, <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以，当要与正则进行整体匹配时，可以直接调用String的matches方法，其余还是老老实实写Pattern和Matcher把…</p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/cbdaaddd.html" title="【Java杂记】正则表达式：基本语法及Java中使用（Pattern&amp;Matcher）">https://yzhblog.work/posts/cbdaaddd.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/98253eea.html" rel="next" title="【必备算法】动态规划：LeetCode题（六）53. 最大子序和，300. 最长上升子序列，1143. 最长公共子序列">
+                <i class="fa fa-chevron-left"></i> 【必备算法】动态规划：LeetCode题（六）53. 最大子序和，300. 最长上升子序列，1143. 最长公共子序列
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/5b63bfc8.html" rel="prev" title="17【必备算法】动态规划：LeetCode题（七）121. 买卖股票的最佳时机，122. 买卖股票的最佳时机 II，123. 买卖股票的最佳时机 III，188. 买卖股票的最佳时机 IV">
+                17【必备算法】动态规划：LeetCode题（七）121. 买卖股票的最佳时机，122. 买卖股票的最佳时机 II，123. 买卖股票的最佳时机 III，188. 买卖股票的最佳时机 IV <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-正则表达式"><span class="nav-text">1.正则表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-基本语法"><span class="nav-text">1.1 基本语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-正则示例"><span class="nav-text">1.2 正则示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Java：Pattern-gt-Matcher"><span class="nav-text">2.Java：Pattern -&gt; Matcher</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用流程"><span class="nav-text">使用流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-matches-：整体匹配"><span class="nav-text">2.1 matches()：整体匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-find-：局部匹配"><span class="nav-text">2.2 find()：局部匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-lookingAt-：头部匹配"><span class="nav-text">2.3 lookingAt() ：头部匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-group-amp-start-amp-end"><span class="nav-text">2.4 group() &amp; start() &amp; end()</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

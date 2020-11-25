@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="Java 虚拟机的指令由以下格式的字节码指令构成：操作码（Opcode 1 字节）[操作数(Oprand)]，具有以下两个特点：  由于 Java 虚拟机采用面向操作数栈而不是寄存器的架构，所以大多数的指令都不包含操作数，只有一个操作码。 class 文件中放弃了对操作数的长度做对齐，节约了填充和间隔符号需要的空间，但是为了在运行时从字节中重建出具体数据的结构，损失了一些执行效率。  下面对所有指">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【JVM】第二篇：JVM指令助记符总结及基本指令大全">
+<meta property="og:url" content="https://yzhblog.work/posts/69fd334c.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="Java 虚拟机的指令由以下格式的字节码指令构成：操作码（Opcode 1 字节）[操作数(Oprand)]，具有以下两个特点：  由于 Java 虚拟机采用面向操作数栈而不是寄存器的架构，所以大多数的指令都不包含操作数，只有一个操作码。 class 文件中放弃了对操作数的长度做对齐，节约了填充和间隔符号需要的空间，但是为了在运行时从字节中重建出具体数据的结构，损失了一些执行效率。  下面对所有指">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-11-25T10:22:14.544Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【JVM】第二篇：JVM指令助记符总结及基本指令大全">
+<meta name="twitter:description" content="Java 虚拟机的指令由以下格式的字节码指令构成：操作码（Opcode 1 字节）[操作数(Oprand)]，具有以下两个特点：  由于 Java 虚拟机采用面向操作数栈而不是寄存器的架构，所以大多数的指令都不包含操作数，只有一个操作码。 class 文件中放弃了对操作数的长度做对齐，节约了填充和间隔符号需要的空间，但是为了在运行时从字节中重建出具体数据的结构，损失了一些执行效率。  下面对所有指">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/69fd334c.html">
+
+
+
+
+
+  <title>【JVM】第二篇：JVM指令助记符总结及基本指令大全 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/69fd334c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【JVM】第二篇：JVM指令助记符总结及基本指令大全</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-26T00:00:00+08:00">
+                2019-10-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.3k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java 虚拟机的指令由以下格式的字节码指令构成：操作码（Opcode 1 字节）[操作数(Oprand)]，具有以下两个特点：</p>
+<ul>
+<li>由于 Java 虚拟机采用面向操作数栈而不是寄存器的架构，所以大多数的指令都不包含操作数，只有一个操作码。</li>
+<li>class 文件中放弃了对操作数的长度做对齐，节约了填充和间隔符号需要的空间，但是为了在运行时从字节中重建出具体数据的结构，损失了一些执行效率。</li>
+</ul>
+<p>下面对所有指令做个总结（在查找时直接ctrl+F找相应命令）：</p>
+<a id="more"></a>
+<ul>
+<li><p>变量到操作数栈：iload,iload_,lload,lload_,fload,fload_,dload,dload_,aload,aload_</p>
+</li>
+<li><p>操作数栈到变量：istore,istore_,lstore,lstore_,fstore,fstore_,dstore,dstor_,astore,astore_</p>
+</li>
+<li><p>常数到操作数栈：bipush,sipush,ldc,ldc_w,ldc2_w,aconst_null,iconst_ml,iconst_,lconst_,fconst_,dconst_</p>
+</li>
+<li><p>加：iadd,ladd,fadd,dadd</p>
+</li>
+<li><p>减：isub,lsub,fsub,dsub</p>
+</li>
+<li><p>乘：imul,lmul,fmul,dmul</p>
+</li>
+<li><p>除：idiv,ldiv,fdiv,ddiv</p>
+</li>
+<li><p>余数：irem,lrem,frem,drem</p>
+</li>
+<li><p>取负：ineg,lneg,fneg,dneg</p>
+</li>
+<li><p>移位：ishl,lshr,iushr,lshl,lshr,lushr</p>
+</li>
+<li><p>按位或：ior,lor</p>
+</li>
+<li><p>按位与：iand,land</p>
+</li>
+<li><p>按位异或：ixor,lxor</p>
+</li>
+<li><p>类型转换：</p>
+<ul>
+<li>i2l,i2f,i2d,l2f,l2d,f2d(放宽数值转换)</li>
+<li>i2b,i2c,i2s,l2i,f2i,f2l,d2i,d2l,d2f(缩窄数值转换)</li>
+</ul>
+</li>
+<li><p>创建类实便：new</p>
+</li>
+<li><p>创建新数组：newarray,anewarray,multianwarray</p>
+</li>
+<li><p>访问类的域和类实例域：getfield,putfield,getstatic,putstatic</p>
+</li>
+<li><p>把数据装载到操作数栈：baload,caload,saload,iaload,laload,faload,daload,aaload</p>
+</li>
+<li><p>从操作数栈存存储到数组：bastore,castore,sastore,iastore,lastore,fastore,dastore,aastore</p>
+</li>
+<li><p>获取数组长度：arraylength</p>
+</li>
+<li><p>检相类实例或数组属性：instanceof,checkcast</p>
+</li>
+<li><p>操作数栈管理：pop,pop2,dup,dup2,dup_xl,dup2_xl,dup_x2,dup2_x2,swap</p>
+</li>
+<li><p>有条件转移：</p>
+<ul>
+<li><p>ifeq,iflt,ifle,ifne,ifgt,ifge,ifnull,ifnonnull,if_icmpeq,if_icmpene,</p>
+</li>
+<li><p>if_icmplt,if_icmpgt,if_icmple,if_icmpge,if_acmpeq,if_acmpne,lcmp,fcmpl</p>
+</li>
+<li><p>fcmpg,dcmpl,dcmpg</p>
+</li>
+</ul>
+</li>
+<li><p>复合条件转移：tableswitch,lookupswitch</p>
+</li>
+<li><p>无条件转移：goto,goto_w,jsr,jsr_w,ret</p>
+</li>
+<li><p>调度对象的实便方法：invokevirtual</p>
+</li>
+<li><p>调用由接口实现的方法：invokeinterface</p>
+</li>
+<li><p>调用需要特殊处理的实例方法：invokespecial</p>
+</li>
+<li><p>调用命名类中的静态方法：invokestatic</p>
+</li>
+<li><p>方法返回：ireturn,lreturn,freturn,dreturn,areturn,return</p>
+</li>
+<li><p>异常：athrow</p>
+</li>
+<li><p>finally关键字的实现使用：jsr,jsr_w,ret</p>
+</li>
+</ul>
+<hr>
+<h2 id="1-栈和局部变量操作"><a href="#1-栈和局部变量操作" class="headerlink" title="1.栈和局部变量操作"></a>1.栈和局部变量操作</h2><h3 id="1-1-将常量压入栈的指令"><a href="#1-1-将常量压入栈的指令" class="headerlink" title="1.1 将常量压入栈的指令"></a>1.1 将常量压入栈的指令</h3><p>aconst_null 将null对象引用压入栈</p>
+<p>iconst_m1 将int类型常量-1压入栈</p>
+<p>iconst_0 将int类型常量0压入栈</p>
+<p>iconst_1 将int类型常量1压入栈</p>
+<p>iconst_2 将int类型常量2压入栈</p>
+<p>iconst_3 将int类型常量3压入栈</p>
+<p>iconst_4 将int类型常量4压入栈</p>
+<p>iconst_5 将int类型常量5压入栈</p>
+<p>lconst_0 将long类型常量0压入栈</p>
+<p>lconst_1 将long类型常量1压入栈</p>
+<p>fconst_0 将float类型常量0压入栈</p>
+<p>fconst_1 将float类型常量1压入栈</p>
+<p>dconst_0 将double类型常量0压入栈</p>
+<p>dconst_1 将double类型常量1压入栈</p>
+<p>bipush 将一个8位带符号整数压入栈</p>
+<p>sipush 将16位带符号整数压入栈</p>
+<p>ldc 把常量池中的项压入栈</p>
+<p>ldc_w 把常量池中的项压入栈（使用宽索引）</p>
+<p>ldc2_w 把常量池中long类型或者double类型的项压入栈（使用宽索引）</p>
+<h3 id="1-2-从栈中的局部变量中装载值的指令"><a href="#1-2-从栈中的局部变量中装载值的指令" class="headerlink" title="1.2 从栈中的局部变量中装载值的指令"></a>1.2 从栈中的局部变量中装载值的指令</h3><p>iload 从局部变量中装载int类型值</p>
+<p>lload 从局部变量中装载long类型值</p>
+<p>fload 从局部变量中装载float类型值</p>
+<p>dload 从局部变量中装载double类型值</p>
+<p>aload 从局部变量中装载引用类型值（refernce）</p>
+<p>iload_0 从局部变量0中装载int类型值</p>
+<p>iload_1 从局部变量1中装载int类型值</p>
+<p>iload_2 从局部变量2中装载int类型值</p>
+<p>iload_3 从局部变量3中装载int类型值</p>
+<p>lload_0 从局部变量0中装载long类型值</p>
+<p>lload_1 从局部变量1中装载long类型值</p>
+<p>lload_2 从局部变量2中装载long类型值</p>
+<p>lload_3 从局部变量3中装载long类型值</p>
+<p>fload_0 从局部变量0中装载float类型值</p>
+<p>fload_1 从局部变量1中装载float类型值</p>
+<p>fload_2 从局部变量2中装载float类型值</p>
+<p>fload_3 从局部变量3中装载float类型值</p>
+<p>dload_0 从局部变量0中装载double类型值</p>
+<p>dload_1 从局部变量1中装载double类型值</p>
+<p>dload_2 从局部变量2中装载double类型值</p>
+<p>dload_3 从局部变量3中装载double类型值</p>
+<p>aload_0 从局部变量0中装载引用类型值</p>
+<p>aload_1 从局部变量1中装载引用类型值</p>
+<p>aload_2 从局部变量2中装载引用类型值</p>
+<p>aload_3 从局部变量3中装载引用类型值</p>
+<p>iaload 从数组中装载int类型值</p>
+<p>laload 从数组中装载long类型值</p>
+<p>faload 从数组中装载float类型值</p>
+<p>daload 从数组中装载double类型值</p>
+<p>aaload 从数组中装载引用类型值</p>
+<p>baload 从数组中装载byte类型或boolean类型值</p>
+<p>caload 从数组中装载char类型值</p>
+<p>saload 从数组中装载short类型值</p>
+<p>将栈中的值存入局部变量的指令</p>
+<p>istore 将int类型值存入局部变量</p>
+<p>lstore 将long类型值存入局部变量</p>
+<p>fstore 将float类型值存入局部变量</p>
+<p>dstore 将double类型值存入局部变量</p>
+<p>astore 将将引用类型或returnAddress类型值存入局部变量</p>
+<p>istore_0 将int类型值存入局部变量0</p>
+<p>istore_1 将int类型值存入局部变量1</p>
+<p>istore_2 将int类型值存入局部变量2</p>
+<p>istore_3 将int类型值存入局部变量3</p>
+<p>lstore_0 将long类型值存入局部变量0</p>
+<p>lstore_1 将long类型值存入局部变量1</p>
+<p>lstore_2 将long类型值存入局部变量2</p>
+<p>lstore_3 将long类型值存入局部变量3</p>
+<p>fstore_0 将float类型值存入局部变量0</p>
+<p>fstore_1 将float类型值存入局部变量1</p>
+<p>fstore_2 将float类型值存入局部变量2</p>
+<p>fstore_3 将float类型值存入局部变量3</p>
+<p>dstore_0 将double类型值存入局部变量0</p>
+<p>dstore_1 将double类型值存入局部变量1</p>
+<p>dstore_2 将double类型值存入局部变量2</p>
+<p>dstore_3 将double类型值存入局部变量3</p>
+<p>astore_0 将引用类型或returnAddress类型值存入局部变量0</p>
+<p>astore_1 将引用类型或returnAddress类型值存入局部变量1</p>
+<p>astore_2 将引用类型或returnAddress类型值存入局部变量2</p>
+<p>astore_3 将引用类型或returnAddress类型值存入局部变量3</p>
+<p>iastore 将int类型值存入数组中</p>
+<p>lastore 将long类型值存入数组中</p>
+<p>fastore 将float类型值存入数组中</p>
+<p>dastore 将double类型值存入数组中</p>
+<p>aastore 将引用类型值存入数组中</p>
+<p>bastore 将byte类型或者boolean类型值存入数组中</p>
+<p>castore 将char类型值存入数组中</p>
+<p>sastore 将short类型值存入数组中</p>
+<p>wide指令</p>
+<p>wide 使用附加字节扩展局部变量索引</p>
+<h3 id="1-3-通用-无类型）栈操作"><a href="#1-3-通用-无类型）栈操作" class="headerlink" title="1.3 通用(无类型）栈操作"></a>1.3 通用(无类型）栈操作</h3><p>nop 不做任何操作</p>
+<p>pop 弹出栈顶端一个字长的内容</p>
+<p>pop2 弹出栈顶端两个字长的内容</p>
+<p>dup 复制栈顶部一个字长内容</p>
+<p>dup_x1 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的两个字长的内容压入栈</p>
+<p>dup_x2 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+<p>dup2 复制栈顶部两个字长内容</p>
+<p>dup2_x1 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+<p>dup2_x2 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的四个字长的内容压入栈</p>
+<p>swap 交换栈顶部两个字长内容</p>
+<h3 id="1-4-类型转换"><a href="#1-4-类型转换" class="headerlink" title="1.4 类型转换"></a>1.4 类型转换</h3><p>i2l 把int类型的数据转化为long类型</p>
+<p>i2f 把int类型的数据转化为float类型</p>
+<p>i2d 把int类型的数据转化为double类型</p>
+<p>l2i 把long类型的数据转化为int类型</p>
+<p>l2f 把long类型的数据转化为float类型</p>
+<p>l2d 把long类型的数据转化为double类型</p>
+<p>f2i 把float类型的数据转化为int类型</p>
+<p>f2l 把float类型的数据转化为long类型</p>
+<p>f2d 把float类型的数据转化为double类型</p>
+<p>d2i 把double类型的数据转化为int类型</p>
+<p>d2l 把double类型的数据转化为long类型</p>
+<p>d2f 把double类型的数据转化为float类型</p>
+<p>i2b 把int类型的数据转化为byte类型</p>
+<p>i2c 把int类型的数据转化为char类型</p>
+<p>i2s 把int类型的数据转化为short类型</p>
+<h3 id="1-5-整数运算"><a href="#1-5-整数运算" class="headerlink" title="1.5 整数运算"></a>1.5 整数运算</h3><p>iadd 执行int类型的加法</p>
+<p>ladd 执行long类型的加法</p>
+<p>isub 执行int类型的减法</p>
+<p>lsub 执行long类型的减法</p>
+<p>imul 执行int类型的乘法</p>
+<p>lmul 执行long类型的乘法</p>
+<p>idiv 执行int类型的除法</p>
+<p>ldiv 执行long类型的除法</p>
+<p>irem 计算int类型除法的余数</p>
+<p>lrem 计算long类型除法的余数</p>
+<p>ineg 对一个int类型值进行取反操作</p>
+<p>lneg 对一个long类型值进行取反操作</p>
+<p>iinc 把一个常量值加到一个int类型的局部变量上</p>
+<h3 id="1-6-逻辑运算"><a href="#1-6-逻辑运算" class="headerlink" title="1.6 逻辑运算"></a>1.6 逻辑运算</h3><p>移位操作</p>
+<p>ishl 执行int类型的向左移位操作</p>
+<p>lshl 执行long类型的向左移位操作</p>
+<p>ishr 执行int类型的向右移位操作</p>
+<p>lshr 执行long类型的向右移位操作</p>
+<p>iushr 执行int类型的向右逻辑移位操作</p>
+<p>lushr 执行long类型的向右逻辑移位操作</p>
+<p>按位布尔运算</p>
+<p>iand 对int类型值进行“逻辑与”操作</p>
+<p>land 对long类型值进行“逻辑与”操作</p>
+<p>ior 对int类型值进行“逻辑或”操作</p>
+<p>lor 对long类型值进行“逻辑或”操作</p>
+<p>ixor 对int类型值进行“逻辑异或”操作</p>
+<p>lxor 对long类型值进行“逻辑异或”操作</p>
+<h3 id="1-7-浮点运算"><a href="#1-7-浮点运算" class="headerlink" title="1.7 浮点运算"></a>1.7 浮点运算</h3><p>fadd 执行float类型的加法</p>
+<p>dadd 执行double类型的加法</p>
+<p>fsub 执行float类型的减法</p>
+<p>dsub 执行double类型的减法</p>
+<p>fmul 执行float类型的乘法</p>
+<p>dmul 执行double类型的乘法</p>
+<p>fdiv 执行float类型的除法</p>
+<p>ddiv 执行double类型的除法</p>
+<p>frem 计算float类型除法的余数</p>
+<p>drem 计算double类型除法的余数</p>
+<p>fneg 将一个float类型的数值取反</p>
+<p>dneg 将一个double类型的数值取反</p>
+<h2 id="2-对象和数组"><a href="#2-对象和数组" class="headerlink" title="2.对象和数组"></a>2.对象和数组</h2><h3 id="2-1-对象操作指令"><a href="#2-1-对象操作指令" class="headerlink" title="2.1 对象操作指令"></a>2.1 对象操作指令</h3><p>new 创建一个新对象</p>
+<p>checkcast 确定对象为所给定的类型</p>
+<p>getfield 从对象中获取字段</p>
+<p>putfield 设置对象中字段的值</p>
+<p>getstatic 从类中获取静态字段</p>
+<p>putstatic 设置类中静态字段的值</p>
+<p>instanceof 判断对象是否为给定的类型</p>
+<h3 id="2-2-数组操作指令"><a href="#2-2-数组操作指令" class="headerlink" title="2.2 数组操作指令"></a>2.2 数组操作指令</h3><p>newarray 分配数据成员类型为基本上数据类型的新数组</p>
+<p>anewarray 分配数据成员类型为引用类型的新数组</p>
+<p>arraylength 获取数组长度</p>
+<p>multianewarray 分配新的多维数组</p>
+<h2 id="3-控制流"><a href="#3-控制流" class="headerlink" title="3.控制流"></a>3.控制流</h2><h3 id="3-1-条件分支指令"><a href="#3-1-条件分支指令" class="headerlink" title="3.1 条件分支指令"></a>3.1 条件分支指令</h3><p>ifeq 如果等于0，则跳转</p>
+<p>ifne 如果不等于0，则跳转</p>
+<p>iflt 如果小于0，则跳转</p>
+<p>ifge 如果大于等于0，则跳转</p>
+<p>ifgt 如果大于0，则跳转</p>
+<p>ifle 如果小于等于0，则跳转</p>
+<p>if_icmpcq 如果两个int值相等，则跳转</p>
+<p>if_icmpne 如果两个int类型值不相等，则跳转</p>
+<p>if_icmplt 如果一个int类型值小于另外一个int类型值，则跳转</p>
+<p>if_icmpge 如果一个int类型值大于或者等于另外一个int类型值，则跳转</p>
+<p>if_icmpgt 如果一个int类型值大于另外一个int类型值，则跳转</p>
+<p>if_icmple 如果一个int类型值小于或者等于另外一个int类型值，则跳转</p>
+<p>ifnull 如果等于null，则跳转</p>
+<p>ifnonnull 如果不等于null，则跳转</p>
+<p>if_acmpeq 如果两个对象引用相等，则跳转</p>
+<p>if_acmpnc 如果两个对象引用不相等，则跳转</p>
+<h3 id="3-2-比较指令"><a href="#3-2-比较指令" class="headerlink" title="3.2 比较指令"></a>3.2 比较指令</h3><p>lcmp 比较long类型值</p>
+<p>fcmpl 比较float类型值（当遇到NaN时，返回-1）</p>
+<p>fcmpg 比较float类型值（当遇到NaN时，返回1）</p>
+<p>dcmpl 比较double类型值（当遇到NaN时，返回-1）</p>
+<p>dcmpg 比较double类型值（当遇到NaN时，返回1）</p>
+<h3 id="3-3-无条件转移指令"><a href="#3-3-无条件转移指令" class="headerlink" title="3.3 无条件转移指令"></a>3.3 无条件转移指令</h3><p>goto 无条件跳转</p>
+<p>goto_w 无条件跳转（宽索引）</p>
+<h3 id="3-4-表跳转指令"><a href="#3-4-表跳转指令" class="headerlink" title="3.4 表跳转指令"></a>3.4 表跳转指令</h3><p>tableswitch 通过索引访问跳转表，并跳转</p>
+<p>lookupswitch 通过键值匹配访问跳转表，并执行跳转操作</p>
+<h3 id="3-5-异常"><a href="#3-5-异常" class="headerlink" title="3.5 异常"></a>3.5 异常</h3><p>athrow 抛出异常或错误</p>
+<p>finally子句</p>
+<p>jsr 跳转到子例程</p>
+<p>jsr_w 跳转到子例程（宽索引）</p>
+<p>rct 从子例程返回</p>
+<h2 id="4-方法调用与返回"><a href="#4-方法调用与返回" class="headerlink" title="4.方法调用与返回"></a>4.方法调用与返回</h2><h3 id="4-1-方法调用指令"><a href="#4-1-方法调用指令" class="headerlink" title="4.1 方法调用指令"></a>4.1 方法调用指令</h3><p>invokcvirtual 运行时按照对象的类来调用实例方法</p>
+<p>invokespecial 根据编译时类型来调用实例方法</p>
+<p>invokestatic 调用类（静态）方法</p>
+<p>invokcinterface 调用接口方法</p>
+<h3 id="4-2-方法返回指令"><a href="#4-2-方法返回指令" class="headerlink" title="4.2 方法返回指令"></a>4.2 方法返回指令</h3><p>ireturn 从方法中返回int类型的数据</p>
+<p>lreturn 从方法中返回long类型的数据</p>
+<p>freturn 从方法中返回float类型的数据</p>
+<p>dreturn 从方法中返回double类型的数据</p>
+<p>areturn 从方法中返回引用类型的数据</p>
+<p>return 从方法中返回，返回值为void</p>
+<h2 id="5-线程同步"><a href="#5-线程同步" class="headerlink" title="5.线程同步"></a>5.线程同步</h2><p>montiorenter 进入并获取对象监视器</p>
+<p>monitorexit 释放并退出对象监视器</p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/69fd334c.html" title="【JVM】第二篇：JVM指令助记符总结及基本指令大全">https://yzhblog.work/posts/69fd334c.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/c2978691.html" rel="next" title="【JVM】第一篇：class字节码文件结构详解">
+                <i class="fa fa-chevron-left"></i> 【JVM】第一篇：class字节码文件结构详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/3167db73.html" rel="prev" title="【Redis】Java操作redis：Jedis&RedisTemplate">
+                【Redis】Java操作redis：Jedis&RedisTemplate <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-栈和局部变量操作"><span class="nav-text">1.栈和局部变量操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-将常量压入栈的指令"><span class="nav-text">1.1 将常量压入栈的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-从栈中的局部变量中装载值的指令"><span class="nav-text">1.2 从栈中的局部变量中装载值的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-通用-无类型）栈操作"><span class="nav-text">1.3 通用(无类型）栈操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-类型转换"><span class="nav-text">1.4 类型转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-整数运算"><span class="nav-text">1.5 整数运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-逻辑运算"><span class="nav-text">1.6 逻辑运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-浮点运算"><span class="nav-text">1.7 浮点运算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-对象和数组"><span class="nav-text">2.对象和数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-对象操作指令"><span class="nav-text">2.1 对象操作指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-数组操作指令"><span class="nav-text">2.2 数组操作指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-控制流"><span class="nav-text">3.控制流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-条件分支指令"><span class="nav-text">3.1 条件分支指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-比较指令"><span class="nav-text">3.2 比较指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-无条件转移指令"><span class="nav-text">3.3 无条件转移指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-表跳转指令"><span class="nav-text">3.4 表跳转指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-异常"><span class="nav-text">3.5 异常</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-方法调用与返回"><span class="nav-text">4.方法调用与返回</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-方法调用指令"><span class="nav-text">4.1 方法调用指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-方法返回指令"><span class="nav-text">4.2 方法返回指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-线程同步"><span class="nav-text">5.线程同步</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

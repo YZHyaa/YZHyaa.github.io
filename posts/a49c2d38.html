@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="在项目里面，什么地方会开启事务，或者配置了事务？无论是在方法上加注解，还是配置切面。 12345678&amp;lt;tx:adviceid=&quot;txAdvice&quot;transaction-manager=&quot;transactionManager&quot;&amp;gt;     &amp;lt;tx:attributes&amp;gt;        &amp;lt;tx:methodname=&quot;save*&quot; rollback-for=&quot;Throw">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【MySQL】事务与锁（一）：详解数据库事务及并发时可能出现的问题">
+<meta property="og:url" content="https://yzhblog.work/posts/a49c2d38.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="在项目里面，什么地方会开启事务，或者配置了事务？无论是在方法上加注解，还是配置切面。 12345678&amp;lt;tx:adviceid=&quot;txAdvice&quot;transaction-manager=&quot;transactionManager&quot;&amp;gt;     &amp;lt;tx:attributes&amp;gt;        &amp;lt;tx:methodname=&quot;save*&quot; rollback-for=&quot;Throw">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201101014238752.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031215550426.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031215613254.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201101031346439.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031215952269.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201031220158913.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T15:07:09.267Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【MySQL】事务与锁（一）：详解数据库事务及并发时可能出现的问题">
+<meta name="twitter:description" content="在项目里面，什么地方会开启事务，或者配置了事务？无论是在方法上加注解，还是配置切面。 12345678&amp;lt;tx:adviceid=&quot;txAdvice&quot;transaction-manager=&quot;transactionManager&quot;&amp;gt;     &amp;lt;tx:attributes&amp;gt;        &amp;lt;tx:methodname=&quot;save*&quot; rollback-for=&quot;Throw">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201101014238752.png#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/a49c2d38.html">
+
+
+
+
+
+  <title>【MySQL】事务与锁（一）：详解数据库事务及并发时可能出现的问题 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/a49c2d38.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【MySQL】事务与锁（一）：详解数据库事务及并发时可能出现的问题</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-03T00:00:00+08:00">
+                2019-10-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据存储/" itemprop="url" rel="index">
+                    <span itemprop="name">数据存储</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4.2k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  15
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在项目里面，什么地方会开启事务，或者配置了事务？无论是在方法上加注解，还是配置切面。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tx:adviceid="txAdvice"transaction-manager="transactionManager"</span>&gt;</span> </span><br><span class="line">    <span class="tag">&lt;<span class="name">tx:attributes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:methodname="save*"</span> <span class="attr">rollback-for</span>=<span class="string">"Throwable"</span>/&gt;</span> </span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:methodname="add*"</span> <span class="attr">rollback-for</span>=<span class="string">"Throwable"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:methodname="send*"</span> <span class="attr">rollback-for</span>=<span class="string">"Throwable"</span>/&gt;</span> </span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:methodname="insert*"</span> <span class="attr">rollback-for</span>=<span class="string">"Throwable"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tx:attributes</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;/<span class="name">tx:advice</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>比如下单，会操作订单表，资金表，物流表等等，这个时候我们需要让这些操作都在一个事务里面完成。当一个业务流程涉及多个表的操作的时候，我们希望它们要么是全部成功的，要么都不成功，这个时候我们会启用事务。</p>
+<p>在金融的系统里面事务配置是很常见的，比如行内转账的这种操作，如果我们把它简单地理解为一个账户的余额增加，另一个账户的余额减少的情况（当然实际上要比这复杂），那么这两个动作一定是同时成功或者同时失败的，否则就会造成银行的会计科目不平衡。</p>
+<a id="more"></a>
+<h2 id="1-什么是事务？"><a href="#1-什么是事务？" class="headerlink" title="1.什么是事务？"></a>1.什么是事务？</h2><blockquote>
+<p>维基百科的定义：事务是数据库管理系统（DBMS）执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成。</p>
+</blockquote>
+<p>可以通俗理解为：就是把多件事情当做一件事情来处理，好比大家同在一条船上，要活一起活，要完一起完 。</p>
+<p>这里面有两个关键点：</p>
+<ol>
+<li>它是数据库最小的工作单元，是不可以再分的。</li>
+<li>它可能包含了一个或者一系列的DML语句，包括 insert delete update。（单条DDL（create drop）和 DCL（grant revoke）也会有事务）</li>
+</ol>
+<p><strong>所以，数据库中哪些存储引擎支持事务？</strong></p>
+<p>在 <a href="https://blog.csdn.net/weixin_43935927/article/details/109324057" target="_blank" rel="noopener">查询sql的执行过程及MySQL架构分析</a> 里面我们说到了，InnoDB支持事务，这个也是它成为默认的存储引擎的一个重要原因：<a href="https://dev.mysql.com/doc/refman/5.7/en/storage-engines.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/storage-engines.html</a>，另一个是NDB。</p>
+<h2 id="2-事务的四大特性"><a href="#2-事务的四大特性" class="headerlink" title="2.事务的四大特性"></a>2.事务的四大特性</h2><p>事务的四大特性：ACID。</p>
+<h3 id="2-1-原子性（Atomicity）"><a href="#2-1-原子性（Atomicity）" class="headerlink" title="2.1 原子性（Atomicity）"></a>2.1 原子性（Atomicity）</h3><p>原子性也就是我们刚才说的不可再分，也就意味着我们对数据库的一系列的操作，要么都是成功，要么都是失败，不可能出现部分成功或者部分失败的情况。以转账的场景为例，一个账户的余额减少，对应一个账户的增加，这两个一定是同时成功或者同时失败的。</p>
+<p>全部成功比较简单，问题是如果前面一个操作已经成功了，后面的操作失败了，怎么让它全部失败呢？这个时候我们必须要回滚。</p>
+<p>原子性，在InnoDB里面是通过undo log来实现的，它记录了数据修改之前的值（逻辑日志），一旦发生异常，就可以用undo log 来实现回滚操作。</p>
+<h3 id="2-2-一致性（Consistent）"><a href="#2-2-一致性（Consistent）" class="headerlink" title="2.2 一致性（Consistent）"></a>2.2 一致性（Consistent）</h3><p>一致性指的是数据库的完整性约束没有被破坏，事务执行的前后都是合法的数据状态。比如主键必须是唯一的，字段长度符合要求。</p>
+<p>除了数据库自身的完整性约束，还有一个是用户自定义的完整性。比如说转账的这个场景，A账户余额减少1000，B账户余额只增加了500，这个时候因为两个操作都成功了，按照我们对原子性的定义，它是满足原子性的， 但是它没有满足一致性，因为它导致了会计科目的不平衡。</p>
+<p>还有一种情况，A 账户余额为 0，如果这个时候转账成功了，A 账户的余额会变成-1000，虽然它满足了原子性的，但是我们知道，借记卡的余额是不能够小于0的，所以也违反了一致性。用户自定义的完整性通常要在代码中控制。</p>
+<h3 id="2-3-隔离性（Isolation）"><a href="#2-3-隔离性（Isolation）" class="headerlink" title="2.3 隔离性（Isolation）"></a>2.3 隔离性（Isolation）</h3><p>我们有了事务的定义以后，在数据库里面会有很多的事务同时去操作我们的同一张表或者同一行数据，必然会产生一些并发或者干扰的操作，那么我们对隔离性的定义，就是这些很多个的事务，对表或者行的并发操作，应该是透明的，互相不干扰的。</p>
+<p>通过这种方式，我们最终也是保证业务数据的一致性。</p>
+<h3 id="2-4-持久性（Durable）"><a href="#2-4-持久性（Durable）" class="headerlink" title="2.4 持久性（Durable）"></a>2.4 持久性（Durable）</h3><p>事务的持久性是什么意思呢？我们对数据库的任意的操作，增删改，只要事务提交成功，那么结果就是永久性的，不可能因为我们系统宕机或者重启了数据库的服务器，它又恢复到原来的状态了。这个就是事务的持久性。</p>
+<p>持久性怎么实现呢？数据库崩溃恢复（crash-safe）是通过什么实现的？持久性是通过redo log和double write双写缓冲来实现的，我们操作数据的时候，会先写到内存的 buffer pool 里面，同时记录 redo log，如果在刷盘之前出现异常，在重启后就可以读取redo log的内容，写入到磁盘，保证数据的持久性。</p>
+<p>当然，恢复成功的前提是数据页本身没有被破坏，是完整的，这个通过双写缓冲（double write）保证。</p>
+<blockquote>
+<p>==&gt; <strong>原子性，隔离性，持久性，最后都是为了实现一致性。</strong></p>
+</blockquote>
+<h2 id="3-数据库如何操作事务？"><a href="#3-数据库如何操作事务？" class="headerlink" title="3.数据库如何操作事务？"></a>3.数据库如何操作事务？</h2><h3 id="3-1-数据库什么时候会出现事务？"><a href="#3-1-数据库什么时候会出现事务？" class="headerlink" title="3.1 数据库什么时候会出现事务？"></a>3.1 数据库什么时候会出现事务？</h3><p>无论是我们在 Navicat 的这种工具里面去操作，还是在我们的 Java 代码里面通过 API 去操作，还是加上@Transactional 的注解或者 AOP 配置，其实最终都是发送一个指令到数据库去执行，Java的JDBC只不过是把这些命令封装起来了。</p>
+<p>我们先来看一下我们的操作环境。版本，存储引擎，事务隔离级别。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select version(); -- 5.7</span><br><span class="line">show variables like &apos;%engine%&apos;; -- InnnoDB</span><br><span class="line">show global variables like &quot;tx_isolation&quot;; -- RR</span><br></pre></td></tr></table></figure>
+<p>执行这样一条更新语句的时候，它有事务吗？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update student set sname=&apos;王五&apos; where id=1;</span><br></pre></td></tr></table></figure>
+<p>实际上，它自动开启了一个事务，并且提交了，所以最终写入了磁盘。这个是开启事务的第一种方式，自动开启和自动提交。</p>
+<blockquote>
+<p>在innodb里面， 所有的活动都是运行在事务里面的，如果autocommit=1，每个SQL语句都是一个事务，innodb默认autocommit=1的，意思就是MySQL会在每个语句执行的时候自动提交事务，当然是语句没有报错，如果报错了，那就会自动回滚rollback。所以在autocommit开启的情况下，每个insert ，update ，delete，都是一个事务，只不过没有显示声明开启事务。</p>
+</blockquote>
+<h3 id="3-2-如何开启关闭事务？"><a href="#3-2-如何开启关闭事务？" class="headerlink" title="3.2 如何开启关闭事务？"></a>3.2 如何开启关闭事务？</h3><p>InnoDB里面有一个autocommit的参数（分成两个级别， session级别和global级别）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;autocommit&apos;;</span><br></pre></td></tr></table></figure>
+<p>它的默认值是ON。autocommit这个参数是什么意思呢？是否自动提交。如果它的值是true/on的话，我们在操作数据的时候，会自动开启一个事务，和自动提交事务。否则，如果我们把autocommit设置成false/off，那么数据库的事务就需要我们手动地去开启和手动地去结束。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set autocommit = &apos;OFF&apos;; -- 这只是session级别的关闭，全局关闭需要global</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201101014238752.png#pic_center" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>MySQL默认操作模式就是autocommit自动提交模式。这就表示除非显式地开始一个事务，否则每个查询都被当做一个单独的事务自动执行。我们可以通过设置autocommit的值改变是否是自动提交autocommit模式。</p>
+<p><br>所以，什么时候需要手动开启和提交事务？</p>
+<ol>
+<li>在autocommit开的情况下，你又想多个语句凑成一个事务，就要显式的声明事务了，使用begin, 或者start transaction, 事务结尾使用commit, 或者rollback。</li>
+<li>autocommit=0,关闭了自动提交事务，那么整个对话里的所有语句就处于一个长事务，需要显式的commit或者rollback。</li>
+</ol>
+</blockquote>
+<p>手动开启事务也有几种方式，一种是用<code>begin</code>；一种是用<code>start transaction</code>。那么怎么结束一个事务呢？我们结束也有两种方式，第一种就是提交一个事务，<code>commit</code>；还有一种就是<code>rollback</code>，回滚的时候，事务也会结束。还有一种情况，客户端的连接断开的时候，事务也会结束。当我们结束一个事务的时候，事务持有的锁就会被释放，无论是提交还是回滚。</p>
+<p>如果我们用begin手工开启一个事务，执行update，但是数据没有写入磁盘，因为事务还没有提交，这个时候commit一下，再刷新一下，OK，写入了。</p>
+<h2 id="4-事务并发会带来什么问题？"><a href="#4-事务并发会带来什么问题？" class="headerlink" title="4.事务并发会带来什么问题？"></a>4.事务并发会带来什么问题？</h2><p>当很多事务并发地去操作数据库的表或者行的时候，如果没有我们刚才讲的事务的Isolation隔离性的时候，会带来哪些问题呢？</p>
+<h3 id="4-1-脏读"><a href="#4-1-脏读" class="headerlink" title="4.1 脏读"></a>4.1 脏读</h3><blockquote>
+<p>事务A读取到了事务B已经修改但尚未提交的数据，还在这个数据基础上做了操作。此时，如果B事务回滚，A读取的数据无效，不符合一致性要求。        </p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20201031215550426.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>我们有两个事务，一个是Transaction A，一个是Transaction B，在第一个事务里面，它首先通过一个where id=1的条件查询一条数据，返回name=Ada，age=16的这条数据。然后第二个事务，它同样地是去操作id=1的这行数据，它通过一个update的语句，把这行id=1的数据的age改成了18，但是注意，它<strong>没有提交</strong>。</p>
+<p>这个时候，在第一个事务里面，它再次去执行相同的查询操作，发现数据发生了变化，获取到的数据age变成了18。那么，这种在一个事务里面，由于其他的时候修改了数据并且没有提交，而导致了前后两次读取数据不一致的情况，这种事务并发的问题，我们把它定义成什么？这种读取到其他事务未提交的数据的情况，我们把它叫做脏读。</p>
+<h3 id="4-2-不可重复读"><a href="#4-2-不可重复读" class="headerlink" title="4.2 不可重复读"></a>4.2 不可重复读</h3><blockquote>
+<p>事务A读取到了事务B已经提交的修改数据，不符合隔离性</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20201031215613254.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>同样是两个事务，第一个事务通过id=1查询到了一条数据。然后在第二个事务里面执行了一个update操作，这里大家注意一下，执行了update以后它通过一个commit <strong>提交了修改</strong>。</p>
+<p>然后第一个事务读取到了其他事务已提交的数据导致前后两次读取数据不一致的情况，就像这里，age到底是等于16 还是18，那么这种事务并发带来的问题，我们把它叫做什么？这种一个事务读取到了其他事务已提交的数据导致前后两次读取数据不一致的情况，我们把它叫做不可重复读。</p>
+<h3 id="4-3-幻读"><a href="#4-3-幻读" class="headerlink" title="4.3 幻读"></a>4.3 幻读</h3><blockquote>
+<p>事务A读取到了事务B提交的新增数据，不符合隔离性</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20201101031346439.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>在第一个事务里面我们执行了一个范围查询，这个时候满足条件的数据只有一条。在第二个事务里面，它<strong>插入了一行数据，并且提交了</strong>。重点：插入了一行数据。在第一个事务里面再去查询的时候，它发现多了一行数据。这种情况，我们把它叫做什么呢？一个事务前后两次读取数据数据不一致，是由于其他事务插入数据造成的，这种情况我们把它叫做幻读。</p>
+<p>不可重复读和幻读，的区别在那里呢？不可重复读是修改或者删除，幻读是插入。</p>
+<blockquote>
+<p>小结：我们刚才讲了事务并发带来的三大问题，现在来总结一下。无论是脏读，还是不可重复读，还是幻读，它们都是数据库的<strong>读一致性问题</strong>，都是在一个事务里面前后两次读取出现了不一致的情况。</p>
+<p><br> 读一致性的问题，必须要由数据库提供一定的事务隔离机制来解决。就像我们去饭店吃饭，基本的设施和卫生保证都是饭店提供的。那么我们使用数据库，隔离性的问题也必须由数据库帮助我们来解决。</p>
+</blockquote>
+<h2 id="5-如何解决并发处理事务带来的问题？"><a href="#5-如何解决并发处理事务带来的问题？" class="headerlink" title="5.如何解决并发处理事务带来的问题？"></a>5.如何解决并发处理事务带来的问题？</h2><h3 id="5-1-SQL92标准"><a href="#5-1-SQL92标准" class="headerlink" title="5.1 SQL92标准"></a>5.1 SQL92标准</h3><p>所以，就有很多的数据库专家联合制定了一个标准，也就是说建议数据库厂商都按照这个标准，提供一定的事务隔离级别，来解决事务并发的问题，这个就是SQL92标准。我们来看一下SQL92标准的<a href="http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt" target="_blank" rel="noopener">官网</a>。 这里面有一张表格（搜索_iso），里面定义了四个隔离级别。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031215952269.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>右边的P1 P2 P3就是代表事务并发的3个问题，脏读，不可重复读，幻读。Possible代表在这个隔离级别下，这个问题有可能发生，换句话说，没有解决这个问题。Not Possible就是解决了这个问题。我们详细地分析一下这4个隔离级别是怎么定义的。</p>
+<ul>
+<li>第一个隔离级别叫做：Read Uncommitted（未提交读），一个事务可以读取到其他事务未提交的数据，会出现脏读，所以叫做RU，它没有解决任何的问题。</li>
+<li>第二个隔离级别叫做：Read Committed（已提交读），也就是一个事务只能读取到其他事务已提交的数据，不能读取到其他事务未提交的数据，它解决了脏读的问题，但是会出现不可重复读的问题。</li>
+<li>第三个隔离级别叫做：Repeatable Read (可重复读)，它解决了不可重复读的问题，也就是在同一个事务里面多次读取同样的数据结果是一样的，但是在这个级别下，没有定义解决幻读的问题。</li>
+<li>最后一个就是：Serializable（串行化），在这个隔离级别里面，所有的事务都是串行执行的，也就是对数据的操作需要排队，已经不存在事务的并发操作了，所以它解决了所有的问题。</li>
+</ul>
+<p>这个是SQL92的标准，但是不同的数据库厂商或者存储引擎的实现有一定的差异，比如Oracle里面就只有两种RC（已提交读）和Serializable（串行化）。那么InnoDB的实现又是怎么样的呢？</p>
+<h3 id="5-2-InnoDB-对隔离级别的支持"><a href="#5-2-InnoDB-对隔离级别的支持" class="headerlink" title="5.2 InnoDB 对隔离级别的支持"></a>5.2 InnoDB 对隔离级别的支持</h3><p>在MySQL InnoDB里面，不需要使用串行化的隔离级别去解决所有问题。那我们来看一下MySQL InnoDB里面对数据库事务隔离级别的支持程度是什么样的。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201031220158913.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>InnoDB支持的四个隔离级别和SQL92定义的基本一致，<strong>隔离级别越高，事务的并发度就越低</strong>。唯一的区别就在于，InnoDB在RR的级别就解决了幻读的问题。这个也是InnoDB默认使用RR作为事务隔离级别的原因，既保证了数据的一致性，又支持较高的并发度。</p>
+<h3 id="5-3-如何设置事务隔离级别"><a href="#5-3-如何设置事务隔离级别" class="headerlink" title="5.3 如何设置事务隔离级别"></a>5.3 如何设置事务隔离级别</h3><p>可以通过以下命令设置事务隔离级别：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">set session transaction isolation level read uncommitted  -- 读未提交</span><br><span class="line">set session transaction isolation level read committed    -- 读已提交</span><br><span class="line">set session transaction isolation level repeatalbe read   -- 可重复读</span><br><span class="line">set session transaction isolation level serializable      -- 串行化</span><br></pre></td></tr></table></figure></p>
+<h3 id="5-4-事务隔离级别怎么选？"><a href="#5-4-事务隔离级别怎么选？" class="headerlink" title="5.4 事务隔离级别怎么选？"></a>5.4 事务隔离级别怎么选？</h3><p>RU 和 Serializable 肯定不能用。为什么网上有些文章推荐有RC？RC和RR主要有几个区别：</p>
+<ol>
+<li>RR的间隙锁会导致锁定范围的扩大。</li>
+<li>条件列未使用到索引，RR锁表，RC锁行。</li>
+<li>RC的“半一致性”（semi-consistent）读可以增加update操作的并发性。</li>
+</ol>
+<p>在RC中，一个update语句，如果读到一行已经加锁的记录，此时InnoDB返回记录最近提交的版本，由MySQL上层判断此版本是否满足 update的where条件。若满足(需要更新)，则MySQL会重新发起一次读操作，此时会读取行的最新版本(并加锁)。</p>
+<p>实际上，如果能够正确地使用锁（避免不使用索引去加锁），只锁定需要的数据，用默认的RR级别就可以了。</p>
+<blockquote>
+<p>所以，事务隔离级别的实现原理是什么？请看这篇<a href="https://blog.csdn.net/weixin_43935927/article/details/109438837" target="_blank" rel="noopener">【MySQL】并发控制方案（LBCC，MVCC）及死锁问题分析</a>…</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/a49c2d38.html" title="【MySQL】事务与锁（一）：详解数据库事务及并发时可能出现的问题">https://yzhblog.work/posts/a49c2d38.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/f3a98a04.html" rel="next" title="【MySQL】事务与锁（二）：锁粒度？表锁，行锁。锁模式？共享锁，排他锁，意向锁。锁算法？记录锁，间隙锁，临键锁">
+                <i class="fa fa-chevron-left"></i> 【MySQL】事务与锁（二）：锁粒度？表锁，行锁。锁模式？共享锁，排他锁，意向锁。锁算法？记录锁，间隙锁，临键锁
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/e2df609d.html" rel="prev" title="【MySQL】事务与锁（三）：行锁到底锁住的是什么？记录？字段？索引？">
+                【MySQL】事务与锁（三）：行锁到底锁住的是什么？记录？字段？索引？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-什么是事务？"><span class="nav-text">1.什么是事务？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-事务的四大特性"><span class="nav-text">2.事务的四大特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-原子性（Atomicity）"><span class="nav-text">2.1 原子性（Atomicity）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-一致性（Consistent）"><span class="nav-text">2.2 一致性（Consistent）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-隔离性（Isolation）"><span class="nav-text">2.3 隔离性（Isolation）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-持久性（Durable）"><span class="nav-text">2.4 持久性（Durable）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-数据库如何操作事务？"><span class="nav-text">3.数据库如何操作事务？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-数据库什么时候会出现事务？"><span class="nav-text">3.1 数据库什么时候会出现事务？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-如何开启关闭事务？"><span class="nav-text">3.2 如何开启关闭事务？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-事务并发会带来什么问题？"><span class="nav-text">4.事务并发会带来什么问题？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-脏读"><span class="nav-text">4.1 脏读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-不可重复读"><span class="nav-text">4.2 不可重复读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-幻读"><span class="nav-text">4.3 幻读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-如何解决并发处理事务带来的问题？"><span class="nav-text">5.如何解决并发处理事务带来的问题？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-SQL92标准"><span class="nav-text">5.1 SQL92标准</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-InnoDB-对隔离级别的支持"><span class="nav-text">5.2 InnoDB 对隔离级别的支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-如何设置事务隔离级别"><span class="nav-text">5.3 如何设置事务隔离级别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-事务隔离级别怎么选？"><span class="nav-text">5.4 事务隔离级别怎么选？</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

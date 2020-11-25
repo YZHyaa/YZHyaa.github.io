@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="Java虚拟机（java virtual machine，JVM)，一种能够运行Java自己Emma的虚拟机。作为一种编程语言的虚拟机，实际上不只是专用于Java语言，只要生成的编译文件匹配JVM对加载编译文件的格式要求，任何语言都可以由JVM编译运行。比如 kotlin、scala等。JVM有很多，不只是Hotspot，还有Jrockit、J9等等。 JVM主要由三个主要的子系统构成：类加载子系">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【JVM】第三篇：详解JVM整体结构">
+<meta property="og:url" content="https://yzhblog.work/posts/52d7a5ed.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="Java虚拟机（java virtual machine，JVM)，一种能够运行Java自己Emma的虚拟机。作为一种编程语言的虚拟机，实际上不只是专用于Java语言，只要生成的编译文件匹配JVM对加载编译文件的格式要求，任何语言都可以由JVM编译运行。比如 kotlin、scala等。JVM有很多，不只是Hotspot，还有Jrockit、J9等等。 JVM主要由三个主要的子系统构成：类加载子系">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212831589.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212129762.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212220391.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212302686.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212935613.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212519813.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212604382.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212632329.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020102123311757.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212653538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021213701410.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212729389.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212710132.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021212758965.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T10:22:10.622Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【JVM】第三篇：详解JVM整体结构">
+<meta name="twitter:description" content="Java虚拟机（java virtual machine，JVM)，一种能够运行Java自己Emma的虚拟机。作为一种编程语言的虚拟机，实际上不只是专用于Java语言，只要生成的编译文件匹配JVM对加载编译文件的格式要求，任何语言都可以由JVM编译运行。比如 kotlin、scala等。JVM有很多，不只是Hotspot，还有Jrockit、J9等等。 JVM主要由三个主要的子系统构成：类加载子系">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201021212831589.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/52d7a5ed.html">
+
+
+
+
+
+  <title>【JVM】第三篇：详解JVM整体结构 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/52d7a5ed.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【JVM】第三篇：详解JVM整体结构</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-27T00:00:00+08:00">
+                2019-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  5.5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  19
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java虚拟机（java virtual machine，JVM)，一种能够运行Java自己Emma的虚拟机。作为一种编程语言的虚拟机，实际上不只是专用于Java语言，只要生成的编译文件匹配JVM对加载编译文件的格式要求，任何语言都可以由JVM编译运行。比如 kotlin、scala等。JVM有很多，不只是Hotspot，还有Jrockit、J9等等。</p>
+<p>JVM主要由三个主要的子系统构成：类加载子系统，运行时数据区（内存结构），执行引擎。</p>
+<a id="more"></a>
+<p><img src="https://img-blog.csdnimg.cn/20201021212831589.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h1 id="1-类加载子系统"><a href="#1-类加载子系统" class="headerlink" title="1.类加载子系统"></a>1.类加载子系统</h1><blockquote>
+<p>Java之所以可以“一次编译，到处运行”，一是因为JVM针对各种操作系统、平台都进行了定制环境（JRE)；二是因为无论在什么平台，都可以编译生成固定格式的字节码（.class文件）供JVM使用。因此，也可以看出字节码对于Java生态的重要性。之所以被称之为字节码，是因为字节码文件由十六进制值组成，而JVM以两个十六进制值为一组，即以字节为单位进行读取…（关于字节码的内容可以参考我关于字节码文件的<a href="https://blog.csdn.net/weixin_43935927/article/details/109209730" target="_blank" rel="noopener">这篇文章</a>）</p>
+</blockquote>
+<h2 id="1-1-类的生命周期"><a href="#1-1-类的生命周期" class="headerlink" title="1.1 类的生命周期"></a>1.1 类的生命周期</h2><p>类的生命周期如下图：<br><img src="https://img-blog.csdnimg.cn/20201021212129762.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ol>
+<li><p>加载：查找和导入class文件，过程如下：</p>
+<p>(1).通过一个类的全限定名获取定义此类的二进制字节流，并通过IO字节流读入</p>
+<p>(2).将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构</p>
+<p>(3).在Java堆中生成一个代表这个类的java.lang.Class对象，作为对方法区中这些数据的访问入口</p>
+<p> 注：类加载器不会一次将所有class都装入，而是按需装入，即用到时再装入</p>
+</li>
+<li><p>连接：分为以下三步</p>
+<ol>
+<li><strong>校验</strong>：检验字节码文件的正确性</li>
+<li><strong>准备</strong>：给类变量分配内存，并赋予默认值（0，null）</li>
+<li><strong>解析</strong>：装入当前类所引用的其他类，将符号引用替换为直接引用，放入运行时常量池<ol>
+<li>主动引用：<ul>
+<li>虚拟机启动时，定义了main()的类先初始化</li>
+<li>当初始化一个类时，发现了其父类还未初始化，则先初始化其父类</li>
+<li>创建类的实例（new）</li>
+<li>访问类的静态变量</li>
+<li>访问类的静态方法</li>
+<li>反射（如，Class.forName) </li>
+</ul>
+<ol start="2">
+<li>被动引用：<ul>
+<li>对象数组</li>
+<li>调用静态常量</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>初始化：对类的<strong>静态变量</strong>初始化为指定的值，<strong>执行静态代码块</strong>（到现在才开始执行自己代码）</p>
+</li>
+</ol>
+<ol start="4">
+<li><p>使用：Class对象   –<em><code>创建</code></em>–<em><code>初始化</code></em>–<em><code>分配内存</code></em>–&gt;   <strong>实例对象</strong>（1-&gt;N)</p>
+</li>
+<li><p>卸载：将不用的Class对象删除，将对应InstanceKlass对象删除</p>
+</li>
+</ol>
+<h2 id="1-2-类装载器ClassLoader"><a href="#1-2-类装载器ClassLoader" class="headerlink" title="1.2  类装载器ClassLoader"></a>1.2  类装载器ClassLoader</h2><p>在装载(Load)阶段，其中第(1)步:通过类的全限定名获取其定义的二进制字节流，需要借助类装载器完成，顾名思义，就是用来装载Class文件的。 </p>
+<ul>
+<li><p>启动类加载器（Bootstrap ClassLoader）：负责加载jre的核心类库，如jre下的rt.jar/charset.jar等</p>
+<p>注：这里加载jre lib是因为jre是运行环境；一个jar包由一个或多个class文件组成</p>
+</li>
+<li><p>扩展类加载器（Extension ClassLoader）：负责加载jre扩展目录ext中的jar包</p>
+</li>
+<li><p>系统类加载器（App ClassLoader）：加载classpath路径下的类包</p>
+<p>注：classpath是存放用户自定义类.class文件的地方，一般为classes目录</p>
+</li>
+<li><p>用户自定义加载器（Custom ClassLoader）：负载加载用户自定义目录下的类包</p>
+<p>注：应用程序根据自身需要自定义的ClassLoader，如tomcat、jboss都会根据j2ee规范自行实现ClassLoader</p>
+</li>
+</ul>
+<h2 id="1-3-类加载机制"><a href="#1-3-类加载机制" class="headerlink" title="1.3 类加载机制"></a>1.3 类加载机制</h2><ul>
+<li><p><strong>全盘负责委托机制</strong>：当一个ClassLoader加载一个类时，除非显式的使用另一个ClassLoader，该类所依赖和引用的类也由这个ClassLoader载入。即一般情况下都是依赖main的加载器（APPClassLoader）</p>
+</li>
+<li><p><strong>双亲委派机制</strong>：指先委托父类加载器寻找目标类，在找不到的情况下再从自己的路径中查找并载入目标类</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212220391.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<ul>
+<li><p>优点：Java类随着加载它的类加载器一起具备了一种带有优先级的层次关系，从而使核心类可以优先加载，避免了类重复加载，并且防止核心类被篡改（沙箱安全机制）</p>
+<p>比如 Java中的 Object类，它存放在rt.jar之中,无论哪一个类加载器要加载这个类，最终都是委派给处于模型最顶端的启动类加载器进行加载，因此Object在各种类加载环境中都是同一个类。如果不采用双亲委派模型，那么由各个类加载器自己取加载的话，那么系统中会存在多种不同的Object 类。</p>
+</li>
+<li><p>破坏：可以继承ClassLoader类，然后重写其中的loadClass方法来打破双亲委派。下面放两个链接</p>
+<ul>
+<li><a href="https://blog.csdn.net/zhouxcwork/article/details/81566636?depth_1-utm_source=distribute.pc_relevant.none-task-blog-OPENSEARCH-4&amp;utm_source=distribute.pc_relevant.none-task-blog-OPENSEARCH-4" target="_blank" rel="noopener">自定义ClassLoader并重写findClass方法</a></li>
+<li><a href="https://blog.csdn.net/cy973071263/article/details/104129163?depth_1-utm_source=distribute.pc_relevant.none-task-blog-OPENSEARCH-1&amp;utm_source=distribute.pc_relevant.none-task-blog-OPENSEARCH-1" target="_blank" rel="noopener">sqlDriver打破双亲委派示例</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="2-运行时数据区"><a href="#2-运行时数据区" class="headerlink" title="2.运行时数据区"></a>2.运行时数据区</h1><blockquote>
+<p>在类的加载阶段的第(2),(3)步可以发现有运行时数据，堆，方法区等名词 </p>
+<ul>
+<li>(2)将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构 </li>
+<li>(3)在Java堆中生成一个代表这个类的java.lang.Class对象，作为对方法区中这些数据的访问入口</li>
+</ul>
+<p>说白了运行时数据区就是类文件被类装载器装载进来之后，类中的内容（比如变量，常量，方法，对象等这些数据）得要有个去处，也就是要存储起来，存储的位置肯定是在JVM中有对应的空间</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20201021212302686.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h2 id="2-1-Method-Area-方法区）"><a href="#2-1-Method-Area-方法区）" class="headerlink" title="2.1  Method Area(方法区）"></a>2.1  Method Area(方法区）</h2><p>方法区是各个<strong>线程共享</strong>的内存区域，在虚拟机启动时创建。<br><img src="https://img-blog.csdnimg.cn/20201021212935613.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="2-1-1-方法区存什么"><a href="#2-1-1-方法区存什么" class="headerlink" title="2.1.1 方法区存什么"></a>2.1.1 方法区存什么</h3><p>方法区是用于存放class文件信息和运行时常量池。那class文件信息有什么呢？运行时常量池又是什么呢？</p>
+<p>1.<strong>class文件</strong>的信息包括类信息和静态常量池（Class Constant Pool）</p>
+<ul>
+<li><p>类信息：包括的所有字段和方法字节码，以及一些特殊方法如构造函数，接口代码等。更多内容可以参考关于字节码的<a href="https://blog.csdn.net/weixin_43935927/article/details/109209730" target="_blank" rel="noopener">这篇文章</a>。</p>
+</li>
+<li><p>class常量池：用于存放编译时生成的各种字面量和符号引用。</p>
+<ul>
+<li>字面量就是我们所说的常量概念。一般包括：文本字符串(“abc”)、基本数据类型的值(1)</li>
+<li>符号引用是一组符号来描述所引用的目标，因为只有在运行时才会知道每个对象的具体地址，比如 <code>A a = new A()</code> 并不知道A对象在运行时的内存地址。一般包括：类和接口的全限定名，字段的名称和描述符，方法的名称和描述符。（描述符是描述字段或方法的类型的字符串）</li>
+</ul>
+</li>
+</ul>
+<p>可以理解成类信息是框架，常量池负责存储具体内容。另外，符号引用和字符串字面量的区别是，符号引用不是直接存储字符串，而是存储字符串在常量池里的索引（#~）</p>
+<p>2.<strong>运行时常量池</strong>的话也叫动态常量池，在JVM的类解析阶段，会将class常量池里的符号引用转为直接引用（内存地址）。即动态常量池是静态常量池加载到内存后的版本。</p>
+<ul>
+<li>与class常量池相同点：运行时常量池也是每个类都有一个的</li>
+<li><p>与class常量池的区别：</p>
+<ul>
+<li><p>class常量池中存放的是字面量和符号引用，而运行时常量池存放的是直接引用（内存地址）</p>
+</li>
+<li><p>class常量池在编译就确定了，但运行时常量池可以动态添加内容。例如调用String的intern方法就能将string的值添加到String常量池中，这里String常量池是包含在动态常量池里的，但在jdk1.8后，将String常量池放到了堆中</p>
+<p>注：final只是将当前变量的访问标识ACC_FINAL置为1，表示当前变量值不可变（线程安全），并不能代表存储位置，更不能说有final它就进入常量池了。示例代码可以参考<a href="http://www.jeepxie.net/article/460260.html" target="_blank" rel="noopener">这篇</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>另外，这里再说一下<strong>字符串常量池</strong>。在HotSpot VM里实现的string pool功能的是一个StringTable类，它是一个Hash表，默认值大小长度是1009；这个StringTable在每个HotSpot VM的实例只有一份，被所有的类共享，所以也叫全局常量池。字符串常量由一个一个字符组成，放在了StringTable上。这三个常量池的对比详细见<a href="https://tangxman.github.io/2015/07/27/the-difference-of-java-string-pool/" target="_blank" rel="noopener">这篇</a>。</p>
+<p>最后，一定要注意一点，静态变量现在并不是存在于方法区。在JDK7以上版本，<strong>静态变量</strong>（线程不安全）是存储于定义类型的Class对象中，而Class对象同堆中的其他对象一样都存在与GC堆中。</p>
+<h3 id="2-1-2-永久代和元空间是什么"><a href="#2-1-2-永久代和元空间是什么" class="headerlink" title="2.1.2 永久代和元空间是什么"></a>2.1.2 永久代和元空间是什么</h3><p>《Java虚拟机规范》只是规定了有方法区这么个概念和它的作用，，并没有规定如何去实现它。那么，在不同的JVM上方法区的实现肯定是不同的了。而我们最常听见的实现就是<strong>永久代和元空间</strong>，它们有什么关系呢？永久代在虚拟机当中，永久代逻辑结构上也属于堆，但是物理上不属于；而元数据区不在虚拟机当中，而是用的本地内存。JDK1.8之后，元空间（Meta Data）替代了永久代，</p>
+<ul>
+<li><p>jdk1.6及以前：有永久代，常量池在方法区</p>
+</li>
+<li><p>jdk1.7：有永久代，逐步“去永久代”，常量池在堆内存</p>
+</li>
+<li><p>jdk1.8及以后：无永久代，常量池在元空间（HotSpot JVM –&gt; JRockit JVM）</p>
+</li>
+</ul>
+<p>为什么移除了永久代？参考<a href="http://openjdk.java.net/jeps/122" target="_blank" rel="noopener">官方解释</a>。大概意思是移除永久代是为融合HotSpot与 JRockit而做出的努力，因为JRockit没有永久代，不需要配置永久代。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212519813.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h2 id="2-2-Heap-堆"><a href="#2-2-Heap-堆" class="headerlink" title="2.2 Heap(堆)"></a>2.2 Heap(堆)</h2><p>Java堆是Java虚拟机所管理内存中最大的一块，在虚拟机启动时创建，被所有<strong>线程共享</strong>。 用于<strong>存放对象的实例和数组</strong>，几乎所有对象（包括常量池）都在堆上分配内存，当对象无法在该空间申请到内存是将抛出OutOfMemoryError异常。同时也是垃圾收集器管理的主要区域。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212604382.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="2-2-1-堆的组成"><a href="#2-2-1-堆的组成" class="headerlink" title="2.2.1 堆的组成"></a>2.2.1 堆的组成</h3><p>堆（heap）由两部分组成，新生代(Young)和老年代(Old)，而新生代又分为伊甸区(Eden)和幸存者区(Survivor)，幸存者区又分为From区(S0)和To区(S1)：</p>
+<ul>
+<li><strong>新生代（1/3）</strong>：新生对象  -&gt; MinorGC<ul>
+<li>伊甸区（Eden space  8/10）：新对象一般都创建在伊甸区，经过MinorGC且存活的对象会进入幸存者区</li>
+<li>幸存者区（Survior space）:  From(1/10)  <--gc15--> To(1/10)，同一时间From和To只能一个有数据一个空</--gc15--></li>
+</ul>
+</li>
+<li><strong>老年代（2/3）</strong>：大对象 + 多次GC后仍存在的对象   -&gt; FullGC</li>
+</ul>
+<p>下面的图直观的展示了堆的组成及各部分的大小关系：</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212632329.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br><strong>问题一</strong>：为什么需要Survivor区?只有Eden不行吗？</p>
+<p>如果没有Survivor,Eden区每进行一次Minor GC,并且没有年龄限制的话，存活的对象就会被送到老年代。 这样一来，老年代很快被填满,触发Major GC(因为Major GC一般伴随着Minor GC,也可以看做触发了Full GC)。 老年代的内存空间远大于新生代,进行一次Full GC消耗的时间比Minor GC长得多。 执行时间长有什么坏处?频发的Full GC消耗的时间很长,会影响大型程序的执行和响应速度。</p>
+<p>可能你会说，那就对老年代的空间进行增加或者较少咯。 假如增加老年代空间，更多存活对象才能填满老年代。虽然降低Full GC频率，但是随着老年代空间加大,一旦发生Full GC,执行所需要的时间更长。 假如减少老年代空间，虽然Full GC所需时间减少，但是老年代很快被存活对象填满,Full GC频率增加。</p>
+<p>所以Survivor的存在意义,就是减少被送到老年代的对象,进而减少Full GC的发生,Survivor的预筛选保证,只有经历16 次Minor GC还能在新生代中存活的对象,才会被送到老年代。</p>
+<p><strong>问题二</strong>：为什么需要两个Survivor区？</p>
+<p>最大的好处就是解决了碎片化。我们现在知道了必须设置Survivor区，也就是说问题是为什么一个Survivor区不行?假设现在只有一个Survivor区,我们来模拟一下流程: 刚刚新建的对象在Eden中,一旦Eden满了,触发一次Minor GC,Eden中的存活对象就会被移动到Survivor区。这样继续循环下去,下一次Eden满了的时候问题来了,此时进行Minor GC,Eden和Survivor各有一些存活对象,如果此时把Eden区的存活对象硬放到Survivor区,很明显这两部分对象所占有的内存是不连续的,也就导致了内存碎片化。 永远有一个Survivor space是空的,另一个非空的Survivor space无碎片。</p>
+<h3 id="2-2-2-对象应该在哪里创建"><a href="#2-2-2-对象应该在哪里创建" class="headerlink" title="2.2.2 对象应该在哪里创建"></a>2.2.2 对象应该在哪里创建</h3><p>既然堆中有这么多区域，那一个对象的创建到底在哪个区域呢？一般情况下，新创建的对象都会被分配到Eden区，一些特殊的大的对象会直接分配到Old区。</p>
+<p>比如有对象A，B，C等创建在Eden区，但是Eden区的内存空间肯定有限，比如有100M，假如已经使用了 100M或者达到一个设定的临界值，这时候就需要对Eden内存空间进行清理，即垃圾收集(Garbage Collect)， 这样的GC我们称之为<strong>Minor GC</strong>，Minor GC指得是Young区的GC。 </p>
+<p>经过GC之后，有些对象就会被清理掉，有些对象可能还存活着，对于存活着的对象需要将其复制到Survivor 区，然后再清空Eden区中的这些对象。 若此时只有Eden区和From中有对象，To 中是空的。 那么进行一次GC操作，From区中对象的年龄就会+1，我们知道Eden区中所有存活的对象会被复制到To 区， From区中还能存活的对象会有两个去处：</p>
+<ul>
+<li>若对象年龄达到之前设置好的年龄阈值，此时对象会被移动到Old区</li>
+<li>如果Eden区和From区没有达到阈值的 对象会被复制到To 区</li>
+</ul>
+<p>此时Eden区和From区已经被清空(被GC的对象肯定没了，没有被GC的对象都有了各自的去处)。 这时候From和To 交换角色，之前的From变成了To ，之前的To 变成了From。也就是说无论如何都要保证名为To 的Survivor区域是空的。 Minor GC会一直重复这样的过程，直到To 区被填满，然后会将所有对象复制到老年代中。</p>
+<p>若最后老年代也满了，这时候将发生Major GC（也可以叫 <strong>Full GC</strong>）， 进行老年区的内存清理。若老年区执行了Full GC之后发现依然无法进行对象的保存，就会抛出 <strong>OOM</strong>（OutOfMemoryError）异常。</p>
+<p>下面这张图就叫做对象的一生把：<br><img src="https://img-blog.csdnimg.cn/2020102123311757.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="2-2-3-方法区和堆的关系"><a href="#2-2-3-方法区和堆的关系" class="headerlink" title="2.2.3 方法区和堆的关系"></a>2.2.3 方法区和堆的关系</h3><p>方法区中包含类的信息，堆中会有对象，那么怎么知道对象时哪个类创建的呢？所以，堆上的所有对象一定要有什么方式<strong>指向方法区</strong>。具体内容本篇就不说了，在下一篇 <a href="https://blog.csdn.net/weixin_43935927/article/details/109211903" target="_blank" rel="noopener">【JVM】第四篇：堆（Heap）上有什么？对象全方位解析</a>。。。</p>
+<h2 id="2-3-Java-Virtual-Machine-Stacks-虚拟机栈）"><a href="#2-3-Java-Virtual-Machine-Stacks-虚拟机栈）" class="headerlink" title="2.3  Java Virtual Machine Stacks(虚拟机栈）"></a>2.3  Java Virtual Machine Stacks(虚拟机栈）</h2><blockquote>
+<p>假如目前的阶段是初始化完成了，后续做啥呢？肯定是Use使用咯，不用的话这样折腾来折腾去有什么意义？那怎样才能被使用到？换句话说里面内容怎样才能被执行？比如通过主函数main调用其他方法，这种方式实际上是main线程执行之后调用的方法，即要想使用里面的各种内容，得要以线程为单位，执行相应的方法才行。</p>
+<p>那一个线程执行的状态如何维护？一个线程可以执行多少个方法？这样的关系怎么维护呢？</p>
+</blockquote>
+<p>虚拟机栈是一个线程执行的区域，保存着一个线程中方法的调用状态。换句话说，一个Java线程的运行状态，由一个虚拟机栈来保存，所以虚拟机栈肯定是<strong>线程私有</strong>的，独有的，随着线程的创建而创建(一个线程对应一个栈)。</p>
+<p>每个方法在执行的同时都会创建一个栈帧（用于存储局部变量表，操作数栈，动态链接，方法出口等信息）不存在垃圾回收问题，只要线程一结束该栈就释放，生命周期和线程一致。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212653538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="2-3-1-栈帧的组成"><a href="#2-3-1-栈帧的组成" class="headerlink" title="2.3.1 栈帧的组成"></a>2.3.1 栈帧的组成</h3><p>上面说了栈帧（一个方法就一个栈帧），那栈帧的组成是什么呢？由四部分组成：<br><img src="https://img-blog.csdnimg.cn/20201021213701410.png#pic_center" alt="在这里插入图片描述"></p>
+<ul>
+<li>局部变量表：方法中定义的局部变量以及方法的参数存放在这张表中<ul>
+<li>局部变量表中的变量不可直接使用，如需要使用的话，必须通过相关指令将其加载至操作数栈中作为操作数使用</li>
+<li>所有在方法里初始化的对象，都是线程私有的，一般安全</li>
+<li>不存在垃圾回收问题，只要线程一结束就释放，生命周期与线程一致</li>
+</ul>
+</li>
+<li>操作数栈：以压栈和出栈的方式存储操作数的</li>
+<li>动态链接：指向运行时常量池的引用(A reference to the run-time constant pool)</li>
+<li>方法出口：方法返回地址。当一个方法开始执行后,只有两种方式可以退出，一种是遇到方法返回的字节码指令；一种是遇见异常，并且 这个异常没有在方法体内得到处理</li>
+</ul>
+<h3 id="2-3-2-栈帧为什么能使函数执行"><a href="#2-3-2-栈帧为什么能使函数执行" class="headerlink" title="2.3.2 栈帧为什么能使函数执行"></a>2.3.2 栈帧为什么能使函数执行</h3><p>栈帧的这四部分如何在实际代码中完成函数执行？代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">math</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> c = (a + b) * <span class="number">10</span>;</span><br><span class="line">        <span class="keyword">return</span> c;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Demo demo = <span class="keyword">new</span> Demo();</span><br><span class="line">        <span class="keyword">int</span> math = demo.math();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译并且class文件，然后将其反编译成我们能看懂的文件。这里再额外提一句，编译过程：Demo.java -&gt; 词法分析器 -&gt; tokens流 -&gt; 语法分析器 -&gt; 语法树/抽象语法树 -&gt; 语义分析器 -&gt; 注解抽象语法树 -&gt; 字节码生成器 -&gt; Demo.class文件 </p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javac Demo.java // person.class都是不可读的字节码文件（注：若不可读则用sublime打开）</span><br><span class="line">javap javap -c -l Demo &gt; Demo.txt // 反编译当前class文件，生成汇编代码，并重定向到Person.txt</span><br></pre></td></tr></table></figure>
+<p>得到的汇编代码如下图所示，这里只对math方法的指令进行了注释，更多JVM指令可以查阅 <a href="https://blog.csdn.net/weixin_43935927/article/details/109200153" target="_blank" rel="noopener">指令助记符总结及基本指令大全</a>。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212729389.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>我画了个每条指令执行的流程图，math函数的执行其实就是靠操作数栈和局部变量表的协作完成。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212710132.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>最后再说一句，若栈调用过深，那么可能会抛出异常 <strong>StackOverFlowError</strong>（栈溢出）。</p>
+<h2 id="2-4-The-pc-Register-程序计数器"><a href="#2-4-The-pc-Register-程序计数器" class="headerlink" title="2.4  The pc Register(程序计数器)"></a>2.4  The pc Register(程序计数器)</h2><blockquote>
+<p>我们都知道一个JVM进程中有多个线程在执行，而线程中的内容是否能够拥有执行权，是根据 CPU调度来的。 </p>
+<p>假如线程A正在执行到某个地方，突然失去了CPU的执行权，切换到线程B了，然后当线程A再获得CPU执行权的时候，怎么能继续执行呢？这就是需要在线程中维护一个变量，记录线程执行到的位置。</p>
+</blockquote>
+<p>程序计数器占用的内存空间很小，由于Java虚拟机的多线程是通过线程轮流切换，并分配处理器执行时间的方式来实现的，在任意时刻，一个处理器只会执行一条线程中的指令。因此，为了线程切换后能够恢复到正确的执行位置，每条线程需要有一个独立的程序计数器(<strong>线程私有</strong>)。 </p>
+<p><strong>就是一个指针</strong>，指向方法区中的方法字节码（用来存储指向吓一跳指令的地址，也即将要执行的指令代码），由执行引擎读取下一条指令，是一个非常小的内存空间，几乎可以忽略不计：</p>
+<ul>
+<li>如果线程正在执行Java方法，则计数器记录的是正在执行的虚拟机字节码指令的地址</li>
+<li>如果正在执行的是Native方法，则这个计数器为空</li>
+</ul>
+<h2 id="2-5-Native-Method-Stacks-本地方法栈）"><a href="#2-5-Native-Method-Stacks-本地方法栈）" class="headerlink" title="2.5 Native Method Stacks(本地方法栈）"></a>2.5 Native Method Stacks(本地方法栈）</h2><p>和栈作用很相似，都是<strong>线程私有</strong>，区别不过是Java栈为JVM执行Java方法服务，而本地方法栈为JVM执行<strong>native方法</strong>服务。登记native 方法，在Execution Engine执行时加载本地方法库</p>
+<h1 id="3-执行引擎"><a href="#3-执行引擎" class="headerlink" title="3.执行引擎"></a>3.执行引擎</h1><ul>
+<li>作用：执行引擎主要负责将class字节码变成01机器码，供cpu执行</li>
+<li>方式：解释执行（启动快） + 编译执行（执行快）</li>
+<li>对常用的代码进行编译，其余的解释执行，总体上混合执行</li>
+</ul>
+<p>文章最后，放一张JVM整体结构图：</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021212758965.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/52d7a5ed.html" title="【JVM】第三篇：详解JVM整体结构">https://yzhblog.work/posts/52d7a5ed.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/3167db73.html" rel="next" title="【Redis】Java操作redis：Jedis&RedisTemplate">
+                <i class="fa fa-chevron-left"></i> 【Redis】Java操作redis：Jedis&RedisTemplate
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/137bef08.html" rel="prev" title="【JVM】第五篇：堆（Heap）上有什么？普通对象全方位解析">
+                【JVM】第五篇：堆（Heap）上有什么？普通对象全方位解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-类加载子系统"><span class="nav-text">1.类加载子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-类的生命周期"><span class="nav-text">1.1 类的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-类装载器ClassLoader"><span class="nav-text">1.2  类装载器ClassLoader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-类加载机制"><span class="nav-text">1.3 类加载机制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-运行时数据区"><span class="nav-text">2.运行时数据区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Method-Area-方法区）"><span class="nav-text">2.1  Method Area(方法区）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-方法区存什么"><span class="nav-text">2.1.1 方法区存什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-永久代和元空间是什么"><span class="nav-text">2.1.2 永久代和元空间是什么</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Heap-堆"><span class="nav-text">2.2 Heap(堆)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-堆的组成"><span class="nav-text">2.2.1 堆的组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-对象应该在哪里创建"><span class="nav-text">2.2.2 对象应该在哪里创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-3-方法区和堆的关系"><span class="nav-text">2.2.3 方法区和堆的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Java-Virtual-Machine-Stacks-虚拟机栈）"><span class="nav-text">2.3  Java Virtual Machine Stacks(虚拟机栈）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1-栈帧的组成"><span class="nav-text">2.3.1 栈帧的组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-2-栈帧为什么能使函数执行"><span class="nav-text">2.3.2 栈帧为什么能使函数执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-The-pc-Register-程序计数器"><span class="nav-text">2.4  The pc Register(程序计数器)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-Native-Method-Stacks-本地方法栈）"><span class="nav-text">2.5 Native Method Stacks(本地方法栈）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-执行引擎"><span class="nav-text">3.执行引擎</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

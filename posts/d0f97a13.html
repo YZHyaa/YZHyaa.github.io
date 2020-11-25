@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="早期，电脑向用户提供的是单调、枯燥、纯字符状态的“命令行界面（CLI）”。就是到现在，我们还可以依稀看到它们的身影：在Windows中开个DOS窗口，就可看到历史的足迹。后来，Apple公司率先在电脑的操作系统中实现了图形化的用户界面（Graphical User Interface，简称GUI），但由于Apple公司封闭的市场策略，自己完成电脑硬件、操作系统、应用软件一条龙的产品，与其它PC不兼">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Java杂记】GUI技术：Swing基本使用及JFormDesigner插件安装使用">
+<meta property="og:url" content="https://yzhblog.work/posts/d0f97a13.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="早期，电脑向用户提供的是单调、枯燥、纯字符状态的“命令行界面（CLI）”。就是到现在，我们还可以依稀看到它们的身影：在Windows中开个DOS窗口，就可看到历史的足迹。后来，Apple公司率先在电脑的操作系统中实现了图形化的用户界面（Graphical User Interface，简称GUI），但由于Apple公司封闭的市场策略，自己完成电脑硬件、操作系统、应用软件一条龙的产品，与其它PC不兼">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201010200310254.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201011172413397.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201010203541110.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T13:25:17.889Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Java杂记】GUI技术：Swing基本使用及JFormDesigner插件安装使用">
+<meta name="twitter:description" content="早期，电脑向用户提供的是单调、枯燥、纯字符状态的“命令行界面（CLI）”。就是到现在，我们还可以依稀看到它们的身影：在Windows中开个DOS窗口，就可看到历史的足迹。后来，Apple公司率先在电脑的操作系统中实现了图形化的用户界面（Graphical User Interface，简称GUI），但由于Apple公司封闭的市场策略，自己完成电脑硬件、操作系统、应用软件一条龙的产品，与其它PC不兼">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201010200310254.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/d0f97a13.html">
+
+
+
+
+
+  <title>【Java杂记】GUI技术：Swing基本使用及JFormDesigner插件安装使用 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/d0f97a13.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Java杂记】GUI技术：Swing基本使用及JFormDesigner插件安装使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-20T00:00:00+08:00">
+                2020-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java杂记/" itemprop="url" rel="index">
+                    <span itemprop="name">Java杂记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.1k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>早期，电脑向用户提供的是单调、枯燥、纯字符状态的“命令行界面（CLI）”。就是到现在，我们还可以依稀看到它们的身影：在Windows中开个DOS窗口，就可看到历史的足迹。后来，Apple公司率先在电脑的操作系统中实现了图形化的用户界面（Graphical User Interface，简称GUI），但由于Apple公司封闭的市场策略，自己完成电脑硬件、操作系统、应用软件一条龙的产品，与其它PC不兼容。这使得Apple公司错过了一次一统全球PC的好机会。<br>　　后来，Microsoft公司推出了风靡全球的Windows操作系统，它凭借着优秀的图形化用户界面，一举奠定了操作系统标准的地位。这也造就了世界首富—比尔.盖茨和IT业的泰山北斗微软公司。<br>　　在这图形用户界面风行于世的今天，一个应用软件没有良好的GUI是无法让用户接受的。而Java语言也深知这一点的重要性，它提供了一套可以轻松构建GUI的工具</p>
+<p><strong>GUI开发包</strong>：</p>
+<ul>
+<li>java.awt 包： 主要提供字体/布局管理器</li>
+<li>javax.swing 包：主要提供各种组件(窗口/按钮/文本框)，商业开发常用</li>
+<li>java.awt.event 包：事件处理，后台功能的实现</li>
+</ul>
+<a id="more"></a>
+<h2 id="1-Swing-组件"><a href="#1-Swing-组件" class="headerlink" title="1.Swing 组件"></a>1.Swing 组件</h2><p>相对于AWT而言Swing包中提供了更多的丰富的、快捷的、强大的GUI组件，而且这些组件都是java语言编写而成，因此Swing不依赖本地平台，可以真正做到跨平台运行。通常而言我们把AWT称之为重量级组件，Swing称之为轻量级软件，一般而言Swing组件都是在AWT组件名称前加J。</p>
+<p>如图所示：swing组件主要可分为三个部分<br><img src="https://img-blog.csdnimg.cn/20201010200310254.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>下面就选这些组件中比较常用的进行介绍…</p>
+<h3 id="1-1-顶层容器（窗口）"><a href="#1-1-顶层容器（窗口）" class="headerlink" title="1.1 顶层容器（窗口）"></a>1.1 顶层容器（窗口）</h3><p>常用的有JFrame，JDialog。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">组件</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong>JFrame</strong></td>
+<td style="text-align:center">一个普通的窗口（绝大多数 Swing 图形界面程序使用 JFrame 作为顶层容器）</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">JDialog</td>
+<td style="text-align:center">对话框</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-2-中间容器（面板）"><a href="#1-2-中间容器（面板）" class="headerlink" title="1.2 中间容器（面板）"></a>1.2 中间容器（面板）</h3><p>JPanel，JOptionPane，JScrollPane，JLayeredPane 等，主要以panel结尾。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">组件</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong>JPanel (相当于div)</strong></td>
+<td style="text-align:center">一般轻量级面板容器组件(作为JFrame中间容器)</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center"><strong>JScrollPane</strong></td>
+<td style="text-align:center">带滚动条的，可以水平和垂直滚动的面板组件</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">JSplitPane</td>
+<td style="text-align:center">分隔面板</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">JTabbedPane</td>
+<td style="text-align:center">选项卡面板</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">JLayeredPane</td>
+<td style="text-align:center">层级面板</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-3-基本组件（按钮，标签等）"><a href="#1-3-基本组件（按钮，标签等）" class="headerlink" title="1.3 基本组件（按钮，标签等）"></a>1.3 基本组件（按钮，标签等）</h3><p>JLabel，JButton，JTextField，JPasswordField，JRadioButton 等。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">组件</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong>JLabel</strong></td>
+<td style="text-align:center">标签</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">JButton</td>
+<td style="text-align:center">按钮</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">JRadioButton</td>
+<td style="text-align:center">单选按钮</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">JCheckBox</td>
+<td style="text-align:center">复选框</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">JToggleButton</td>
+<td style="text-align:center">开关按钮</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center"><strong>JTextField</strong></td>
+<td style="text-align:center">文本框</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center"><strong>JPasswordField</strong></td>
+<td style="text-align:center">密码框</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center"><strong>JTextArea</strong></td>
+<td style="text-align:center">文本区域</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center">JComboBox</td>
+<td style="text-align:center">下拉列表框</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center">JList</td>
+<td style="text-align:center">列表</td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center">JProgressBar</td>
+<td style="text-align:center">进度条</td>
+</tr>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:center">JSlider</td>
+<td style="text-align:center">滑块</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-Swing-API"><a href="#2-Swing-API" class="headerlink" title="2.Swing API"></a>2.Swing API</h2><p>现在已经知道了 Swing 中有哪些基本组件，那我们如何编写代码实操呢？下面就介绍一下 Swing 中部分常用组件的Java api…</p>
+<h3 id="2-1-Jframe组件"><a href="#2-1-Jframe组件" class="headerlink" title="2.1 Jframe组件"></a>2.1 Jframe组件</h3><table>
+<thead>
+<tr>
+<th>JFrame frame = new JFrame(“HelloWorldSwing”);</th>
+<th>创建及设置窗口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>frame.<strong>setBounds</strong>(600, 300, 500, 400);</td>
+<td>设置窗口的x,y位置，窗口大小x,y.</td>
+</tr>
+<tr>
+<td>frame.<strong>setDefaultCloseOperation</strong>(JFrame.EXIT_ON_CLOSE);</td>
+<td>设置默认的关闭窗口</td>
+</tr>
+<tr>
+<td>frame.add(panel)</td>
+<td>添加panel面板到容器</td>
+</tr>
+<tr>
+<td>frame.<strong>getContentPane().add</strong>(panel, BorderLayout.NORTH);</td>
+<td>添加面板到主窗口，布局在北面</td>
+</tr>
+<tr>
+<td>flame.<strong>getContentPane().add</strong>(scrollPane, BorderLayout.CENTER);</td>
+<td>添加可滚动面板到主窗口，布局在中间</td>
+</tr>
+<tr>
+<td>frame.<strong>setVisible</strong>(true);</td>
+<td>这个最好放在最后，不然视图会看不到</td>
+</tr>
+<tr>
+<td>frame.setDefaultLookAndFeelDecorated(true);</td>
+<td>确保一个漂亮的外观风格</td>
+</tr>
+<tr>
+<td>frame.pack();</td>
+<td>显示窗口</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-2-Panel组件"><a href="#2-2-Panel组件" class="headerlink" title="2.2 Panel组件"></a>2.2 Panel组件</h3><ul>
+<li><strong>Jpanel</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JPanel panel = <span class="keyword">new</span> JPanel(); <span class="comment">// 创建面板容器</span></span><br><span class="line">panel.add(button); <span class="comment">// 添加按钮到面板</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>JScrollPane</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JScrollPane scrollPane = <span class="keyword">new</span> JScrollPane(); <span class="comment">// 创建可滚动面板</span></span><br><span class="line">scrollPane.setViewportView(textArea); <span class="comment">// 设置面板内容</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>JOptionPane</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 弹出提示框到panel容器</span></span><br><span class="line">JOptionPane.showMessageDialog(panel3, <span class="string">"没有选中任何文件"</span>, <span class="string">"提示"</span>, JOptionPane.WARNING_MESSAGE);</span><br></pre></td></tr></table></figure>
+<h3 id="2-3-功能组件"><a href="#2-3-功能组件" class="headerlink" title="2.3 功能组件"></a>2.3 功能组件</h3><ul>
+<li><p><strong>JLabel：即要显示的文字</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JLabel label = <span class="keyword">new</span> JLabel(<span class="string">"Hello World"</span>); <span class="comment">// 添加标签</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Jbutton：一般需要添加监听事件ActionEvent，提交后跳转到指定方法</strong></p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JButton button = <span class="keyword">new</span> JButton(<span class="string">"选择文件"</span>); <span class="comment">// 创建按钮</span></span><br><span class="line">button.addActionListener(<span class="keyword">new</span> ActionListener() &#123;&#125; <span class="comment">// 添加操作按钮后的事件监听器</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>JTextArea：与TextFiled和passwordFiled类似，主要是get与set</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">JTextArea textArea = <span class="keyword">new</span> JTextArea(); <span class="comment">// 创建文本区域</span></span><br><span class="line">String text = textArea.getText(); <span class="comment">// 获取输入的内容</span></span><br><span class="line">textArea.setText(content); <span class="comment">// 设置内容</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>JFileChooser</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES ); <span class="comment">// 设置文件对话框</span></span><br><span class="line">jfc.showSaveDialog(frmIpa); <span class="comment">// 显示打开的文件对话框</span></span><br><span class="line">jfc.getSelectedFile(); <span class="comment">// 获取选择器选择的文件</span></span><br></pre></td></tr></table></figure>
+<h3 id="Layout布局"><a href="#Layout布局" class="headerlink" title="Layout布局"></a>Layout布局</h3><p>无论上面哪种组件，都可以设置布局，比如 <code>frame.setLayout(new BorderLayOut())</code> 或者 <code>panel.setLayout(new FlowLayout())</code> 再或是 <code>button.setLayout(GridLayout)</code>。常用布局如下：<br>| 所属类包   | 布局管理器名称               | 说明                                                         |<br>| ———- | —————————- | ———————————————————— |<br>| Java.awt   | <strong>BorderLayout</strong>（边界布局） | 容器划分为东、西、南、北、中五个区域，每个区域只能放置一个组件。 |<br>| Java.awt   | <strong>GridLayout</strong>（网格布局     | 容器的空间划分成M×N列的网格区域, 每个区域只能放置一个组件。其中col与row可以手动设置 |<br>| Java.awt   | <strong>FlowLayout</strong>（流式布局）   | 组件按照加入的先后顺序按照设置的对齐方式从左向右排列，一行排满到下一行开始继续排列 |<br>| Java.awt   | GridBagLayout（网格包布局）  | GridLayout的升级版，组件仍然是按照行、列放置，但是每个组件可以占据多个网格 |<br>| Java.awt   | CardLayout（卡片布局）       | 如同一叠牌，每个牌对应一个组件，但每次只能显示其中的一张牌。适用于在一个空间中防止多个组件的情况 |<br>| Java.swing | BoxLayout（箱式布局）        | 允许在容器中纵向或者横向防止多个控件                         |<br>| Java.swing | SprigLayout（弹簧布局）      | 根据一组约束条件放置控件                                     |<br>| 无         | 空布局                       | 不使用布局管理器，按照控件自身提供的大小、位置信息放置控件   |</p>
+<h2 id="3-Swing-示例"><a href="#3-Swing-示例" class="headerlink" title="3.Swing 示例"></a>3.Swing 示例</h2><p>下面通过swing 创建一个窗口，然后添加3个按钮。效果如下<br><img src="https://img-blog.csdnimg.cn/20201011172413397.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 创建窗口</span></span><br><span class="line">        JFrame jf = <span class="keyword">new</span> JFrame(<span class="string">"测试窗口"</span>);</span><br><span class="line">        jf.setSize(<span class="number">300</span>, <span class="number">300</span>); <span class="comment">// 设置窗口大小</span></span><br><span class="line">        jf.setLocationRelativeTo(<span class="keyword">null</span>);</span><br><span class="line">        jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); <span class="comment">// 设置默认关闭窗口</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建面板，指定布局为null，使用绝对布局</span></span><br><span class="line">        JPanel panel = <span class="keyword">new</span> JPanel(<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建按钮1</span></span><br><span class="line">        JButton button01 = <span class="keyword">new</span> JButton(<span class="string">"Button01"</span>);</span><br><span class="line">        button01.setLocation(<span class="number">50</span>, <span class="number">50</span>);  <span class="comment">// 设置按钮坐标</span></span><br><span class="line">        button01.setSize(<span class="number">100</span>, <span class="number">50</span>); <span class="comment">// 设置按钮的宽高</span></span><br><span class="line">        <span class="comment">// 将按钮1添加到面板panel中</span></span><br><span class="line">        panel.add(button01);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建按钮2</span></span><br><span class="line">        JButton button02 = <span class="keyword">new</span> JButton(<span class="string">"Button02"</span>);</span><br><span class="line">        button02.setBounds(<span class="number">50</span>, <span class="number">100</span>, <span class="number">100</span>, <span class="number">50</span>); <span class="comment">// 设置按钮的界限（坐标和宽高）</span></span><br><span class="line">        <span class="comment">// 将按钮2添加到面板panel中</span></span><br><span class="line">        panel.add(button02);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将panel添加到窗口Frame中，并设置为可见</span></span><br><span class="line">        jf.setContentPane(panel);</span><br><span class="line">        jf.setVisible(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建按钮3</span></span><br><span class="line">        JButton button03 = <span class="keyword">new</span> JButton(<span class="string">"Button03"</span>);</span><br><span class="line">        <span class="comment">// 将按钮设置在内容面板右下角，并且设置宽高为 100,50</span></span><br><span class="line">        button03.setBounds(panel.getWidth() - <span class="number">100</span>, panel.getHeight() - <span class="number">50</span>, <span class="number">100</span>, <span class="number">50</span>);</span><br><span class="line">        <span class="comment">// 将按钮3添加到面板panel中</span></span><br><span class="line">        panel.add(button03);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-JFormDesigner插件"><a href="#4-JFormDesigner插件" class="headerlink" title="4.JFormDesigner插件"></a>4.JFormDesigner插件</h2><p>JFormDesigner插件提供了GUI编程可视化与代码自动生成</p>
+<h3 id="4-1-安装"><a href="#4-1-安装" class="headerlink" title="4.1 安装"></a>4.1 安装</h3><p>这里放一个我的云盘链接：链接：<a href="https://pan.baidu.com/s/1axTxq5LvWDWsBI_XW6NIPQ" target="_blank" rel="noopener">https://pan.baidu.com/s/1axTxq5LvWDWsBI_XW6NIPQ</a> 提取码：8ofg。具体安装过程我就不写了，放两个参考链接吧：<a href="https://blog.csdn.net/qq_36084640/article/details/83987661?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-2&amp;utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-2" target="_blank" rel="noopener">参考链接1</a>，<a href="https://blog.csdn.net/qq_27453555/article/details/88882067?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-3&amp;utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-3" target="_blank" rel="noopener">参考链接2</a>。</p>
+<h3 id="4-2-使用"><a href="#4-2-使用" class="headerlink" title="4.2 使用"></a>4.2 使用</h3><p>一个示例：<a href="https://blog.csdn.net/scc95599/article/details/100714388?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-5&amp;utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-5" target="_blank" rel="noopener">设计登录页面</a>。博主试了，内容没问题，在使用过程中有几点注意：</p>
+<p><img src="https://img-blog.csdnimg.cn/20201010203541110.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ul>
+<li><p>组件的大小不固定，但是不能手动设置，只能通过frame / panel的组件间距进行设置</p>
+<ul>
+<li>frame –》Layout Manger<ul>
+<li>horizontal gap ：窗口内面板横间距</li>
+<li>vertical gap：窗口内面板纵间距</li>
+</ul>
+</li>
+<li>panel –》Layout Manger <ul>
+<li>horizontal gap ：面板内组件横间距</li>
+<li>vertical gap：面板内组件纵间距</li>
+</ul>
+</li>
+<li>组件 –》Properties<ul>
+<li>horizontalAlign：设置对齐方式</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>显示效果可以预览</p>
+<ul>
+<li><p>frame –》Properties</p>
+<ul>
+<li><p>title：标题</p>
+</li>
+<li><p>minimumSize：预览大小（高度，宽度）</p>
+<p>注：若不再额外设置setBound，就默认使用改值</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>编码注意</p>
+<ul>
+<li>要在构造函数手动设置<ul>
+<li>setVistalbe(true)，要放在函数最后</li>
+<li>setDefaultCloseOperation(DISPOSE_ON_CLOSE)，设置前台关闭后程序结束</li>
+<li>setBounds(500,500,450,450)，设置大小与显示位置</li>
+</ul>
+</li>
+<li>监听事件<ul>
+<li>在登录按钮添加监听事件</li>
+<li>在监听事件方法内调用TextField的getText与setText方法进行操作</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/d0f97a13.html" title="【Java杂记】GUI技术：Swing基本使用及JFormDesigner插件安装使用">https://yzhblog.work/posts/d0f97a13.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/206e981f.html" rel="next" title="【必备算法】动态规划：LeetCode题（三）：198. 打家劫舍，213. 打家劫舍 II">
+                <i class="fa fa-chevron-left"></i> 【必备算法】动态规划：LeetCode题（三）：198. 打家劫舍，213. 打家劫舍 II
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/f6b9768a.html" rel="prev" title="【必备算法】从递归到树形问题">
+                【必备算法】从递归到树形问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Swing-组件"><span class="nav-text">1.Swing 组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-顶层容器（窗口）"><span class="nav-text">1.1 顶层容器（窗口）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-中间容器（面板）"><span class="nav-text">1.2 中间容器（面板）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-基本组件（按钮，标签等）"><span class="nav-text">1.3 基本组件（按钮，标签等）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Swing-API"><span class="nav-text">2.Swing API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Jframe组件"><span class="nav-text">2.1 Jframe组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Panel组件"><span class="nav-text">2.2 Panel组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-功能组件"><span class="nav-text">2.3 功能组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Layout布局"><span class="nav-text">Layout布局</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Swing-示例"><span class="nav-text">3.Swing 示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-JFormDesigner插件"><span class="nav-text">4.JFormDesigner插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-安装"><span class="nav-text">4.1 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-使用"><span class="nav-text">4.2 使用</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

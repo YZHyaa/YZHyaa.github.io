@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="Java操作Redis主要有两种方式：Jedis和RedisTemplate。Jedis是Redis官方推荐的面向Java操作Redis的客户端开发Jar包；而RedisTemplate是Spring框架对Jedis API的进行了高度封装，支持连接池自动管理。  PS：redis-cli.exe是Redis官方提供的客户端，可以看作一个shell程序，它可以发送命令对redis进行操作；对于Je">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Redis】Java操作redis：Jedis&amp;RedisTemplate">
+<meta property="og:url" content="https://yzhblog.work/posts/3167db73.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="Java操作Redis主要有两种方式：Jedis和RedisTemplate。Jedis是Redis官方推荐的面向Java操作Redis的客户端开发Jar包；而RedisTemplate是Spring框架对Jedis API的进行了高度封装，支持连接池自动管理。  PS：redis-cli.exe是Redis官方提供的客户端，可以看作一个shell程序，它可以发送命令对redis进行操作；对于Je">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201106211954806.png#pic_center">
+<meta property="og:updated_time" content="2020-11-25T15:14:01.027Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Redis】Java操作redis：Jedis&amp;RedisTemplate">
+<meta name="twitter:description" content="Java操作Redis主要有两种方式：Jedis和RedisTemplate。Jedis是Redis官方推荐的面向Java操作Redis的客户端开发Jar包；而RedisTemplate是Spring框架对Jedis API的进行了高度封装，支持连接池自动管理。  PS：redis-cli.exe是Redis官方提供的客户端，可以看作一个shell程序，它可以发送命令对redis进行操作；对于Je">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201106211954806.png#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/3167db73.html">
+
+
+
+
+
+  <title>【Redis】Java操作redis：Jedis&RedisTemplate | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/3167db73.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Redis】Java操作redis：Jedis&RedisTemplate</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-27T00:00:00+08:00">
+                2019-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据存储/" itemprop="url" rel="index">
+                    <span itemprop="name">数据存储</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.7k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java操作Redis主要有两种方式：Jedis和RedisTemplate。Jedis是Redis官方推荐的面向Java操作Redis的客户端开发Jar包；而RedisTemplate是Spring框架对Jedis API的进行了高度封装，支持连接池自动管理。</p>
+<blockquote>
+<p>PS：redis-cli.exe是Redis官方提供的客户端，可以看作一个shell程序，它可以发送命令对redis进行操作；对于Jedis而言，同理是使用Java语言操作Redis，相当于Mysql驱动。Jedis提供了很多接口供Java语言调用。可以在Redis官网下载，当然还有一些开源爱好者提供的客户端，如Jredis、SRP等等。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="1-Jedis"><a href="#1-Jedis" class="headerlink" title="1.Jedis"></a>1.Jedis</h2><p>简单来说，Jedis就是Redis官方推荐的Java连接开发工具。在Java中，Redis对应于Jedis就相当于关系数据库对应于JDBC。</p>
+<p>Jedis的依赖如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>redis.clients<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jedis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="1-1-基本操作"><a href="#1-1-基本操作" class="headerlink" title="1.1 基本操作"></a>1.1 基本操作</h3><p>使用Jedis连接Redis的简单示例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 连接Redis（第一个参数是Redis的IP地址，第二个参数是Redis的端口号）</span></span><br><span class="line">Jedis jedis = <span class="keyword">new</span> Jedis(<span class="string">"localhost"</span>, <span class="number">6379</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在redis中放入一个字符串</span></span><br><span class="line">jedis.set(<span class="string">"msg"</span>, <span class="string">"Hello World!"</span>);</span><br><span class="line"><span class="comment">// 在redis获取一个字符串</span></span><br><span class="line">String msg = jedis.get(<span class="string">"msg"</span>);	</span><br><span class="line">System.out.println(msg);	<span class="comment">// 打印"Hello World!"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭Redis连接</span></span><br><span class="line">jedis.close();</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">方法</th>
+<th style="text-align:left">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">new Jedis(host, port)</td>
+<td style="text-align:left">创建jedis对象，参数host是redis服务器地址，参数port是redis服务端口</td>
+</tr>
+<tr>
+<td style="text-align:left">set(key,value)</td>
+<td style="text-align:left">设置字符串类型的数据</td>
+</tr>
+<tr>
+<td style="text-align:left">get(key)</td>
+<td style="text-align:left">获得字符串类型的数据</td>
+</tr>
+<tr>
+<td style="text-align:left">hset(key,field,value)</td>
+<td style="text-align:left">设置哈希类型的数据</td>
+</tr>
+<tr>
+<td style="text-align:left">hget(key,field)</td>
+<td style="text-align:left">获得哈希类型的数据</td>
+</tr>
+<tr>
+<td style="text-align:left">lpush(key,values)</td>
+<td style="text-align:left">设置列表类型的数据</td>
+</tr>
+<tr>
+<td style="text-align:left">lpop(key)</td>
+<td style="text-align:left">列表左面弹栈</td>
+</tr>
+<tr>
+<td style="text-align:left">rpop(key)</td>
+<td style="text-align:left">列表右面弹栈</td>
+</tr>
+<tr>
+<td style="text-align:left">sadd(key, value)</td>
+<td style="text-align:left">设置Set类型数据</td>
+</tr>
+<tr>
+<td style="text-align:left">zadd(key, score，value)</td>
+<td style="text-align:left">设置ZSet类型数据</td>
+</tr>
+<tr>
+<td style="text-align:left">del(key)</td>
+<td style="text-align:left">删除指定的key</td>
+</tr>
+</tbody>
+</table>
+<p>更多示例可以参考<a href="https://www.jianshu.com/p/4042b4a82456" target="_blank" rel="noopener">这篇</a>…</p>
+<h3 id="1-2-JedisPool"><a href="#1-2-JedisPool" class="headerlink" title="1.2 JedisPool"></a>1.2 JedisPool</h3><p>因为资源的创建与销毁是很消耗程序性能的，所以Jedis提供了连接池机制。在生产环境中需要向Jedis连接池获取对Redis的连接，Jedis的连接池类为<code>redis.clients.jedis.JedisPool</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 1、获得连接池配置对象，设置配置项</span></span><br><span class="line">    JedisPoolConfig config = <span class="keyword">new</span> JedisPoolConfig();</span><br><span class="line">    config.setMaxTotal(<span class="number">20</span>); <span class="comment">// 最大连接数</span></span><br><span class="line">    config.setMaxIdle(<span class="number">10</span>);  <span class="comment">// 最大空闲连接数</span></span><br><span class="line">    config.setMaxWaitMillis(<span class="number">3000</span>); <span class="comment">// 最大等待时间</span></span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 2.初始化连接池</span></span><br><span class="line">    <span class="comment">// 注：这里也可以省略ip和port不写，默认是localhost和6379</span></span><br><span class="line">    JedisPool jedisPool = <span class="keyword">new</span> JedisPool(config，<span class="string">"43.105.136.120"</span>,<span class="number">6379</span>);</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 3.从连接池中获取到一个连接</span></span><br><span class="line">    Jedis jedis = jedisPool.getResource();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 4.操作函数同上</span></span><br><span class="line">    jedis.set(<span class="string">"hello"</span>,<span class="string">"world"</span>); </span><br><span class="line">    System.out.println(jedis.get(<span class="string">"hello"</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 5.关闭当前连接，返回连接池</span></span><br><span class="line">    jedis.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里再说一下JedisPool的属性配置（JedisPoolConfig）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">JedisPoolConfig jedisPoolConfig = <span class="keyword">new</span> JedisPoolConfig();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 连接超时时是否阻塞，false时报异常,ture阻塞直到超时, 默认true</span></span><br><span class="line">jedisPoolConfig.setBlockWhenExhausted(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 逐出策略（默认DefaultEvictionPolicy(当连接超过最大空闲时间,或连接数超过最大空闲连接数)）</span></span><br><span class="line">jedisPoolConfig.setEvictionPolicyClassName(<span class="string">"org.apache.commons.pool2.impl.DefaultEvictionPolicy"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 最大空闲连接数, 默认8个</span></span><br><span class="line">jedisPoolConfig.setMaxIdle(<span class="number">8</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 最大连接数, 默认8个</span></span><br><span class="line">jedisPoolConfig.setMaxTotal(<span class="number">8</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间,  默认-1</span></span><br><span class="line">jedisPoolConfig.setMaxWaitMillis(-<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 逐出连接的最小空闲时间 默认1800000毫秒(30分钟)</span></span><br><span class="line">jedisPoolConfig.setMinEvictableIdleTimeMillis(<span class="number">1800000</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 最小空闲连接数, 默认0</span></span><br><span class="line">jedisPoolConfig.setMinIdle(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3</span></span><br><span class="line">jedisPoolConfig.setNumTestsPerEvictionRun(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对象空闲多久后逐出, 当空闲时间&gt;该值 且 空闲连接&gt;最大空闲数 时直接逐出,不再根据MinEvictableIdleTimeMillis判断  (默认逐出策略)   </span></span><br><span class="line">jedisPoolConfig.setSoftMinEvictableIdleTimeMillis(<span class="number">1800000</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间, 默认-1</span></span><br><span class="line">jedisPoolConfig.setMaxWaitMillis(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对拿到的connection进行validateObject校验</span></span><br><span class="line">jedisPoolConfig.setTestOnBorrow(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在进行returnObject对返回的connection进行validateObject校验</span></span><br><span class="line">jedisPoolConfig.setTestOnReturn(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定时对线程池中空闲的链接进行validateObject校验</span></span><br><span class="line">jedisPoolConfig.setTestWhileIdle(<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-JedisUtil"><a href="#1-3-JedisUtil" class="headerlink" title="1.3 JedisUtil"></a>1.3 JedisUtil</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># jedisConf.properties</span><br><span class="line">jedis.host=43.105.136.120</span><br><span class="line">jedis.port=6379</span><br><span class="line">jedis.maxTotal=30</span><br><span class="line">jedis.maxIdle=10</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JedisUtils</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> JedisPool jp;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">static</span> &#123;</span><br><span class="line">		<span class="comment">// 加载Jedis连接池配置参数。这里需要提前写好配置文件 jedisConf.properties</span></span><br><span class="line">		InputStream is = JedisUtils.class.getResourceAsStream(<span class="string">"jedisConf.properties"</span>);</span><br><span class="line">		Properties prop = <span class="keyword">new</span> Properties();</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			prop.load(is);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">		String host = prop.getProperty(<span class="string">"jedis.host"</span>);</span><br><span class="line">		<span class="keyword">int</span> port = Integer.parseInt(prop.getProperty(<span class="string">"jedis.port"</span>));</span><br><span class="line">		<span class="keyword">int</span> maxTotal = Integer.parseInt(prop.getProperty(<span class="string">"jedis.maxTotal"</span>));</span><br><span class="line">		<span class="keyword">int</span> maxIdle = Integer.parseInt(prop.getProperty(<span class="string">"jedis.maxIdle"</span>));</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 设置Jedis连接池参数</span></span><br><span class="line">		JedisPoolConfig jpc = <span class="keyword">new</span> JedisPoolConfig();</span><br><span class="line">		jpc.setMaxTotal(maxTotal);</span><br><span class="line">		jpc.setMaxIdle(maxIdle);</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 初始化Jedis连接池</span></span><br><span class="line">		jp = <span class="keyword">new</span> JedisPool(jpc, host, port);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 从Jedis连接池获取连接</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Jedis <span class="title">getJedis</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> jp.getResource();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-RedisTemplate"><a href="#2-RedisTemplate" class="headerlink" title="2.RedisTemplate"></a>2.RedisTemplate</h2><p>为了让Spring框架体系能够更加方便的接入Redis的功能，Spring对Jedis进行了封装 ==&gt; RedisTemplate。它支持所有的 redis 原生的 api。</p>
+<p>需要引入的依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在yml/properties文件中进行配置：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">redis:</span></span><br><span class="line"><span class="attr">  host:</span> <span class="number">43.105</span><span class="number">.136</span><span class="number">.120</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">6379</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-1-基本操作"><a href="#2-1-基本操作" class="headerlink" title="2.1 基本操作"></a>2.1 基本操作</h3><p>在 RedisTemplate中提供了几个常用的接口方法的使用，分别是: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> ValueOperations&lt;K, V&gt; valueOps; </span><br><span class="line"><span class="keyword">private</span> HashOperations&lt;K, V&gt; hashOps; </span><br><span class="line"><span class="keyword">private</span> ListOperations&lt;K, V&gt; listOps; </span><br><span class="line"><span class="keyword">private</span> SetOperations&lt;K, V&gt; setOps; </span><br><span class="line"><span class="keyword">private</span> ZSetOperations&lt;K, V&gt; zSetOps;</span><br></pre></td></tr></table></figure>
+<p>RedisTemplate 中定义了对5种数据结构操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">redisTemplate.opsForValue(); <span class="comment">// 操作字符串 </span></span><br><span class="line">redisTemplate.opsForHash();  <span class="comment">// 操作hash </span></span><br><span class="line">redisTemplate.opsForList();  <span class="comment">// 操作list </span></span><br><span class="line">redisTemplate.opsForSet();   <span class="comment">// 操作set </span></span><br><span class="line">redisTemplate.opsForZSet();  <span class="comment">// 操作有序set</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意，StringRedisTemplate继承自RedisTemplate，也一样拥有上面这些操作。 </p>
+</blockquote>
+<p>Redis客户端命令对应的RedisTemplate中的方法列表（String）： </p>
+<p><strong>1.String</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Redis</th>
+<th style="text-align:left">RedisTemplate rt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">set key value</td>
+<td style="text-align:left">rt.opsForValue().set(“key”,”value”)</td>
+</tr>
+<tr>
+<td style="text-align:left">get key</td>
+<td style="text-align:left">rt.opsForValue().get(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">del key</td>
+<td style="text-align:left">rt.delete(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">strlen key</td>
+<td style="text-align:left">rt.opsForValue().size(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">getset key value</td>
+<td style="text-align:left">rt.opsForValue().getAndSet(“key”,”value”)</td>
+</tr>
+<tr>
+<td style="text-align:left">getrange key start end</td>
+<td style="text-align:left">rt.opsForValue().get(“key”,start,end)</td>
+</tr>
+<tr>
+<td style="text-align:left">append key value</td>
+<td style="text-align:left">rt.opsForValue().append(“key”,”value”)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2.Hash</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Redis</th>
+<th style="text-align:left">RedisTemplate rt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">hset key field value</td>
+<td style="text-align:left">rt.opsForHash().put(“key”,”field”,”value”)</td>
+</tr>
+<tr>
+<td style="text-align:left">hmset key field1 value1 field2 value2…</td>
+<td style="text-align:left">rt.opsForHash().putAll(“key”,map) //map是一 个集合对象</td>
+</tr>
+<tr>
+<td style="text-align:left">hexists key field</td>
+<td style="text-align:left">rt.opsForHash().hasKey(“key”,”field”)</td>
+</tr>
+<tr>
+<td style="text-align:left">hgetall key</td>
+<td style="text-align:left">rt.opsForHash().entries(“key”)  //返回Map对象</td>
+</tr>
+<tr>
+<td style="text-align:left">hvals key</td>
+<td style="text-align:left">rt.opsForHash().values(“key”) //返回List对象</td>
+</tr>
+<tr>
+<td style="text-align:left">hkeys key</td>
+<td style="text-align:left">rt.opsForHash().keys(“key”) //返回List对象</td>
+</tr>
+<tr>
+<td style="text-align:left">hmget key field1 field2…</td>
+<td style="text-align:left">rt.opsForHash().multiGet(“key”,keyList)</td>
+</tr>
+<tr>
+<td style="text-align:left">hsetnx key field value</td>
+<td style="text-align:left">rt.opsForHash().putIfAbsent(“key”,”field”,”value”)</td>
+</tr>
+<tr>
+<td style="text-align:left">hdel key field1 field2</td>
+<td style="text-align:left">rt.opsForHash().delete(“key”,”field1”,”field2”)</td>
+</tr>
+<tr>
+<td style="text-align:left">hget key</td>
+<td style="text-align:left">field rt.opsForHash().get(“key”,”field”)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>3.List</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Redis</th>
+<th style="text-align:left">RedisTemplate rt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">lpush list node1 node2 node3…</td>
+<td style="text-align:left">rt.opsForList().leftPush(“list”,”node”)<br>rt.opsForList().leftPushAll(“list”,list) //list是集 合对象</td>
+</tr>
+<tr>
+<td style="text-align:left">rpush list node1 node2 node3…</td>
+<td style="text-align:left">rt.opsForList().rightPush(“list”,”node”)<br>rt.opsForList().rightPushAll(“list”,list) //list是集 合对象</td>
+</tr>
+<tr>
+<td style="text-align:left">lindex key index</td>
+<td style="text-align:left">rt.opsForList().index(“list”, index)</td>
+</tr>
+<tr>
+<td style="text-align:left">llen key</td>
+<td style="text-align:left">rt.opsForList().size(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">lpop key</td>
+<td style="text-align:left">rt.opsForList().leftPop(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">rpop key</td>
+<td style="text-align:left">rt.opsForList().rightPop(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">lpushx list node</td>
+<td style="text-align:left">rt.opsForList().leftPushIfPresent(“list”,”node”)</td>
+</tr>
+<tr>
+<td style="text-align:left">rpushx list node</td>
+<td style="text-align:left">rt.opsForList().rightPushIfPresent(“list”,”node “)</td>
+</tr>
+<tr>
+<td style="text-align:left">lrange list start end</td>
+<td style="text-align:left">rt.opsForList().range(“list”,start,end)</td>
+</tr>
+<tr>
+<td style="text-align:left">lrem list count value</td>
+<td style="text-align:left">rt.opsForList().remove(“list”,count,”value”)</td>
+</tr>
+<tr>
+<td style="text-align:left">lset key index value</td>
+<td style="text-align:left">rt.opsForList().set(“list”,index,”value”)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>4.Set</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Redis</th>
+<th style="text-align:left">RedisTemplate rt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">sadd key member1 member2…</td>
+<td style="text-align:left">rt.boundSetOps(“key”).add(“member1”,”me mber2”,…)<br>rt.opsForSet().add(“key”, set) //set是一个集合 对象</td>
+</tr>
+<tr>
+<td style="text-align:left">scard key</td>
+<td style="text-align:left">rt.opsForSet().size(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">sidff key1 key2</td>
+<td style="text-align:left">rt.opsForSet().difference(“key1”,”key2”) //返 回一个集合对象</td>
+</tr>
+<tr>
+<td style="text-align:left">sinter key1 key2</td>
+<td style="text-align:left">rt.opsForSet().intersect(“key1”,”key2”)//同上</td>
+</tr>
+<tr>
+<td style="text-align:left">sunion key1 key2</td>
+<td style="text-align:left">rt.opsForSet().union(“key1”,”key2”)//同上</td>
+</tr>
+<tr>
+<td style="text-align:left">sdiffstore des key1 key2</td>
+<td style="text-align:left">rt.opsForSet().differenceAndStore(“key1”,”ke y2”,”des”)</td>
+</tr>
+<tr>
+<td style="text-align:left">sinter des key1 key2</td>
+<td style="text-align:left">rt.opsForSet().intersectAndStore(“key1”,”key2 “,”des”)</td>
+</tr>
+<tr>
+<td style="text-align:left">sunionstore des key1 key2</td>
+<td style="text-align:left">rt.opsForSet().unionAndStore(“key1”,”key2”,” des”)</td>
+</tr>
+<tr>
+<td style="text-align:left">sismember key member</td>
+<td style="text-align:left">rt.opsForSet().isMember(“key”,”member”)</td>
+</tr>
+<tr>
+<td style="text-align:left">smembers key</td>
+<td style="text-align:left">rt.opsForSet().members(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">spop key</td>
+<td style="text-align:left">rt.opsForSet().pop(“key”)</td>
+</tr>
+<tr>
+<td style="text-align:left">srandmember key count</td>
+<td style="text-align:left">rt.opsForSet().randomMember(“key”,count)</td>
+</tr>
+<tr>
+<td style="text-align:left">srem key member1 member2…</td>
+<td style="text-align:left">rt.opsForSet().remove(“key”,”member1”,”member2”)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-2-StringRedisTemplate"><a href="#2-2-StringRedisTemplate" class="headerlink" title="2.2 StringRedisTemplate"></a>2.2 StringRedisTemplate</h3><p>我们可以使用RedisTemplate完成对redis的操作，但是它却存在一点瑕疵。因为通过redis-cli查看时，会发现key和value都是是乱码的，比如key是这样的 \xac\xed\x00\x05t\x00\key （如下图）。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201106211954806.png#pic_center" alt="在这里插入图片描述"><br>那解决办法是什么呢？将RedisTemplate换成StringRedisTemplate。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StringRedisTemplate</span> <span class="keyword">extends</span> <span class="title">RedisTemplate</span>&lt;<span class="title">String</span>, <span class="title">String</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">StringRedisTemplate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		RedisSerializer&lt;String&gt; stringSerializer = <span class="keyword">new</span> StringRedisSerializer();</span><br><span class="line">		setKeySerializer(stringSerializer);</span><br><span class="line">		setValueSerializer(stringSerializer);</span><br><span class="line">		setHashKeySerializer(stringSerializer);</span><br><span class="line">		setHashValueSerializer(stringSerializer);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">StringRedisTemplate</span><span class="params">(RedisConnectionFactory connectionFactory)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>();</span><br><span class="line">		setConnectionFactory(connectionFactory);</span><br><span class="line">		afterPropertiesSet();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> RedisConnection <span class="title">preProcessConnection</span><span class="params">(RedisConnection connection, <span class="keyword">boolean</span> existingConnection)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> DefaultStringRedisConnection(connection);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>StringRedisTemplate 就是继承了  RedisTemplate&lt;String,String&gt;。</p>
+<p>一般来说子类继承父类，应该能实现更多的功能，但是此处我们发现 StringRedisTemplate 继承的是 RedisTemplate的泛型类，指定了String-String的泛型！故功能只专注于String类型！也可以说成StringRedisTemplate无非就是限定了 K，V 为 String类型的RedisTemplate。</p>
+<p>在它的构造函数中设置了序列化规则，key、value、hashKey、hashValue的序列化规则都为 RedisSerializer.string()。</p>
+<p><strong>问题一</strong>：RedisTemplate和StringRedisTemplate的区别？</p>
+<ol>
+<li><p>操作范围不同：</p>
+<ol>
+<li>StringRedisTemplate只能对key=String，value=String的键值对进行操作</li>
+<li>RedisTemplate可以对任何类型的key-value键值对操作</li>
+</ol>
+</li>
+<li><p>序列化策略不同：</p>
+<ul>
+<li>StringRedisTemplate默认采用的是String的序列化策略，保存的key和value都是采用此策略序列化保存的。</li>
+<li>RedisTemplate默认采用的是JDK的序列化策略，保存的key和value都是采用此策略序列化保存的。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>因为序列化方式不同，所以两者的数据是不共通的。也就是说RedisTemplate不能取StringRedisTemplate存入的数据，StringRedisTemplate不能取RedisTemplate存入的数据。</p>
+</blockquote>
+<p><strong>问题二</strong>：RedisTemplate和StringRedisTemplate如何选择？</p>
+<ol>
+<li>如果 key, value, hashKey, hashValue 都是 String类型直接使用  StringRedisTemplate 就好。</li>
+<li>如果我们存一些简单的数据结构，建议使用StringRedisTemplate,因为方便在数据库中查看。通常项目中都是 String 类型作为key，主要是开发人员方便自己识别，而key 的序列化也会使用 string 序列化，这样在命令行环境下 get 查询的时候 直接使用定义的key字符串就能查询到值。</li>
+<li>如果我们存一些复杂的数据接口，比如对象里面还包含多个对象的，就建议使用RedisTemplate了，系统会帮忙转换，省去我们自己转换的麻烦。当然，也可以自己先序列化成json字符串然后保存，不过这样在get 或者set 的时候需要进行相应转换操作。</li>
+</ol>
+<h2 id="3-关于SpringBoot"><a href="#3-关于SpringBoot" class="headerlink" title="3.关于SpringBoot"></a>3.关于SpringBoot</h2><blockquote>
+<p><strong>SpringBoot 2.0已经使用<code>Lettuce代替Jedis</code></strong></p>
+</blockquote>
+<p>其实，随着<code>Spring Boot2.x</code>的到来，支持的组件越来越丰富，也越来越成熟，其中对<code>Redis</code>的支持不仅仅是丰富了它的API，更是替换掉底层<code>Jedis</code>的依赖，取而代之换成了<code>Lettuce</code>高级Redis客户端，用于多线程安全同步，异步和响应使用。</p>
+<p><code>Lettuce</code>和<code>Jedis</code>的都是连接<code>Redis Server</code>的客户端程序。<code>Jedis</code>在实现上是直连<code>redis server</code>，多线程环境下非线程安全，除非使用连接池JedisPool，为每个Jedis实例增加物理连接。<code>Lettuce</code>基于Netty的连接实例（StatefulRedisConnection），可以在多个线程间并发访问，且线程安全，满足多线程环境下的并发访问，同时它是可伸缩的设计，一个连接实例不够的情况也可以按需增加连接实例。</p>
+<blockquote>
+<p>为了多线程安全，以前是Jedis+JedisPool组合 ,现在在SpringBoot 2.0应用中直接使用<code>Lettuce客户端的API封装</code>RedisTemplate即可<code>，</code>只要配置好连接池属性，那么SpringBoot就能自动管理连接池。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/3167db73.html" title="【Redis】Java操作redis：Jedis&RedisTemplate">https://yzhblog.work/posts/3167db73.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/69fd334c.html" rel="next" title="【JVM】第二篇：JVM指令助记符总结及基本指令大全">
+                <i class="fa fa-chevron-left"></i> 【JVM】第二篇：JVM指令助记符总结及基本指令大全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/52d7a5ed.html" rel="prev" title="【JVM】第三篇：详解JVM整体结构">
+                【JVM】第三篇：详解JVM整体结构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Jedis"><span class="nav-text">1.Jedis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-基本操作"><span class="nav-text">1.1 基本操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-JedisPool"><span class="nav-text">1.2 JedisPool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-JedisUtil"><span class="nav-text">1.3 JedisUtil</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-RedisTemplate"><span class="nav-text">2.RedisTemplate</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-基本操作"><span class="nav-text">2.1 基本操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-StringRedisTemplate"><span class="nav-text">2.2 StringRedisTemplate</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-关于SpringBoot"><span class="nav-text">3.关于SpringBoot</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

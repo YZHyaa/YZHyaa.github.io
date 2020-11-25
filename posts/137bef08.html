@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="1.对象存储布局一个Java对象在内存中包括3个部分：对象头、实例数据和对齐填充">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【JVM】第五篇：堆（Heap）上有什么？普通对象全方位解析">
+<meta property="og:url" content="https://yzhblog.work/posts/137bef08.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="1.对象存储布局一个Java对象在内存中包括3个部分：对象头、实例数据和对齐填充">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201021225030673.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201007012842298.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200930160832287.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200930160852868.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T10:22:01.705Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【JVM】第五篇：堆（Heap）上有什么？普通对象全方位解析">
+<meta name="twitter:description" content="1.对象存储布局一个Java对象在内存中包括3个部分：对象头、实例数据和对齐填充">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201021225030673.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/137bef08.html">
+
+
+
+
+
+  <title>【JVM】第五篇：堆（Heap）上有什么？普通对象全方位解析 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/137bef08.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【JVM】第五篇：堆（Heap）上有什么？普通对象全方位解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-28T00:00:00+08:00">
+                2019-10-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.6k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-对象存储布局"><a href="#1-对象存储布局" class="headerlink" title="1.对象存储布局"></a>1.对象存储布局</h2><p>一个Java对象在内存中包括3个部分：对象头、实例数据和对齐填充</p>
+<p><img src="https://img-blog.csdnimg.cn/20201021225030673.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<a id="more"></a>
+<h3 id="1-1-对象头"><a href="#1-1-对象头" class="headerlink" title="1.1 对象头"></a>1.1 对象头</h3><p><strong>Mark Word</strong></p>
+<p>状态标识。与虚拟机位数一样，一般64bit，32bit很少。下图是一个32位虚拟机的Mark Word示例：<br><img src="https://img-blog.csdnimg.cn/20201007012842298.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>从对象头中可以获取到两点信息：</p>
+<ol>
+<li>Minor GC年龄默认15，是因为分代年龄只有4bit，最大就是15</li>
+<li>有锁状态无HashCode是因为没空间存了</li>
+</ol>
+<p><strong>Klass Pointer</strong></p>
+<p>指针，指向相应类信息的地址（方法区）。大小也是由虚拟机位数决定，但 64bit 时由于 Klass Pointer 开启了指针压缩（UseCompressedClassPointer），所以大小会变成32bit。注意，32bit能产生的地址约为32G，当内存大于32G时，压缩失效。</p>
+<p><strong>数组长度（数组）</strong></p>
+<p>4bit，数组才有，作用是是记录数组长度。</p>
+<h3 id="1-2-实例数据（-gt-成员变量）"><a href="#1-2-实例数据（-gt-成员变量）" class="headerlink" title="1.2 实例数据（=&gt;成员变量）"></a>1.2 实例数据（=&gt;成员变量）</h3><p>实例数据占用内存大小要分为两种情况：</p>
+<ul>
+<li>基本数据类型：大小随着类型不同，比如 int-32，double-64，char-1，boolean-1</li>
+<li><p>引用类型(Oops：普通对象指针)：应该与虚拟机一样大64bit， 但存在指针压缩UseCompressedOops，变成32bit</p>
+<p>注：若存在继承关系，还要加上父类的实例变量大小</p>
+</li>
+</ul>
+<h3 id="1-3-对齐字节"><a href="#1-3-对齐字节" class="headerlink" title="1.3 对齐字节"></a>1.3 对齐字节</h3><p>对齐填充需要满足以下两个规则：</p>
+<ul>
+<li>整体是大小是8的整数倍，因为计算机寄存器一般64bit，JVM一次读取一个内存单元（8bit）    </li>
+<li>每个实例变量的偏移量是4的整数倍</li>
+</ul>
+<h2 id="2-对象大小"><a href="#2-对象大小" class="headerlink" title="2.对象大小"></a>2.对象大小</h2><p>　　我们怎么知道一个java对象的大小呢？比如<code>HashMap&lt;String,Object&gt; map = new HashMap&lt;&gt;();</code>这个map对象在堆中多大呢？占多少个字节呢？</p>
+<p>　　我们可以借助apache的一个类RamUsageEstimator来计算，例如下面这种：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;lucene-core&lt;/artifactId&gt;</span><br><span class="line">   &lt;version&gt;6.6.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Integer integer = <span class="keyword">new</span> Integer(<span class="number">10</span>);</span><br><span class="line">HashMap&lt;String,Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">System.out.println(RamUsageEstimator.shallowSizeOf(integer));<span class="comment">// 16</span></span><br><span class="line">System.out.println(RamUsageEstimator.shallowSizeOf(map));  <span class="comment">//48</span></span><br></pre></td></tr></table></figure>
+<p>下面我们就来看看，为什么Integer是16，而那个map是48…</p>
+<h3 id="2-1-Integer：16字节"><a href="#2-1-Integer：16字节" class="headerlink" title="2.1 Integer：16字节"></a>2.1 Integer：16字节</h3><ul>
+<li>对象头<ul>
+<li>markword：64位 jvm 中 markword 占8个字节（多少位虚拟机就多大，一般是64bit，32bit的很少）</li>
+<li>klass类型的指针：4个字节（同上，默认64位，但开启了指针压缩，所以是32bit）</li>
+<li>这里不存在数组长度（4字节）</li>
+</ul>
+</li>
+<li>实例数据（不能算static）：Integer 封装的 <code>int value</code> 大小是 4个字节</li>
+<li>对齐填充（JVM一次读8bit，每个变量的偏移量是4的倍数）：8 + 4 + 4 = 16，不用对齐字节</li>
+</ul>
+<h3 id="2-2-HashMap：48字节"><a href="#2-2-HashMap：48字节" class="headerlink" title="2.2 HashMap：48字节"></a>2.2 HashMap：48字节</h3><ul>
+<li>对象头<ul>
+<li>MarkWord：8个字节</li>
+<li>KlassPointer：4个字节</li>
+</ul>
+</li>
+<li>实例数据（代码在下边）：<ul>
+<li>父类（AbstractMap）：4 + 4</li>
+<li>table：<strong>Node&lt;K,V&gt;[] - 引用类型 4字节</strong></li>
+<li>entrySet：Set&lt;Map.Entry&lt;K,V&gt;&gt; - 引用类型 4字节</li>
+<li>modCount：int - 4字节</li>
+<li>size：int - 4字节</li>
+<li>threshold：int - 4字节</li>
+<li>loadFactory：int - 4字节</li>
+</ul>
+</li>
+<li>对齐填充12 + 4<em>2 +  4 </em> 6 = 44 补4字节 –&gt; 48</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">transient</span> Node&lt;K,V&gt;[] table;<span class="comment">//引用类型，占四个字节</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;<span class="comment">//引用类型，占四个字节</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> size;<span class="comment">//int类型，4个字节</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> modCount;<span class="comment">//int类型，4个字节</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> threshold;<span class="comment">//int类型，4个字节</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;<span class="comment">//int类型，4个字节</span></span><br><span class="line"></span><br><span class="line">------------------------------------------------------------------</span><br><span class="line"><span class="comment">// AbstractMap的成员变量；</span></span><br><span class="line"><span class="keyword">transient</span> Set&lt;K&gt;        keySet;</span><br><span class="line"><span class="keyword">transient</span> Collection&lt;V&gt; values;</span><br></pre></td></tr></table></figure>
+<h2 id="3-对象创建"><a href="#3-对象创建" class="headerlink" title="3.对象创建"></a>3.对象创建</h2><h3 id="3-1-三步过程"><a href="#3-1-三步过程" class="headerlink" title="3.1 三步过程"></a>3.1 三步过程</h3><ol>
+<li>创建对象：未初始化，还是类型默认值</li>
+<li>对象初始化</li>
+<li>分配内存 ：将对象放到指定内存</li>
+</ol>
+<p>这里知道对象创建过程有什么用呢？向下看！</p>
+<h3 id="3-2-DCL单例"><a href="#3-2-DCL单例" class="headerlink" title="3.2 DCL单例"></a>3.2 DCL单例</h3><p>DCL单例全称 Double Check Lock，实现代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> Object lock = <span class="keyword">new</span> Object();</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">null</span>; <span class="comment">// 为什么要volatile？</span></span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125; <span class="comment">// 私有构造器，防止被外部类实例化</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         <span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123; <span class="comment">// 第一次检查</span></span><br><span class="line">              <span class="keyword">synchronized</span>(lock) &#123;</span><br><span class="line">                  <span class="keyword">if</span>(instance == <span class="keyword">null</span>) &#123; <span class="comment">// 第二次检查。为什么要二检呢？</span></span><br><span class="line">                        instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">                  &#125;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码很好理解，关键就在于那两个问题：</p>
+<ul>
+<li>Double Check：防止对象创建多次</li>
+<li>volatile：防止半初始化，即重排序后，对象未初始化就被别的线程拿走使用。本来的顺序应该是1-2-3，现在重排序后成了1-3-2；如果现在1应执行完，正执行3-2期间有线程来取对象了，由于对象已经创建好，所以未经初始化的对象就直接被返回了，就出空指针等问题。</li>
+</ul>
+<p>看看，这是不是就用到了对象创建时的细节。</p>
+<h2 id="4-对象分配位置"><a href="#4-对象分配位置" class="headerlink" title="4.对象分配位置"></a>4.对象分配位置</h2><p>对象时有大小的啊，所以要创建对象前要先分配好空间，那是直接就分配在堆上吗？<br><img src="https://img-blog.csdnimg.cn/20200930160832287.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>从上图可以看到创建对象时不只是之前<a href="https://blog.csdn.net/weixin_43935927/article/details/109210130" target="_blank" rel="noopener">第三篇</a>说的会在Heap上分配内存，还可能会在Java栈和老年代分配内存。</p>
+<h3 id="4-1-Eden区分配"><a href="#4-1-Eden区分配" class="headerlink" title="4.1 Eden区分配"></a>4.1 Eden区分配</h3><ul>
+<li>条件：新对象的创建大多数都在新生代的Eden区分配内存</li>
+<li><p>回收：分为两种情况</p>
+<ul>
+<li>符合GC条件，直接被youngGC回收</li>
+<li>不符合GC条件，移到Survivor区。若 from-to 年满（&lt;=15）进入老年代被FullGC回收<h3 id="4-2-栈上分配（效率高）"><a href="#4-2-栈上分配（效率高）" class="headerlink" title="4.2 栈上分配（效率高）"></a>4.2 栈上分配（效率高）</h3></li>
+</ul>
+</li>
+<li><p>条件：满足两个条件 逃逸分析 &amp;&amp; 标量替换</p>
+<ul>
+<li>逃逸分析：没有别的对象持有当前对象的引用，例如我们在方法里new的对象</li>
+<li>标量替换：可以用对象的实例变量代表这个对象，即它的实例变量压入栈就行</li>
+</ul>
+</li>
+<li>回收：代表对象的实例变量都出栈</li>
+</ul>
+<h3 id="4-3-老年代分配"><a href="#4-3-老年代分配" class="headerlink" title="4.3 老年代分配"></a>4.3 老年代分配</h3><ul>
+<li>条件：对象所占空间很大</li>
+<li>回收：FullGC</li>
+</ul>
+<h3 id="4-4-线程本地（新生代线程私部分）"><a href="#4-4-线程本地（新生代线程私部分）" class="headerlink" title="4.4 线程本地（新生代线程私部分）"></a>4.4 线程本地（新生代线程私部分）</h3><ul>
+<li>条件：Thread Local Allocation Buffer未满</li>
+<li>优势：避免了<strong>碰撞指针</strong>，即多个对象要同时分配内存时的加锁同步，</li>
+</ul>
+<h2 id="5-对象寻址"><a href="#5-对象寻址" class="headerlink" title="5.对象寻址"></a>5.对象寻址</h2><p>现在对象已经创建好了，但是对象中只有基本数据，类信息、方法字节码那些还在方法区呢，所以我一个对象怎么获取到呢？</p>
+<p><img src="https://img-blog.csdnimg.cn/20200930160852868.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>从图中可以看到有两种寻址方式，下面就一一来看。</p>
+<h3 id="5-1-句柄方式"><a href="#5-1-句柄方式" class="headerlink" title="5.1 句柄方式"></a>5.1 句柄方式</h3><ul>
+<li>两个指针：实例变量数据 +实例变量信息（类型，名）</li>
+<li>特点<ul>
+<li>优点：GC对象可能因为标记整理等算法，而进行移动/复制，指针指向方法区类型减少了指针重定位工作量</li>
+<li>缺点：两次访问</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-2-直接指针（HotSpot）"><a href="#5-2-直接指针（HotSpot）" class="headerlink" title="5.2 直接指针（HotSpot）"></a>5.2 直接指针（HotSpot）</h3><ul>
+<li>一个指针：实例变量数据 –<code>Klass Pointer</code>–&gt; 实例变量信息（类型，名）</li>
+<li>特点<ul>
+<li>优点：直接访问</li>
+<li>缺点：GC后，对象移动/拷贝麻烦，指针重定位工作量大</li>
+</ul>
+</li>
+</ul>
+<h2 id="6-对象生命周期"><a href="#6-对象生命周期" class="headerlink" title="6.对象生命周期"></a>6.对象生命周期</h2><h3 id="6-1-创建阶段-Created"><a href="#6-1-创建阶段-Created" class="headerlink" title="6.1 创建阶段(Created)"></a>6.1 创建阶段(Created)</h3><p>在创建阶段系统通过下面的几个步骤来完成对象的创建过程</p>
+<ol>
+<li>为对象分配存储空间</li>
+<li>开始构造对象</li>
+<li>从超类到子类对static成员进行初始化</li>
+<li>超类成员变量按顺序初始化，递归调用超类的构造方法</li>
+<li>子类成员变量按顺序初始化，子类构造方法调用</li>
+</ol>
+<p>一旦对象被创建，并被分派给某些变量赋值，这个对象的状态就切换到了应用阶段</p>
+<h3 id="6-2-应用阶段-In-Use"><a href="#6-2-应用阶段-In-Use" class="headerlink" title="6.2 应用阶段(In Use)"></a>6.2 应用阶段(In Use)</h3><p>对象至少被一个强引用持有着。</p>
+<h3 id="6-3-不可见阶段-Invisible"><a href="#6-3-不可见阶段-Invisible" class="headerlink" title="6.3 不可见阶段(Invisible)"></a>6.3 不可见阶段(Invisible)</h3><p>当一个对象处于不可见阶段时，说明程序本身不再持有该对象的任何强引用，虽然该这些引用仍然是存在着的。</p>
+<p>简单说就是程序的执行已经超出了该对象的作用域了。</p>
+<p>举例如下代码：本地变量count在25行时已经超出了其作用域，则在此时称之为count处于不可视阶段。当然这种情况编译器在编译的过程中会直接报错了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> bool = fasle;</span><br><span class="line"><span class="keyword">if</span> (bool == <span class="keyword">true</span>) &#123;</span><br><span class="line">	<span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">	count++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">System.out.println(count);</span><br></pre></td></tr></table></figure>
+<h3 id="6-4-不可达阶段-Unreachable"><a href="#6-4-不可达阶段-Unreachable" class="headerlink" title="6.4 不可达阶段(Unreachable)"></a>6.4 不可达阶段(Unreachable)</h3><p>对象处于不可达阶段是指该对象不再被任何强引用所持有。</p>
+<p>与“不可见阶段”相比，“不可见阶段”是指程序不再持有该对象的任何强引用，这种情况下，该对象仍可能被JVM等系统下的某些已装载的静态变量或线程或JNI等强引用持有着，这些特殊的强引用被称为”GC root”。存在着这些GC root会导致对象的内存泄露情况，无法被回收。</p>
+<h3 id="6-5-收集阶段-Collected"><a href="#6-5-收集阶段-Collected" class="headerlink" title="6.5 收集阶段(Collected)"></a>6.5 收集阶段(Collected)</h3><p>当垃圾回收器发现该对象已经处于“不可达阶段”并且垃圾回收器已经对该对象的内存空间重新分配做好准备时，则对象进入了“收集阶段”。如果该对象已经重写了finalize()方法，则会去执行该方法的终端操作。</p>
+<p>这里要特别说明一下：不要重载finazlie()方法！原因有两点：</p>
+<ul>
+<li><p>会影响JVM的对象分配与回收速度</p>
+<p>  在分配该对象时，JVM需要在垃圾回收器上注册该对象，以便在回收时能够执行该重载方法；在该方法的执行时需要消耗CPU时间且在执行完该方法后才会重新执行回收操作，即至少需要垃圾回收器对该对象执行两次GC。</p>
+</li>
+<li><p>可能造成该对象的再次“复活”</p>
+<p>  在finalize()方法中，如果有其它的强引用再次持有该对象，则会导致对象的状态由“收集阶段”又重新变为“应用阶段”。这个已经破坏了Java对象的生命周期进程，且“复活”的对象不利用后续的代码管理。</p>
+</li>
+</ul>
+<h3 id="6-6-终结阶段"><a href="#6-6-终结阶段" class="headerlink" title="6.6 终结阶段"></a>6.6 终结阶段</h3><p>当对象执行完finalize()方法后仍然处于不可达状态时，则该对象进入终结阶段。在该阶段是等待垃圾回收器对该对象空间进行回收。</p>
+<h3 id="6-7-对象空间重新分配阶段"><a href="#6-7-对象空间重新分配阶段" class="headerlink" title="6.7 对象空间重新分配阶段"></a>6.7 对象空间重新分配阶段</h3><p>垃圾回收器对该对象的所占用的内存空间进行回收或者再分配了，则该对象彻底消失了，称之为“对象空间重新分配阶段”。</p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/137bef08.html" title="【JVM】第五篇：堆（Heap）上有什么？普通对象全方位解析">https://yzhblog.work/posts/137bef08.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/52d7a5ed.html" rel="next" title="【JVM】第三篇：详解JVM整体结构">
+                <i class="fa fa-chevron-left"></i> 【JVM】第三篇：详解JVM整体结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/758f6be6.html" rel="prev" title="【Redis】核心原理分析及持久化、缓存淘汰策略">
+                【Redis】核心原理分析及持久化、缓存淘汰策略 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-对象存储布局"><span class="nav-text">1.对象存储布局</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-对象头"><span class="nav-text">1.1 对象头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-实例数据（-gt-成员变量）"><span class="nav-text">1.2 实例数据（=&gt;成员变量）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-对齐字节"><span class="nav-text">1.3 对齐字节</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-对象大小"><span class="nav-text">2.对象大小</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Integer：16字节"><span class="nav-text">2.1 Integer：16字节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-HashMap：48字节"><span class="nav-text">2.2 HashMap：48字节</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-对象创建"><span class="nav-text">3.对象创建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-三步过程"><span class="nav-text">3.1 三步过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-DCL单例"><span class="nav-text">3.2 DCL单例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-对象分配位置"><span class="nav-text">4.对象分配位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Eden区分配"><span class="nav-text">4.1 Eden区分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-栈上分配（效率高）"><span class="nav-text">4.2 栈上分配（效率高）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-老年代分配"><span class="nav-text">4.3 老年代分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-线程本地（新生代线程私部分）"><span class="nav-text">4.4 线程本地（新生代线程私部分）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-对象寻址"><span class="nav-text">5.对象寻址</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-句柄方式"><span class="nav-text">5.1 句柄方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-直接指针（HotSpot）"><span class="nav-text">5.2 直接指针（HotSpot）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-对象生命周期"><span class="nav-text">6.对象生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-创建阶段-Created"><span class="nav-text">6.1 创建阶段(Created)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-应用阶段-In-Use"><span class="nav-text">6.2 应用阶段(In Use)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-不可见阶段-Invisible"><span class="nav-text">6.3 不可见阶段(Invisible)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-不可达阶段-Unreachable"><span class="nav-text">6.4 不可达阶段(Unreachable)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-收集阶段-Collected"><span class="nav-text">6.5 收集阶段(Collected)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-终结阶段"><span class="nav-text">6.6 终结阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-7-对象空间重新分配阶段"><span class="nav-text">6.7 对象空间重新分配阶段</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

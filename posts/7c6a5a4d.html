@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="从类注释可以得到关于SynchronousQueue的信息：  队列不存储数据，所以没有大小，也无法迭代。没有大小如何理解呢？即每次进行put值进去时, 必须等待相应的 consumer 拿走数据后才可以再次 put 数据。 queue 对应 peek, contains, clear, isEmpty … 等方法其实是无效的。 队列由两种数据结构组成，分别是后入先出的堆栈和先入先出的队列，堆栈是">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【JUC源码】阻塞队列：SynchronousQueue吐血万字源码深析（超详细注释）">
+<meta property="og:url" content="https://yzhblog.work/posts/7c6a5a4d.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="从类注释可以得到关于SynchronousQueue的信息：  队列不存储数据，所以没有大小，也无法迭代。没有大小如何理解呢？即每次进行put值进去时, 必须等待相应的 consumer 拿走数据后才可以再次 put 数据。 queue 对应 peek, contains, clear, isEmpty … 等方法其实是无效的。 队列由两种数据结构组成，分别是后入先出的堆栈和先入先出的队列，堆栈是">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201003225637665.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T12:49:43.774Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【JUC源码】阻塞队列：SynchronousQueue吐血万字源码深析（超详细注释）">
+<meta name="twitter:description" content="从类注释可以得到关于SynchronousQueue的信息：  队列不存储数据，所以没有大小，也无法迭代。没有大小如何理解呢？即每次进行put值进去时, 必须等待相应的 consumer 拿走数据后才可以再次 put 数据。 queue 对应 peek, contains, clear, isEmpty … 等方法其实是无效的。 队列由两种数据结构组成，分别是后入先出的堆栈和先入先出的队列，堆栈是">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201003225637665.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/7c6a5a4d.html">
+
+
+
+
+
+  <title>【JUC源码】阻塞队列：SynchronousQueue吐血万字源码深析（超详细注释） | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/7c6a5a4d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【JUC源码】阻塞队列：SynchronousQueue吐血万字源码深析（超详细注释）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-18T00:00:00+08:00">
+                2020-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JUC源码/" itemprop="url" rel="index">
+                    <span itemprop="name">JUC源码</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  5.1k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  21
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>从类注释可以得到关于SynchronousQueue的信息：</p>
+<ol>
+<li>队列不存储数据，所以没有大小，也无法迭代。没有大小如何理解呢？即每次进行put值进去时, 必须等待相应的 consumer 拿走数据后才可以再次 put 数据。</li>
+<li>queue 对应 peek, contains, clear, isEmpty … 等方法其实是无效的。</li>
+<li>队列由两种数据结构组成，分别是后入先出的堆栈和先入先出的队列，堆栈是非公平的，队列是公平的。</li>
+</ol>
+<a id="more"></a>
+<h1 id="1-结构"><a href="#1-结构" class="headerlink" title="1.结构"></a>1.结构</h1><p>SynchronousQueue 继承关系，核心成员变量及主要构造函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronousQueue</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractQueue</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">BlockingQueue</span>&lt;<span class="title">E</span>&gt;, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Transferer 定义了transfer方法，put，take都是用的同一个transfer方法</span></span><br><span class="line">	<span class="keyword">abstract</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Transferer</span>&lt;<span class="title">E</span>&gt;</span>&#123;</span><br><span class="line">	    <span class="comment">// e为空的，会直接返回特殊值，不为空会传递给消费者</span></span><br><span class="line">        <span class="function"><span class="keyword">abstract</span> E <span class="title">transfer</span><span class="params">(E e, <span class="keyword">boolean</span> timed, <span class="keyword">long</span> nanos)</span></span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 堆栈实现，后入先出（非公平）</span></span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TransferStack</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Transferer</span>&lt;<span class="title">E</span>&gt;</span>&#123;...&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 队列实现，先入先出（公平）</span></span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TransferQueue</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Transferer</span>&lt;<span class="title">E</span>&gt;</span>&#123;...&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// tranfer变量</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> Transferer&lt;E&gt; transferer;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//----------------------------------构造函数---------------------------------</span></span><br><span class="line">	<span class="comment">// 默认非公平</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SynchronousQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(<span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 公平用TransferQueue，非公平就用TransferStack</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SynchronousQueue</span><span class="params">(<span class="keyword">boolean</span> fair)</span> </span>&#123;</span><br><span class="line">        transferer = fair ? <span class="keyword">new</span> TransferQueue&lt;E&gt;() : <span class="keyword">new</span> TransferStack&lt;E&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里需要着重强调的是，SynchronousQueue <strong>没有使用锁</strong>(synchronized 与 reentrantlock) ，因为锁底层的队列无法实现匹配。所以 SynchronousQueue  必须自己保证线程安全，并实现线程的调度：</p>
+<ul>
+<li>通过<strong>CAS与自旋</strong>实现线程安全</li>
+<li><strong>直接对线程进行阻塞（park）与唤醒</strong>。其中有两种策略，堆栈实现的非公平配对与队列的公平配对</li>
+</ul>
+<h2 id="1-1-TransferStack（非公平-gt-FILO）"><a href="#1-1-TransferStack（非公平-gt-FILO）" class="headerlink" title="1.1 TransferStack（非公平=&gt;FILO）"></a>1.1 TransferStack（非公平=&gt;FILO）</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TransferStack</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Transferer</span>&lt;<span class="title">E</span>&gt;</span>&#123;</span><br><span class="line">   </span><br><span class="line">        <span class="comment">// 栈中元素，这是一个链式栈</span></span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">SNode</span></span>&#123;...&#125;</span><br><span class="line">        <span class="comment">// 栈头指针</span></span><br><span class="line">        <span class="keyword">volatile</span> SNode head;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// SNode的三种状态：</span></span><br><span class="line">    	<span class="comment">// 1.REQUEST：执行的是take方法，相当于消费者</span></span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST    = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 2.DATA：执行的是put方法，相当于生产者</span></span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DATA       = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 3.FULFILLING：栈头正在阻塞等待其他线程进行 put 或 take</span></span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FULFILLING = <span class="number">2</span>;</span><br><span class="line">    </span><br><span class="line">    	<span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SNode"><a href="#SNode" class="headerlink" title="SNode"></a>SNode</h3><p>虽然 SynchronousQueue 的特性说的是里面是没有元素，但这句话实际的意义是 SynchronousQueue 是一个不能  peek，contains 等操作的节点，但是里面是有一条链表来<strong>保存竞争的线程和数据</strong>。</p>
+<p>也就是说，整个SynchronousQueue的运行机制也还是通过维护一个链表来实现的。当有并发时，通过判断链表插入一端节点的类型（mode），从而确定是否进行交换。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">SNode</span> </span>&#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 当前线程</span></span><br><span class="line">            <span class="comment">// 注：不是在创建SNode时设置，而是在awaitFulfill方法中没匹配到需要休眠时才会设置</span></span><br><span class="line">            <span class="keyword">volatile</span> Thread waiter;</span><br><span class="line">            <span class="comment">// 当前线程数据</span></span><br><span class="line">            <span class="comment">// 注：只有put的线程item才会有值，take的线程item=null。若take的线程要取出数据只能通过match指针为中介</span></span><br><span class="line">            Object item;</span><br><span class="line">    	    <span class="comment">// 节点类型：REQUEST(0)-消费者（take） ，DATA(1)-生产者（put）， FULFILLING(2)-交换中</span></span><br><span class="line">            <span class="keyword">int</span> mode;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">volatile</span> SNode next;</span><br><span class="line">            <span class="comment">// 很重要的节点。表示和本节点配对（match）的节点，有两个作用：</span></span><br><span class="line">            <span class="comment">// 1.判断阻塞栈元素能被唤醒的时机</span></span><br><span class="line">            <span class="comment">//  比如线程A在take时由于队列为空被阻塞了，然后线程B进行了put操作，那么就会将A的match设置为B，表示可以将A唤醒了</span></span><br><span class="line">            <span class="comment">// 2.作为take线程获取数据交换的中介</span></span><br><span class="line">            <span class="comment">//  比如当线程A唤醒后要返回数据，那么就可以通过match找到B，从而拿到put的数据。这个逻辑可以在下面的transfer方法可以看到</span></span><br><span class="line">            <span class="keyword">volatile</span> SNode match;</span><br><span class="line">------------------------------------------------------------------------------------------------------------------			</span><br><span class="line">			<span class="comment">// 构造函数，传入item</span></span><br><span class="line">			<span class="comment">// 注：一般不直接构造，而是调用封装好的snode方法：SNode snode(SNode s, Object e, SNode next, int mode) </span></span><br><span class="line">            SNode(Object item) &#123;</span><br><span class="line">                <span class="keyword">this</span>.item = item;</span><br><span class="line">            &#125;</span><br><span class="line">------------------------------------------------------------------------------------------------------------------			</span><br><span class="line">    	    <span class="comment">// 通过CAS把val节点连接到cmp后面</span></span><br><span class="line">            <span class="function"><span class="keyword">boolean</span> <span class="title">casNext</span><span class="params">(SNode cmp, SNode val)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> cmp == next &amp;&amp;</span><br><span class="line">                       UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, nextOffset, cmp, val);</span><br><span class="line">            &#125;</span><br><span class="line">			</span><br><span class="line">    		<span class="comment">// tryMatch 非常重要的方法，两个作用：</span></span><br><span class="line">            <span class="comment">// 1 尝试将参数节点s，赋给当前线程的配对节点match</span></span><br><span class="line">            <span class="comment">// 2.唤醒被阻塞的栈头的线程，醒后就能从 match 中得到本次操作 s</span></span><br><span class="line">            <span class="comment">// 其中 s.item 记录着本次的操作节点，也就是记录本次操作的数据</span></span><br><span class="line">            <span class="function"><span class="keyword">boolean</span> <span class="title">tryMatch</span><span class="params">(SNode s)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">if</span> (match == <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                    <span class="comment">// CAS改变match来进行匹配，成功的条件是当前节点的match属性为null</span></span><br><span class="line">                    UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, matchOffset, <span class="keyword">null</span>, s)) &#123;</span><br><span class="line">                    Thread w = waiter;</span><br><span class="line">                    <span class="keyword">if</span> (w != <span class="keyword">null</span>) &#123;    </span><br><span class="line">                        <span class="comment">// 将waiter置为null</span></span><br><span class="line">                        waiter = <span class="keyword">null</span>;</span><br><span class="line">                        <span class="comment">// 唤醒当前node的线程</span></span><br><span class="line">                        LockSupport.unpark(w);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 返回是否配对成功</span></span><br><span class="line">                <span class="keyword">return</span> match == s; </span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">           <span class="comment">// 尝试取消，就是把match换为自己。</span></span><br><span class="line">		   <span class="comment">// 自己匹配自己的前提是match为null，也就是说，如果已经匹配了，那么这个方法不能取消</span></span><br><span class="line">    	   <span class="comment">// 一般在设置超时且过期后，会将其设为cancel</span></span><br><span class="line">            <span class="function"><span class="keyword">void</span> <span class="title">tryCancel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, matchOffset, <span class="keyword">null</span>, <span class="keyword">this</span>);</span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">		   <span class="comment">// 判断超时失效</span></span><br><span class="line">    	   <span class="comment">// 和上一个方法对比，则可以知道，判断match是不是自己</span></span><br><span class="line">            <span class="function"><span class="keyword">boolean</span> <span class="title">isCancelled</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> match == <span class="keyword">this</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">           <span class="comment">// unsafe相关代码...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="transfer-：进栈-amp-出栈"><a href="#transfer-：进栈-amp-出栈" class="headerlink" title="transfer()：进栈&amp;出栈"></a>transfer()：进栈&amp;出栈</h3><p>transfer 将  take 和 put 两个方法都揉在了一起，所以第一个问题是如何区分put 和 take？是通过参数 e 是否为null来区分，e不为 null 是 put，为null是 take。第二个问题是如何进行线程管理的，或者说如何使 put 和 take 的线程配对的？具体分为以下三种情况：</p>
+<ul>
+<li>情况 1：队列中还没有数据 或 当前节点与栈顶节点同类型（同put或同take）<ul>
+<li>情况 1.1：要加入的e设置了超时时间，并且 e 进栈或者出栈要超时了<ul>
+<li>情况 1.1.1：栈头不为null 且 栈头已经超时失效，将栈顶置为第二个节点</li>
+<li>情况 1.1.2：栈头是空的，返回null</li>
+</ul>
+</li>
+<li>情况 1.2：没有设置新元素e的超时时间，或者设置了但未超时，    <ol>
+<li>用e构造新节点s，使s.next=head，然后将s设为新的栈头</li>
+<li>阻塞等待与s匹配的节点m</li>
+<li>若没等到（s过期了），就调用clean删除s</li>
+<li>若等到了，就让s与m出栈，设置新的头结点，并返回</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>情况 2： 当前栈包含于给定节点模式互补的节点（比如栈顶是put时阻塞，而当前节点是take操作）<ul>
+<li>情况 2.1：栈头已经被取消，将下一个节点置为栈头</li>
+<li>情况 2.2：可以将当前节点s打上”正在匹配”的标记，并设置为head<pre><code>1.  取s的下一个节点m，s与m不断tryMatch
+          2.  匹配成功，删除s与m，返回item
+</code></pre><ol start="3">
+<li>匹配失败，交换m与m.next</li>
+<li>若栈完了都没匹配到则退出自旋，进入3</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>情况 3：当动作2匹配失败（可能同时线程3抢先完成了配对），帮助这个节点完成匹配和移除(出栈)的操作。然后继续执行(主循环)。这部分代码基本和动作2的代码一样，只是不会返回节点的数据。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line"><span class="function">E <span class="title">transfer</span><span class="params">(E e, <span class="keyword">boolean</span> timed, <span class="keyword">long</span> nanos)</span> </span>&#123;</span><br><span class="line">    SNode s = <span class="keyword">null</span>; </span><br><span class="line">    <span class="comment">// 判断是put还是take：e 为空是take方法(REQUEST)，不为空是put方法(DATA)</span></span><br><span class="line">    <span class="keyword">int</span> mode = (e == <span class="keyword">null</span>) ? REQUEST : DATA;</span><br><span class="line">    <span class="comment">// 自旋，保证一定能成功</span></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="comment">// 拿出头节点，有几种情况</span></span><br><span class="line">        SNode h = head;</span><br><span class="line">-----------------------------------------------------------------------------------------------------------------        </span><br><span class="line">        <span class="comment">// 情况 1：队列中还没有数据 || 当前节点与栈顶节点同类型（同put或同take）</span></span><br><span class="line">        <span class="keyword">if</span> (h == <span class="keyword">null</span> || h.mode == mode) &#123;</span><br><span class="line">            <span class="comment">// 情况 1.1：要加入的e设置了超时时间，并且 e 进栈或者出栈要超时了</span></span><br><span class="line">            <span class="keyword">if</span> (timed &amp;&amp; nanos &lt;= <span class="number">0</span>) &#123;     </span><br><span class="line">                <span class="comment">// 情况 1.1.1：栈头不为null &amp;&amp; 栈头已经超时失效</span></span><br><span class="line">                <span class="keyword">if</span> (h != <span class="keyword">null</span> &amp;&amp; h.isCancelled())</span><br><span class="line">                    casHead(h, h.next); <span class="comment">// 丢弃栈头，把栈头后一个元素作为栈头</span></span><br><span class="line">                <span class="comment">// 情况 1.1.2：栈头是空的</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// 直接返回 null</span></span><br><span class="line">            <span class="comment">// 情况 1.2：没有设置新元素e的超时时间，或者设置了但未超时</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (casHead(h, s = snode(s, e, h, mode))) &#123; <span class="comment">// 用e构造新节点s，使s.next=head，然后将s设为新的栈头</span></span><br><span class="line">                <span class="comment">// 阻塞等待，目的是等到与s匹配的SNode</span></span><br><span class="line">                SNode m = awaitFulfill(s, timed, nanos);</span><br><span class="line">                <span class="comment">// 返回m==s代表当前节s点已经超时了</span></span><br><span class="line">                <span class="keyword">if</span> (m == s) &#123;   </span><br><span class="line">                    clean(s); <span class="comment">// 栈中无法直接删除s，所以调用clean</span></span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 只有真正匹配到值才能走到这一步</span></span><br><span class="line">                <span class="comment">// 栈不为空 &amp;&amp; 栈二是s（因为等到的m此时是新栈顶）</span></span><br><span class="line">                <span class="keyword">if</span> ((h = head) != <span class="keyword">null</span> &amp;&amp; h.next == s)</span><br><span class="line">                    <span class="comment">// 将s.next设置为head，表示将s和他的配对m出栈</span></span><br><span class="line">                    casHead(h, s.next);  </span><br><span class="line">                <span class="comment">// 返回item</span></span><br><span class="line">                <span class="comment">// 注：这里返回的是put的节点的数据，若是take节点那么需要通过中介m来获取到数据</span></span><br><span class="line">                <span class="keyword">return</span> (E) ((mode == REQUEST) ? m.item : s.item);</span><br><span class="line">            &#125;</span><br><span class="line">-----------------------------------------------------------------------------------------------------------------                    </span><br><span class="line">        <span class="comment">// 情况 2： 当前栈包含于给定节点模式互补的节点（比如栈顶是put时阻塞，而当前节点是take操作）</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!isFulfilling(h.mode)) &#123; </span><br><span class="line">            <span class="comment">// 情况 2.1：栈头已经被取消</span></span><br><span class="line">            <span class="keyword">if</span> (h.isCancelled())            </span><br><span class="line">                casHead(h, h.next); <span class="comment">// 把下一个元素作为栈头</span></span><br><span class="line">            <span class="comment">// 情况 2.2：可以将当前节点s打上"正在匹配"的标记，并设置为head</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (casHead(h, s=snode(s, e, h, FULFILLING|mode))) &#123;</span><br><span class="line">                <span class="comment">// 自旋，直到配对</span></span><br><span class="line">                <span class="keyword">for</span> (;;) &#123; </span><br><span class="line">                    <span class="comment">// m和s是正在匹配两个节点</span></span><br><span class="line">                    <span class="comment">// 注：此时m不一定是之前的栈顶，因为这段时间可能又有节点进入或者之前的栈顶已被先一步匹配走了</span></span><br><span class="line">                    SNode m = s.next;       <span class="comment">// m is s's match</span></span><br><span class="line">                    <span class="comment">// 栈遍历完了，都没有找到</span></span><br><span class="line">                    <span class="keyword">if</span> (m == <span class="keyword">null</span>) &#123;        <span class="comment">// all waiters are gone</span></span><br><span class="line">                        casHead(s, <span class="keyword">null</span>);   <span class="comment">// pop fulfill node</span></span><br><span class="line">                        s = <span class="keyword">null</span>;           <span class="comment">// use new node next time</span></span><br><span class="line">                        <span class="keyword">break</span>;              <span class="comment">// restart main loop</span></span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 获取m的next节点，因为如果s和m匹配成功，mn就得补上head的位置了</span></span><br><span class="line">                    <span class="comment">// 注：虽然后面m可能会与mn交换，但在每轮循环中mn一定是栈中第三个节点</span></span><br><span class="line">                    SNode mn = m.next;</span><br><span class="line">                    <span class="comment">// 调用 tryMatch 让 m和s 配对</span></span><br><span class="line">                    <span class="comment">// 注：这里调用tryMatch给s配对时，会唤醒阻塞在awaitFulfill方法的线程m，若配对失败m还会回到阻塞状态</span></span><br><span class="line">                    <span class="keyword">if</span> (m.tryMatch(s)) &#123;</span><br><span class="line">                        <span class="comment">// 配对成功，弹出s与m，将head置为mn</span></span><br><span class="line">                        casHead(s, mn);     </span><br><span class="line">                        <span class="comment">// 返回put的数据，若是take节点那么需要通过中介m来获取到数据</span></span><br><span class="line">                        <span class="keyword">return</span> (E) ((mode == REQUEST) ? m.item : s.item);</span><br><span class="line">                    &#125; <span class="keyword">else</span>  </span><br><span class="line">                        <span class="comment">// 若配对失败，将m与m.next交换，开始下一轮匹配</span></span><br><span class="line">                        s.casNext(m, mn);   </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">-----------------------------------------------------------------------------------------------------------------                    </span><br><span class="line">       	<span class="comment">// 情况3：上面匹配失败，可能是同时又线程3提前完成了配对  </span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;                             </span><br><span class="line">            SNode m = h.next;  </span><br><span class="line">            <span class="comment">// 栈里面没有任何等待者了,其他节点把m匹配走了</span></span><br><span class="line">            <span class="keyword">if</span> (m == <span class="keyword">null</span>)                 </span><br><span class="line">                casHead(h, <span class="keyword">null</span>);           <span class="comment">// pop fulfilling node</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 如果m和h匹配成功，则mn就成为新head了。</span></span><br><span class="line">                SNode mn = m.next;</span><br><span class="line">                <span class="keyword">if</span> (m.tryMatch(h))          <span class="comment">// help match</span></span><br><span class="line">                    casHead(h, mn);         <span class="comment">// pop both h and m</span></span><br><span class="line">                <span class="keyword">else</span>                        <span class="comment">// lost match</span></span><br><span class="line">                    h.casNext(m, mn);       <span class="comment">// help unlink</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="awaitFulfill-：等待匹配节点"><a href="#awaitFulfill-：等待匹配节点" class="headerlink" title="awaitFulfill()：等待匹配节点"></a>awaitFulfill()：等待匹配节点</h3><p>awaitFulfill 作用是阻塞等待匹配的节点，但<strong>不是一上来就阻塞住，而是在自旋一定次数后</strong>，仍然没有其它线程来满足自己的要求时，才会真正的阻塞住，等待其他线程transfer后tryMatch</p>
+<ol>
+<li>计算死亡时间 deadline（时间戳）与自旋次数 spains</li>
+<li>自旋，每次循环都判断s是否获得到match</li>
+<li>达到自旋次数，park当前线程（定时）</li>
+<li>线程被唤醒时机：<ul>
+<li>tryMatch唤醒：其余线程在transfer中遍历栈时调用 tryMatch唤醒，若匹配成功 return 相应 m，否则重新回到阻塞</li>
+<li>超时唤醒：return s（自己）</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Node <span class="title">awaitFulfill</span><span class="params">(SNode s, <span class="keyword">boolean</span> timed, <span class="keyword">long</span> nanos)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// deadline 死亡时间，如果设置了超时时间的话，死亡时间等于当前时间 + 超时时间，否则就是 0</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> deadline = timed ? System.nanoTime() + nanos : <span class="number">0L</span>;</span><br><span class="line">    <span class="comment">// 当前线程</span></span><br><span class="line">    Thread w = Thread.currentThread();</span><br><span class="line">    <span class="comment">// 自旋的次数，如果设置了超时时间，会自旋 32 次，否则自旋 512 次</span></span><br><span class="line">    <span class="keyword">int</span> spins = (shouldSpin(s) ? (timed ? maxTimedSpins : maxUntimedSpins) : <span class="number">0</span>);</span><br><span class="line">                 </span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="comment">// 当前线程有无被打断，如果过了超时时间，当前线程就会被打断</span></span><br><span class="line">        <span class="keyword">if</span> (w.isInterrupted())</span><br><span class="line">            s.tryCancel();</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 尝试获取当前节点的match</span></span><br><span class="line">        SNode m = s.match;</span><br><span class="line">        <span class="comment">// 该函数的唯一出口，一定要匹配到值</span></span><br><span class="line">        <span class="comment">// 返回的 m==s 表示超时取消，返回的 m!=s 表确实匹配到了</span></span><br><span class="line">        <span class="keyword">if</span> (m != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> m;</span><br><span class="line">        <span class="keyword">if</span> (timed) &#123;</span><br><span class="line">            nanos = deadline - System.nanoTime();</span><br><span class="line">            <span class="comment">// 超时了，取消当前线程的等待操作</span></span><br><span class="line">            <span class="keyword">if</span> (nanos &lt;= <span class="number">0L</span>) &#123;</span><br><span class="line">                <span class="comment">// 调用cancel，使m=s</span></span><br><span class="line">                s.tryCancel();</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 如果没到自旋次数，那么自旋次数减少 1</span></span><br><span class="line">        <span class="keyword">if</span> (spins &gt; <span class="number">0</span>)</span><br><span class="line">            spins = shouldSpin(s) ? (spins-<span class="number">1</span>) : <span class="number">0</span>; <span class="comment">// </span></span><br><span class="line">        <span class="comment">// 如果s没设置waiter，那么把当前线程设置成 waiter</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (s.waiter == <span class="keyword">null</span>)</span><br><span class="line">            s.waiter = w; </span><br><span class="line">        <span class="comment">// 如果没有设置超时，那么直接park当前线程  </span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (!timed)</span><br><span class="line">            LockSupport.park(<span class="keyword">this</span>); <span class="comment">// 当被unpark唤醒时也是在此处,继续循环</span></span><br><span class="line">        <span class="comment">// 如果设置了超时，调用带有nanos超时时间的park</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (nanos &gt; spinForTimeoutThreshold)</span><br><span class="line">            LockSupport.parkNanos(<span class="keyword">this</span>, nanos);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="clean-：清除过期节点"><a href="#clean-：清除过期节点" class="headerlink" title="clean()：清除过期节点"></a>clean()：清除过期节点</h3><p>清除处于栈中的过期节点s，大致过程如下：</p>
+<ol>
+<li>找到s的下一个没有cancel的节点past</li>
+<li>判断head是否cancel</li>
+<li>从head遍历连接past</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">clean</span><span class="params">(SNode s)</span> </span>&#123;</span><br><span class="line">            s.item = <span class="keyword">null</span>;   <span class="comment">// forget item 把item和waiter都置空</span></span><br><span class="line">            s.waiter = <span class="keyword">null</span>; <span class="comment">// forget thread</span></span><br><span class="line">			</span><br><span class="line">            <span class="comment">// 获得下一个SNode</span></span><br><span class="line">            SNode past = s.next;</span><br><span class="line">    	   <span class="comment">// 如果past被cancell了，那么就再past一个</span></span><br><span class="line">            <span class="keyword">if</span> (past != <span class="keyword">null</span> &amp;&amp; past.isCancelled())</span><br><span class="line">                past = past.next;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 从头节点开始清除</span></span><br><span class="line">            SNode p;</span><br><span class="line">    	    <span class="comment">// 把头节点链接到下一个节点，节点不能为cancelled</span></span><br><span class="line">            <span class="keyword">while</span> ((p = head) != <span class="keyword">null</span> &amp;&amp; p != past &amp;&amp; p.isCancelled())</span><br><span class="line">                casHead(p, p.next);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Unsplice embedded nodes</span></span><br><span class="line">            <span class="keyword">while</span> (p != <span class="keyword">null</span> &amp;&amp; p != past) &#123;</span><br><span class="line">                <span class="comment">// 在去除链接头节点以后的节点，同样也不能为null。</span></span><br><span class="line">                SNode n = p.next;</span><br><span class="line">                <span class="keyword">if</span> (n != <span class="keyword">null</span> &amp;&amp; n.isCancelled())</span><br><span class="line">                    p.casNext(n, n.next);</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    p = n;</span><br><span class="line">            &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1-2-TransferQueue-公平-gt-FIFO"><a href="#1-2-TransferQueue-公平-gt-FIFO" class="headerlink" title="1.2 TransferQueue(公平=&gt;FIFO)"></a>1.2 TransferQueue(公平=&gt;FIFO)</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TransferQueue</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Transferer</span>&lt;<span class="title">E</span>&gt;</span>&#123;</span><br><span class="line">    <span class="comment">// 队列头 </span></span><br><span class="line">    <span class="keyword">transient</span> <span class="keyword">volatile</span> QNode head;</span><br><span class="line">    <span class="comment">// 队列尾 </span></span><br><span class="line">    <span class="keyword">transient</span> <span class="keyword">volatile</span> QNode tail;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 队列的元素</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">QNode</span> </span>&#123;...&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="QNode"><a href="#QNode" class="headerlink" title="QNode"></a>QNode</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">QNode</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 当前元素的值，如果当前元素被阻塞住了，等其他线程来唤醒自己时，其他线程会把自己 set 到 item 里面</span></span><br><span class="line">    <span class="keyword">volatile</span> Object item;         <span class="comment">// CAS'ed to or from null</span></span><br><span class="line">    <span class="comment">// 可以阻塞住的当前线程</span></span><br><span class="line">    <span class="keyword">volatile</span> Thread waiter;       <span class="comment">// to control park/unpark</span></span><br><span class="line">     <span class="comment">// true 是 put，false 是 take</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> isData;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 当前元素的下一个元素</span></span><br><span class="line">    <span class="keyword">volatile</span> QNode next;         </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 构造时传入数据和节点类型</span></span><br><span class="line">	QNode(Object item, <span class="keyword">boolean</span> isData) &#123;</span><br><span class="line">	    <span class="keyword">this</span>.item = item;</span><br><span class="line">	    <span class="keyword">this</span>.isData = isData;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 将节点val通过cas连接在cmp后面</span></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">casNext</span><span class="params">(QNode cmp, QNode val)</span> </span>&#123;</span><br><span class="line">	    <span class="keyword">return</span> next == cmp &amp;&amp;</span><br><span class="line">	        UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, nextOffset, cmp, val);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 将item的值通过cas变为val</span></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">casItem</span><span class="params">(Object cmp, Object val)</span> </span>&#123;</span><br><span class="line">	    <span class="keyword">return</span> item == cmp &amp;&amp;</span><br><span class="line">	        UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, itemOffset, cmp, val);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Tries to cancel by CAS'ing ref to this as item.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">tryCancel</span><span class="params">(Object cmp)</span> </span>&#123;</span><br><span class="line">	    UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, itemOffset, cmp, <span class="keyword">this</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 被取消的节点就是item=this</span></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">isCancelled</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	    <span class="keyword">return</span> item == <span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// unsafe相关代码...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="transfer-：入队-amp-出队"><a href="#transfer-：入队-amp-出队" class="headerlink" title="transfer()：入队&amp;出队"></a>transfer()：入队&amp;出队</h3><p>当前线程是如何把自己的数据传给阻塞线程的？为了方便说明，我们假设线程 1 往队列中 take 数据 ，被阻塞住了，变成阻塞线程 A ，然后线程 2 开始往队列中 put 数据 B，大致的流程是这样的：</p>
+<ol>
+<li>线程 1 从队列中拿数据，发现队列中没有数据，于是被阻塞，成为 A ；</li>
+<li>线程 2 往队尾 put 数据，会从队尾往前找到第一个被阻塞的节点，假设此时能找到的就是节点 A，然后线程 B 把将 put 的数据放到节点 A 的 item 属性里面，并唤醒线程 1；</li>
+<li>线程 1 被唤醒后，就能从 A.item 里面拿到线程 2 put 的数据了，线程 1 成功返回。</li>
+</ol>
+<p>从这个过程中，我们能看出<strong>公平主要体现在，每次 put 数据的时候，都 put 到队尾上，而每次拿数据时，并不是直接从队头拿数据，而是从队尾往前寻找第一个被阻塞的线程，这样就会按照顺序释放被阻塞的线程</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">E <span class="title">transfer</span><span class="params">(E e, <span class="keyword">boolean</span> timed, <span class="keyword">long</span> nanos)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    QNode s = <span class="keyword">null</span>; <span class="comment">// constructed/reused as needed</span></span><br><span class="line">    <span class="comment">// true 是 put，false 是 get</span></span><br><span class="line">    <span class="keyword">boolean</span> isData = (e != <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="comment">// 队列头和尾的临时变量,队列是空的时候，t=h</span></span><br><span class="line">        QNode t = tail;</span><br><span class="line">        QNode h = head;</span><br><span class="line">        <span class="comment">// tail 和 head 没有初始化时，无限循环</span></span><br><span class="line">        <span class="comment">// 虽然这种continue非常耗cpu，但一般碰不到这种情况，因为tail和head 在 TransferQueue 初始化时就已经被赋值空节点了</span></span><br><span class="line">        <span class="keyword">if</span> (t == <span class="keyword">null</span> || h == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">-----------------------------------------------------------------------------------------------------------------                        </span><br><span class="line">        <span class="comment">// 情况一：首尾节点相同（空队列）|| 尾节点的操作和当前节点操作一致（比如队尾是take时阻塞，当前线程也是take）</span></span><br><span class="line">        <span class="keyword">if</span> (h == t || t.isData == isData) &#123;</span><br><span class="line">            QNode tn = t.next;</span><br><span class="line">            <span class="comment">// 当 t 不是 tail 时。即 tail 已经被修改过了，因为 tail 没有被修改的情况下，t 和 tail 必然相等</span></span><br><span class="line">            <span class="keyword">if</span> (t != tail)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="comment">// 队尾后面的值还不为空，t 还不是队尾，直接把 tn 赋值给 t，这是一步加强校验。</span></span><br><span class="line">            <span class="keyword">if</span> (tn != <span class="keyword">null</span>) &#123;</span><br><span class="line">            	<span class="comment">// CAS修改tail为tn</span></span><br><span class="line">                advanceTail(t, tn);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 超时直接返回 null</span></span><br><span class="line">            <span class="keyword">if</span> (timed &amp;&amp; nanos &lt;= <span class="number">0</span>)        <span class="comment">// can't wait</span></span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            <span class="comment">// 构造node节点</span></span><br><span class="line">            <span class="keyword">if</span> (s == <span class="keyword">null</span>)</span><br><span class="line">                s = <span class="keyword">new</span> QNode(e, isData);</span><br><span class="line">            <span class="comment">// 如果把 e 放到队尾失败，继续递归放进去</span></span><br><span class="line">            <span class="keyword">if</span> (!t.casNext(<span class="keyword">null</span>, s))        <span class="comment">// failed to link in</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">            advanceTail(t, s);              <span class="comment">// swing tail and wait</span></span><br><span class="line">            <span class="comment">// awaitFulfill 同 TransferStack，阻塞住自己，等待配对节点x</span></span><br><span class="line">            Object x = awaitFulfill(s, e, timed, nanos);</span><br><span class="line">            <span class="keyword">if</span> (x == s) &#123;                   <span class="comment">// wait was cancelled</span></span><br><span class="line">                clean(t, s);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!s.isOffList()) &#123;   <span class="comment">// not already unlinked</span></span><br><span class="line">            	<span class="comment">// CAS修改head为s     </span></span><br><span class="line">                advanceHead(t, s);  <span class="comment">// unlink if head</span></span><br><span class="line">                <span class="keyword">if</span> (x != <span class="keyword">null</span>)      <span class="comment">// and forget fields</span></span><br><span class="line">                    s.item = s;</span><br><span class="line">                s.waiter = <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> (x != <span class="keyword">null</span>) ? (E)x : e;</span><br><span class="line">-----------------------------------------------------------------------------------------------------------------            </span><br><span class="line">        <span class="comment">// 情况二：队列不为空，并且当前操作和队尾不一致（比如队尾是因为 take 被阻塞的，那么当前操作必然是 put）</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;                            <span class="comment">// complementary-mode</span></span><br><span class="line">            <span class="comment">// 如果是第一次执行，此处的 m 代表就是 tail</span></span><br><span class="line">            <span class="comment">// 也就是这行代码体现出队列的公平，每次操作时，从头开始按照顺序进行操作</span></span><br><span class="line">            QNode m = h.next;               <span class="comment">// node to fulfill</span></span><br><span class="line">            <span class="keyword">if</span> (t != tail || m == <span class="keyword">null</span> || h != head)</span><br><span class="line">                <span class="keyword">continue</span>;                   <span class="comment">// inconsistent read</span></span><br><span class="line"></span><br><span class="line">            Object x = m.item;</span><br><span class="line">            <span class="keyword">if</span> (isData == (x != <span class="keyword">null</span>) ||    <span class="comment">// m already fulfilled</span></span><br><span class="line">                x == m ||                   <span class="comment">// m cancelled</span></span><br><span class="line">                <span class="comment">// m 代表栈头</span></span><br><span class="line">                <span class="comment">// 这里把当前的操作值赋值给阻塞住的 m 的 item 属性，所以 m 被释放时，就可得到此次操作的值</span></span><br><span class="line">                !m.casItem(x, e)) &#123;         <span class="comment">// lost CAS</span></span><br><span class="line">                advanceHead(h, m);          <span class="comment">// dequeue and retry</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 当前操作放到队头</span></span><br><span class="line">            advanceHead(h, m);              <span class="comment">// successfully fulfilled</span></span><br><span class="line">            <span class="comment">// 释放队头阻塞节点</span></span><br><span class="line">            LockSupport.unpark(m.waiter);</span><br><span class="line">            <span class="keyword">return</span> (x != <span class="keyword">null</span>) ? (E)x : e;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="2-方法解析-amp-api"><a href="#2-方法解析-amp-api" class="headerlink" title="2.方法解析 &amp; api"></a>2.方法解析 &amp; api</h1><p>SynchronousQueue 的方法都很简单，因为已经封装好了两种 Transfer 的实现，TransferStack 和 TransferQueue，所以后面的方法直接调用就行。</p>
+<h2 id="2-1-放入：put"><a href="#2-1-放入：put" class="headerlink" title="2.1 放入：put"></a>2.1 放入：put</h2><p>将新元素放进队列，直到有另外一个线程从队列中取走，成功结束，失败打断线程<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(E e)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="comment">// e为空，抛异常</span></span><br><span class="line">    <span class="keyword">if</span> (e == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">    <span class="comment">// 调用transfer方法，传入e</span></span><br><span class="line">    <span class="comment">// 一直等待</span></span><br><span class="line">    <span class="keyword">if</span> (transferer.transfer(e, <span class="keyword">false</span>, <span class="number">0</span>) == <span class="keyword">null</span>) &#123;</span><br><span class="line">        Thread.interrupted();</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InterruptedException();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面，我们再看看 offer 方法，offer 不会阻塞，简单点说就是 offer 的时候如果有消费者在等待那么就会立马满足返回true，如果没有就会返回false，不会等待消费者到来<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">offer</span><span class="params">(E e)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (e == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">       <span class="keyword">return</span> transferer.transfer(e, <span class="keyword">true</span>, <span class="number">0</span>) != <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到与 put 的区别就是 timed 参数为true。</p>
+<p>不会阻塞的原理是（以TransferStack为例）: transfer方法分为两种情况，其中 [当前栈包含于给定节点模式互补的节点] 的情况下就不会出现阻塞，若匹配到就会直接返回put的值；而 [当前节点与栈顶节点类型相同] 的清况会调用 awaitFulfill 方法阻塞等待互补节点。<br><img src="https://img-blog.csdnimg.cn/20201003225637665.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>从上图可以看到若 timed为true，就只会进入情况 1.1 而不会进入情况1.2中调用 awaitFulfill 方法，所以这种情况下offer也不会阻塞。</p>
+<h2 id="2-2-取出：take"><a href="#2-2-取出：take" class="headerlink" title="2.2 取出：take"></a>2.2 取出：take</h2><p>从队列头拿数据并删除数据，成功返回，失败打断线程<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">take</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="comment">// 调用transfer方法，传入null</span></span><br><span class="line">    E e = transferer.transfer(<span class="keyword">null</span>, <span class="keyword">false</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (e != <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> e;</span><br><span class="line">    Thread.interrupted();</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> InterruptedException();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面，我们看看 poll 方法。原理同上面 offer<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">poll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> transferer.transfer(<span class="keyword">null</span>, <span class="keyword">true</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-3-容量相关方法"><a href="#2-3-容量相关方法" class="headerlink" title="2.3 容量相关方法"></a>2.3 容量相关方法</h2><p>与容量相关方法都是默认实现，即写死的。</p>
+<h3 id="peek"><a href="#peek" class="headerlink" title="peek()"></a>peek()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">peek</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="remove"><a href="#remove" class="headerlink" title="remove()"></a>remove()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">remove</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="contains"><a href="#contains" class="headerlink" title="contains()"></a>contains()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/7c6a5a4d.html" title="【JUC源码】阻塞队列：SynchronousQueue吐血万字源码深析（超详细注释）">https://yzhblog.work/posts/7c6a5a4d.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/8f78f712.html" rel="next" title="【JUC源码】阻塞队列：DelayQueue源码分析">
+                <i class="fa fa-chevron-left"></i> 【JUC源码】阻塞队列：DelayQueue源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/f6485ebf.html" rel="prev" title="【JUC源码】阻塞队列相关面试合集（附源码分析链接）">
+                【JUC源码】阻塞队列相关面试合集（附源码分析链接） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-结构"><span class="nav-text">1.结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-TransferStack（非公平-gt-FILO）"><span class="nav-text">1.1 TransferStack（非公平=&gt;FILO）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNode"><span class="nav-text">SNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#transfer-：进栈-amp-出栈"><span class="nav-text">transfer()：进栈&amp;出栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#awaitFulfill-：等待匹配节点"><span class="nav-text">awaitFulfill()：等待匹配节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clean-：清除过期节点"><span class="nav-text">clean()：清除过期节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-TransferQueue-公平-gt-FIFO"><span class="nav-text">1.2 TransferQueue(公平=&gt;FIFO)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#QNode"><span class="nav-text">QNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#transfer-：入队-amp-出队"><span class="nav-text">transfer()：入队&amp;出队</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-方法解析-amp-api"><span class="nav-text">2.方法解析 &amp; api</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-放入：put"><span class="nav-text">2.1 放入：put</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-取出：take"><span class="nav-text">2.2 取出：take</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-容量相关方法"><span class="nav-text">2.3 容量相关方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#peek"><span class="nav-text">peek()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#remove"><span class="nav-text">remove()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#contains"><span class="nav-text">contains()</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

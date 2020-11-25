@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="1 Java线程模型Java语言的线程，从规范的角度来说是不强制要求任何具体的实现方式的。采用1:1、N:1、M:N模型都可以。先放个传送门：RednaxelaFX：JVM中的线程模型是用户级的么？ N : 1（JDK2前）Java线程在JDK1.2之前，是基于称为“绿色线程”（Green Threads）的用户线程实现的，而在JDK1.2中，线程模型替换为基于操作系统原生线程模型来实现。因此，在">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Java并发编程】操作系统基础（五）：Java线程模型&amp;线程调度">
+<meta property="og:url" content="https://yzhblog.work/posts/126d2e82.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="1 Java线程模型Java语言的线程，从规范的角度来说是不强制要求任何具体的实现方式的。采用1:1、N:1、M:N模型都可以。先放个传送门：RednaxelaFX：JVM中的线程模型是用户级的么？ N : 1（JDK2前）Java线程在JDK1.2之前，是基于称为“绿色线程”（Green Threads）的用户线程实现的，而在JDK1.2中，线程模型替换为基于操作系统原生线程模型来实现。因此，在">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-service.csdnimg.cn/img_convert/bb4d933d90814db5d51565f9feab4a2e.png">
+<meta property="og:image" content="https://img-service.csdnimg.cn/img_convert/4778cf35618d344d3a23ca1833bcbc3d.png">
+<meta property="og:updated_time" content="2020-11-25T10:40:11.075Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Java并发编程】操作系统基础（五）：Java线程模型&amp;线程调度">
+<meta name="twitter:description" content="1 Java线程模型Java语言的线程，从规范的角度来说是不强制要求任何具体的实现方式的。采用1:1、N:1、M:N模型都可以。先放个传送门：RednaxelaFX：JVM中的线程模型是用户级的么？ N : 1（JDK2前）Java线程在JDK1.2之前，是基于称为“绿色线程”（Green Threads）的用户线程实现的，而在JDK1.2中，线程模型替换为基于操作系统原生线程模型来实现。因此，在">
+<meta name="twitter:image" content="https://img-service.csdnimg.cn/img_convert/bb4d933d90814db5d51565f9feab4a2e.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/126d2e82.html">
+
+
+
+
+
+  <title>【Java并发编程】操作系统基础（五）：Java线程模型&线程调度 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/126d2e82.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Java并发编程】操作系统基础（五）：Java线程模型&线程调度</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-10T00:00:00+08:00">
+                2019-11-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java并发编程/" itemprop="url" rel="index">
+                    <span itemprop="name">Java并发编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.9k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  13
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-Java线程模型"><a href="#1-Java线程模型" class="headerlink" title="1 Java线程模型"></a>1 Java线程模型</h1><p>Java语言的线程，<strong>从规范的角度来说是不强制要求任何具体的实现方式的。采用1:1、N:1、M:N模型都可以</strong>。先放个传送门：<a href="https://www.zhihu.com/question/23096638/answer/29617153" target="_blank" rel="noopener">RednaxelaFX：JVM中的线程模型是用户级的么</a>？</p>
+<h2 id="N-1（JDK2前）"><a href="#N-1（JDK2前）" class="headerlink" title="N : 1（JDK2前）"></a>N : 1（JDK2前）</h2><p><strong>Java线程在JDK1.2之前，是基于称为“绿色线程”（Green Threads）的用户线程实现的</strong>，而在JDK1.2中，线程模型替换为基于操作系统原生线程模型来实现。因此，在目前的JDK版本中，操作系统支持怎样的线程模型，在很大程度上决定了Java虚拟机的线程是怎样映射的，这点在不同的平台上没有办法达成一致，虚拟机规范中也并未限定Java线程需要使用哪种线程模型来实现。线程模型只对线程的并发规模和操作成本产生影响，对Java程序的编码和运行过程来说，这些差异都是透明的。</p>
+<a id="more"></a>
+<p>也就说JDK1.2之前，<strong>程序员们为JVM开发了自己的一个线程调度内核，而到操作系统层面就是用户空间内的线程实现</strong>。而到了JDK1.2及以后，JVM选择了更加稳健且方便使用的操作系统原生的线程模型，通过系统调用，将程序的线程交给了操作系统内核进行调度</p>
+<p>对于Sun JDK来说，它的Windows版与Linux版都是使用一对一的线程模型实现的，一条Java线程就映射到一条轻量级进程之中，因为Windows和Linux系统提供的线程模型就是一对一的。</p>
+<p>也就是说，<strong>现在的Java中线程的本质，其实就是操作系统中的线程，Linux下是基于pthread库实现的轻量级进程，Windows下是原生的系统Win32 API提供系统调用从而实现多线程</strong>。</p>
+<h2 id="1-1（HotSpot）"><a href="#1-1（HotSpot）" class="headerlink" title="1 : 1（HotSpot）"></a>1 : 1（HotSpot）</h2><p>具体到我们平时常用的JVM实现，Oracle/Sun的HotSpot VM，它是用1:1模型来实现Java线程的，也就是说一个Java线程是直接通过一个OS线程来实现的，中间并没有额外的间接结构。而且HotSpot VM自己也不干涉线程的调度，全权交给底下的OS去处理。所以如果OS想把某个线程调度到某个CPU/核上，它就自己弄了。</p>
+<p>这个意义上说Java程序跑在HotSpot VM上开多个Java线程，就跟一个C/C++程序开了多线程来跑没有任何两样。那么怎么控制这些线程分布到不同的CPU核上去呢？</p>
+<p>在Linux上的话，可以用taskset来把线程绑在某个指定的核上。在Java层面上，有大佬写了个现成的库来利用taskset绑核：<a href="https://github.com/OpenHFT/Java-Thread-Affinity" target="_blank" rel="noopener">OpenHFT/Java-Thread-Affinity</a>  有兴趣的话可以参考一下。</p>
+<p>最后提一下：JVM的实现有很多种，并不是所有JVM都像HotSpot VM这样总是用1:1模型的。前面的传送门已经有例子了所以这里就不多说，但还是想特别提一下免得给初学者留下“Java线程就肯定是OS线程”的误解。请务必针对实现来讨论这种问题。</p>
+<h1 id="2-Java线程调度"><a href="#2-Java线程调度" class="headerlink" title="2.Java线程调度"></a>2.Java线程调度</h1><h2 id="2-1-JVM调度（JDK2前）"><a href="#2-1-JVM调度（JDK2前）" class="headerlink" title="2.1 JVM调度（JDK2前）"></a>2.1 JVM调度（JDK2前）</h2><p>在早期的java1.1中，JVM自己实现线程调度，而不依赖于底层的平台。绿色线程（用户级线程）是JVM使用的唯一的线程模型（至少是在solaris平台上）。</p>
+<pre><code>（1）JVM使用抢占的、基于优先权的调度策略；
+
+（2）每个线程都有优先级，JVM总是选择最高优先级的线程执行；
+
+（3）若果两个线程具有相同的优先级，则采用FIFO的调度顺序。
+</code></pre><ul>
+<li><strong>绿色线程的执行时间由线程本身来控制，线程自身工作告一段落后，要主动告知系统切换到另一个线程上</strong>。其特点是实现简单，不需要专门的硬件支持，切换操作对线程自身来说是预先可知的。</li>
+<li>因为绿色线程库是用户级的，并且Solaris一次只能处理一个绿色线程，即Java运行时采用<strong>多对一的线程模型</strong>，所以会导致如下问题：<ul>
+<li>Java应用程序不能与Solaris环境中的多线程技术互操作，就是说Solaris管理不了Java线程；</li>
+<li>Java线程不能在多处理机上并行执行</li>
+<li>Java 应用不能享用操作系统提供的并发性<br>由于绿色线程的这些限制，在java1.2之后的版本中放弃了该模型，而采用本地线程（Native threads，是指使用操作系统本地的线程库建立和管理的线程），即将Java线程连接到本地线程上，主要<strong>由底层平台实现线程的调度</strong>。</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-2-底层平台调度"><a href="#2-2-底层平台调度" class="headerlink" title="2.2 底层平台调度"></a>2.2 底层平台调度</h2><p>Java语言规范和Java虚拟机规范是Java的重要文档，可惜的是他们都没有说明Java线程的调度问题。或许从Java的角度看，线程并不是Java最基本的内容。毕竟Thread类也仅仅是Java一个特定的类而已。</p>
+<p>终于在Java SE 8 API规范的Thread类说明中算是找到了线程调度的有关描述：</p>
+<ul>
+<li>每个线程有一个优先级（从1级到10级），较高优先级的线程比低优先级线程先执行。</li>
+<li>程序员可以通过Thread.setPriority(int)设置线程的优先级，默认的优先级是NORM_PRIORITY。</li>
+<li>Java SE 还声明JVM可以任何方式实现线程的优先级，甚至忽略它的存在。</li>
+</ul>
+<p>我们是通过Java创建的线程，线程调度的事儿Java是脱不开的。那Java又是如何将线程调度交给底层的操作系统去做呢？下面我们将跟随JVM虚拟机底层平台上的实现，说明Java线程的调度策略。</p>
+<p>既然Java底层的运行平台提供了强大的线程管理能力，Java就没有理由再自己进行线程的管理和调度了。于是JVM放弃了绿色线程的实现机制，<strong>将每个Java线程一对一映射到底层平台上的一个本地线程上，并将线程调度交由本地线程的调度程序</strong>。由于Java线程是与本地线程是一对一地绑在一起的，所以改变Java线程的优先权也不会有可靠地运行结果。</p>
+<h2 id="2-2-1-Solaris"><a href="#2-2-1-Solaris" class="headerlink" title="2.2.1 Solaris"></a>2.2.1 Solaris</h2><p><strong>Solaris早期版本还是尽量实现了基本的用户模式下的抢占</strong>。</p>
+<p>系统维护这一条戒律：就绪队列上任何线程的优先级必须小于等于正在运行的线程，否则，优先级最低的正在运行的线程将被剥夺运行的机会，即将其对应的LWP让给优先级高的本地线程。在如下三种情况下会发生线程的抢占：</p>
+<ul>
+<li>当正在运行的本地线程降低了其优先级，使其小于就绪队列中的某个线程的优先级</li>
+<li>当正在运行的本地线程增加了就绪队列中某个线程的优先级，使其高于正在运行的线程的优先级</li>
+<li>当就绪队列中新加入了一个优先级高于正在运行的线程的优先级，例如，某个高优先级的线程被唤醒。</li>
+</ul>
+<p>Java线程的唤醒、优先级设置是由JVM实现的，但线程的调度（与LWP的连接）则是由本地线程库完成。操作系统（Solaris）可以依据自己的原则改变LWP的优先级，例如，通过动态优先级实现分时，这是线程库和JVM都无法干预的。</p>
+<p><strong>Solaris 9之后，使用了1:1的线程模型</strong></p>
+<p>即本地线程与LWP一对一地绑在一起，本地线程库也失去了直接干预线程调度的机会（指为本地线程选择连接LWP）。Java线程也就通过本地线程与LWP终生地一对一地绑在一起。这样可以通过改变本地线程或Java线程的优先级来影响LWP的优先级，从而影响系统的CPU调度。但具体的CPU分配策略还是Solaris做出的，JVM仅起辅助的作用。</p>
+<h3 id="2-2-2-Windows"><a href="#2-2-2-Windows" class="headerlink" title="2.2.2 Windows"></a>2.2.2 Windows</h3><p>在Windows下，Java线程一对一地绑定到Win32线程（相当于Solaris的native线程）上。当然Win32线程也是一对一地绑定到内核级线程上，所以Java线程的调度实际上是内核完成的。Java虚拟机可以做的是通过将Java线程的优先级映射到Win32线程的优先级上，从而影响系统的线程调度决策。</p>
+<p><strong>优先级划分</strong></p>
+<p>Windows内核使用了32级优先权模式来决定线程的调度顺序。优先权被分为两类：可变类优先权包含了1-15级，不可变类优先权（实时类）包含了16-31级。<strong>调度程序为每一个优先级建一个调度队列，从高优先级到低优先级队列逐个查找，直到找到一个可运行的线程</strong>。</p>
+<pre><code>Win32将进程（process）分为如下6个优先级类：
+REALTIME_PRIORITY_CLASS
+HIGH_PRIORITY_CLASS
+ABOVE_NORMAL_PRIORITY_CLASS
+NORAL_PRIORITY_CLASS
+BELOW_NORMAL_PRIORITY_CLASS
+IDLE_PRIORITY_CLASS
+
+为区分进程内线程的优先级，每个优先级类又包含6个相对优先级：
+TIME_CRITIAL
+HEGHEST
+ABOVE_NORNAL
+NORMAL
+BELOW_NORMAL
+LOWEST
+IDLE
+</code></pre><p>当把Java 线程绑定到Win32线程时，需要将Java线程的优先级映射到Win32线程上。Java 6在Windows的实现中将Java线程的优先级按下表所示映射到Win32线程的相对优先级上。</p>
+<p><img src="https://img-service.csdnimg.cn/img_convert/bb4d933d90814db5d51565f9feab4a2e.png" alt="img"></p>
+<p>当JVM将线程的优先级映射到Win32线程的优先级上之后，线程调度的工作就是Win32和Windows内核的事儿了。</p>
+<p><strong>抢占式</strong></p>
+<p>Windows采用基于优先级的、抢占的线程调度算法。调度程序保证总是让具有最高优先级的线程运行。一个线程仅在如下四种情况下才会放弃CPU：</p>
+<ul>
+<li>（1）被一个更高优先级的线程抢占；</li>
+<li>（2）结束；</li>
+<li>（3）时间片到；</li>
+<li>（4）执行导致阻塞的系统调用。</li>
+</ul>
+<p>请注意，尽管Windows采用了基于优先级的调度策略，但<strong>不会出现饥饿现象</strong>。其采取的主要措施是：优先级再高的的线程也会在运行一个时间片之后放弃CPU，并且降低其优先级，从而保证了低优先级线程也有机会运行。</p>
+<p><strong>动态优先级</strong></p>
+<ul>
+<li>当线程的时间片用完后，降低其优先级；</li>
+<li>当线程从阻塞变为就绪时，增加线程的优先级；</li>
+<li>当线程很长时间没有机会运行时，系统也会提升线程的优先级。</li>
+<li>Windows区分前台和后台进程，前台进程往往获得更长的时间片。</li>
+</ul>
+<p>以上这些措施体现了<strong>Windows基于动态优先级、分时和抢占的CPU调度策略</strong>。调度策略很复杂，考虑了线程执行过程的各个方面，再加上系统运行环境的变化，我们很难通过线程运行过程的观察理清调度算法的全貌。</p>
+<p><strong>由于Java线程到Windows内核线程一对一的绑定方式，所以我们看到的Java线程的运行过程实际上反映的是Windows的调度策略</strong>。</p>
+<h3 id="2-2-3-Linux"><a href="#2-2-3-Linux" class="headerlink" title="2.2.3 Linux"></a>2.2.3 Linux</h3><p>同Windows一样，在Linux上Java线程一对一地映射到内核级线程上。不过Linux中是不区分进程和线程的，同一个进程中的线程可以看作是共享程度较高的一组进程。<strong>Linux也是通过优先级来实现CPU分配的</strong>，应用程序可以通过调整nice值（谦让值）来设置进程的优先级。nice值反映了线程的谦让程度，该值越高说明这个线程越有意愿把CPU让给别的线程，nice的值可以由线程自己设定。所以JVM需要实现Java线程的优先级到nice的映射，即从区间[1，10]到[19， -20]的映射。把自己线程的nice值设置高了，说明你的人品很谦让，当然使用CPU的机会就会少一点。</p>
+<p>linux调度器实现了一个抢占的、基于优先级的调度算法，支持两种类型的进程的调度：实时进程的优先级范围为[0，99]，普通进程的优先级范围为[100，140]。<br><img src="https://img-service.csdnimg.cn/img_convert/4778cf35618d344d3a23ca1833bcbc3d.png" alt="img"><br><strong>进程的优先权越高，所获得的时间片就越大</strong>。每个就绪进程都有一个时间片。内核将就绪进程分为活动的（active）和过期的（expired）两类：只要进程的时间片没有耗尽，就一直有资格运行，称为活动的；当进程的时间片耗尽后，就没有资格运行了，称为过期的。<strong>调度程序总是在活动的进程中选择优先级最高的进程执行，直到所有的活动进程都耗尽了他们的时间片</strong>。当所有的活动进程都变成过期的之后，调度程序再将所有过期的进程置为活动的，并为他们分配相应的时间片，重新进行新一轮的调度。所以Linux的线程调度也不会出现饥饿现象。</p>
+<p>在Linux上，同Windows的情况类似，Java线程的调度最终转化为了操作系统中的进程调度。</p>
+<h2 id="2-3-总结"><a href="#2-3-总结" class="headerlink" title="2.3 总结"></a>2.3 总结</h2><p>从以上Java在不同平台上的实现来看，只有在底层平台不支持线程时，JVM才会自己实现线程的管理和调度，此时Java线程以绿色线程的方式运行。由于目前流行的操作系统都支持线程，所以JVM就没必要管线程调度的事情了。应用程序通过setPriority()方法设置的线程优先级，将映射到内核级线程的优先级，影响内核的线程调度。</p>
+<p>目前的Java的官方文档中几乎不再介绍有关Java线程的调度算法问题，因为这确实不是Java的事儿了。尽管程序中还可以调用setPriority()，提请JVM注意线程的优先级，但你千万不要把这事儿太当真。Java中所谓的线程调度仅是底层平台线程调度的一个影子而已。</p>
+<p>由于Java是跨平台的，因此要求Java的程序设计不能对Java线程的调度方法有任何假设，即程序运行的正确性不能依赖于线程调度的方法。所以说程序员最好不要过分关心底层平台是如何实现线程调度的，只要知道他们是并发运行的就可以了，甚至不必在意线程的优先级，因为优先级也不靠谱。正如Joshua Bloch在他的书《Effective Java》中给出的第72条忠告：任何依赖线程调度器来达到正确性或性能要求的程序，很有可能都是不可移植的。当然，世界上没有绝对的事情。</p>
+<p><strong>如果程序员一定要规范线程的执行顺序，应该使用线程的同步操作wait(), notify()等显式实现线程之间的同步关系，才能保证程序的正确性。– 锁机制</strong></p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/126d2e82.html" title="【Java并发编程】操作系统基础（五）：Java线程模型&线程调度">https://yzhblog.work/posts/126d2e82.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/15f52530.html" rel="next" title="【Java并发编程】操作系统基础（三）：进程调度">
+                <i class="fa fa-chevron-left"></i> 【Java并发编程】操作系统基础（三）：进程调度
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/c72c6cdd.html" rel="prev" title="【Java并发编程】操作系统基础（四）：上下文切换">
+                【Java并发编程】操作系统基础（四）：上下文切换 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Java线程模型"><span class="nav-text">1 Java线程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#N-1（JDK2前）"><span class="nav-text">N : 1（JDK2前）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1（HotSpot）"><span class="nav-text">1 : 1（HotSpot）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Java线程调度"><span class="nav-text">2.Java线程调度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-JVM调度（JDK2前）"><span class="nav-text">2.1 JVM调度（JDK2前）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-底层平台调度"><span class="nav-text">2.2 底层平台调度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-1-Solaris"><span class="nav-text">2.2.1 Solaris</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-Windows"><span class="nav-text">2.2.2 Windows</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-3-Linux"><span class="nav-text">2.2.3 Linux</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-总结"><span class="nav-text">2.3 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,学习ing,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="多线程和并发性并不是什么新内容，但是 Java 语言设计中的创新之一就是，它是第一个直接把跨平台线程模型和正规的内存模型集成到语言中的主流语言。核心类库包含一个 Thread 类，可以用它来构建、启动和操纵线程，Java 语言包括了跨线程传达并发性约束的构造 —— synchronized 和 volatile 。在简化与平台无关的并发类的开发的同时，它决没有使并发类的编写工作变得更繁琐，只是使它">
+<meta name="keywords" content="Java,学习ing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Java并发编程】锁机制（四）：synchronized 与 Reentrantlock 对比">
+<meta property="og:url" content="https://yzhblog.work/posts/52ba9a1b.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="多线程和并发性并不是什么新内容，但是 Java 语言设计中的创新之一就是，它是第一个直接把跨平台线程模型和正规的内存模型集成到语言中的主流语言。核心类库包含一个 Thread 类，可以用它来构建、启动和操纵线程，Java 语言包括了跨线程传达并发性约束的构造 —— synchronized 和 volatile 。在简化与平台无关的并发类的开发的同时，它决没有使并发类的编写工作变得更繁琐，只是使它">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure1.jpg">
+<meta property="og:image" content="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure2.jpg">
+<meta property="og:image" content="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure3.jpg">
+<meta property="og:image" content="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure4.jpg">
+<meta property="og:updated_time" content="2020-11-25T10:41:41.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Java并发编程】锁机制（四）：synchronized 与 Reentrantlock 对比">
+<meta name="twitter:description" content="多线程和并发性并不是什么新内容，但是 Java 语言设计中的创新之一就是，它是第一个直接把跨平台线程模型和正规的内存模型集成到语言中的主流语言。核心类库包含一个 Thread 类，可以用它来构建、启动和操纵线程，Java 语言包括了跨线程传达并发性约束的构造 —— synchronized 和 volatile 。在简化与平台无关的并发类的开发的同时，它决没有使并发类的编写工作变得更繁琐，只是使它">
+<meta name="twitter:image" content="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/52ba9a1b.html">
+
+
+
+
+
+  <title>【Java并发编程】锁机制（四）：synchronized 与 Reentrantlock 对比 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/52ba9a1b.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Java并发编程】锁机制（四）：synchronized 与 Reentrantlock 对比</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-23T00:00:00+08:00">
+                2019-11-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java并发编程/" itemprop="url" rel="index">
+                    <span itemprop="name">Java并发编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4.3k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  15
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>多线程和并发性并不是什么新内容，但是 Java 语言设计中的创新之一就是，它是第一个直接把跨平台线程模型和正规的内存模型集成到语言中的主流语言。核心类库包含一个 <code>Thread</code> 类，可以用它来构建、启动和操纵线程，Java 语言包括了跨线程传达并发性约束的构造 —— <code>synchronized</code> 和 <code>volatile</code> 。在简化与平台无关的并发类的开发的同时，它决没有使并发类的编写工作变得更繁琐，只是使它变得更容易了。</p>
+<a id="more"></a>
+<h1 id="1-简单回顾"><a href="#1-简单回顾" class="headerlink" title="1.简单回顾"></a>1.简单回顾</h1><h2 id="1-1-synchronized"><a href="#1-1-synchronized" class="headerlink" title="1.1 synchronized"></a>1.1 synchronized</h2><p>把代码块声明为 synchronized，有两个重要后果，通常是指该代码具有 <em>原子性（atomicity）</em>和 <em>可见性（visibility）</em>。原子性意味着一个线程一次只能执行由一个指定监控对象（lock）保护的代码，从而防止多个线程在更新共享状态时相互冲突。可见性则更为微妙；它要对付内存缓存和编译器优化的各种反常行为。一般来说，线程以某种不必让其他线程立即可以看到的方式（不管这些线程在寄存器中、在处理器特定的缓存中，还是通过指令重排或者其他编译器优化），不受缓存变量值的约束，但是如果开发人员使用了同步，如下面的代码所示，那么运行库将确保某一线程对变量所做的更新先于对现有 <code>synchronized</code> 块所进行的更新，当进入由同一监控器（lock）保护的另一个 <code>synchronized</code> 块时，将立刻可以看到这些对变量所做的更新。类似的规则也存在于 <code>volatile</code> 变量上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span> (lockObject) &#123; </span><br><span class="line">  <span class="comment">// update object state</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以，实现同步操作需要考虑安全更新多个共享变量所需的一切，不能有争用条件，不能破坏数据（假设同步的边界位置正确），而且要保证正确同步的其他线程可以看到这些变量的最新值。通过定义一个清晰的、跨平台的内存模型（该模型在 JDK 5.0 中做了修改，改正了原来定义中的某些错误），通过遵守下面这个简单规则，构建“一次编写，随处运行”的并发类是有可能的：</p>
+<blockquote>
+<p>不论什么时候，只要您将编写的变量接下来可能被另一个线程读取，或者您将读取的变量最后是被另一个线程写入的，那么您必须进行同步。</p>
+</blockquote>
+<p>不过现在好了一点，在最近的 JVM 中，没有争用的同步（一个线程拥有锁的时候，没有其他线程企图获得锁）的性能成本还是很低的。（也不总是这样；早期 JVM 中的同步还没有优化，所以让很多人都这样认为，但是现在这变成了一种误解，人们认为不管是不是争用，同步都有很高的性能成本。）</p>
+<hr>
+<p><a href><strong>对 synchronized 的改进</strong></a></p>
+<p>如此看来同步相当好了，是么？那么为什么 JSR 166 小组花了这么多时间来开发 <code>java.util.concurrent.lock</code> 框架呢？答案很简单－同步是不错，但它并不完美。它有一些功能性的限制 —— 它无法中断一个正在等候获得锁的线程，也无法通过投票得到锁，如果不想等下去，也就没法得到锁。同步还要求锁的释放只能在与获得锁所在的堆栈帧相同的堆栈帧中进行，多数情况下，这没问题（而且与异常处理交互得很好），但是，确实存在一些非块结构的锁定更合适的情况。</p>
+<h2 id="1-2-reentrantlock"><a href="#1-2-reentrantlock" class="headerlink" title="1.2 reentrantlock"></a>1.2 reentrantlock</h2><p><code>java.util.concurrent.lock</code> 中的 <code>Lock</code> 框架是锁定的一个抽象，它允许把锁定的实现作为 Java 类，而不是作为语言的特性来实现。这就为 <code>Lock</code> 的多种实现留下了空间，各种实现可能有不同的调度算法、性能特性或者锁定语义。 <code>ReentrantLock</code> 类实现了 <code>Lock</code>，它拥有与 <code>synchronized</code> 相同的并发性和内存语义，但是添加了类似锁投票、定时锁等候和可中断锁等候的一些特性。此外，它还提供了在激烈争用情况下更佳的性能。（换句话说，当许多线程都想访问共享资源时，JVM 可以花更少的时候来调度线程，把更多时间用在执行线程上。）</p>
+<p><em>reentrant</em> 锁意味着什么呢？简单来说，它有一个与锁相关的获取计数器，如果拥有锁的某个线程再次得到锁，那么获取计数器就加1，然后锁需要被释放两次才能获得真正释放。这模仿了 <code>synchronized</code> 的语义；如果线程进入由线程已经拥有的监控器保护的 synchronized 块，就允许线程继续进行，当线程退出第二个（或者后续） <code>synchronized</code> 块的时候，不释放锁，只有线程退出它进入的监控器保护的第一个 <code>synchronized</code> 块时，才释放锁。</p>
+<p>在查看清单 1 中的代码示例时，可以看到 <code>Lock</code> 和 synchronized 有一点明显的区别 —— lock 必须在 finally 块中释放。否则，如果受保护的代码将抛出异常，锁就有可能永远得不到释放！这一点区别看起来可能没什么，但是实际上，它极为重要。忘记在 finally 块中释放锁，可能会在程序中留下一个定时炸弹，当有一天炸弹爆炸时，您要花费很大力气才有找到源头在哪。而使用同步，JVM 将确保锁会获得自动释放。</p>
+<p><a href><strong>清单 1. 用 ReentrantLock 保护代码块。</strong></a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Lock lock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line">lock.lock();</span><br><span class="line"><span class="keyword">try</span> &#123; </span><br><span class="line">  <span class="comment">// update object state</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">finally</span> &#123;</span><br><span class="line">  lock.unlock(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>除此之外，与目前的 synchronized 实现相比，争用下的 <code>ReentrantLock</code> 实现更具可伸缩性。（在未来的 javaJVM 版本中，synchronized 的争用性能很有可能会获得提高。）这意味着当许多线程都在争用同一个锁时，使用 <code>ReentrantLock</code> 的总体开支通常要比 <code>synchronized</code> 少得多。</p>
+<hr>
+<h1 id="2-特性对比"><a href="#2-特性对比" class="headerlink" title="2.特性对比"></a>2.特性对比</h1><h2 id="2-1-吞吐率"><a href="#2-1-吞吐率" class="headerlink" title="2.1 吞吐率"></a>2.1 吞吐率</h2><p>Tim Peierls 用一个简单的线性全等伪随机数生成器（PRNG）构建了一个简单的评测，用它来测量 <code>synchronized</code> 和 <code>Lock</code> 之间相对的可伸缩性。这个示例很好，因为每次调用 <code>nextRandom()</code> 时，PRNG 都确实在做一些工作，所以这个基准程序实际上是在测量一个合理的、真实的 <code>synchronized</code> 和 <code>Lock</code> 应用程序，而不是测试纯粹纸上谈兵或者什么也不做的代码（就像许多所谓的基准程序一样。）</p>
+<p>在这个基准程序中，有一个 <code>PseudoRandom</code> 的接口，它只有一个方法 <code>nextRandom(int bound)</code> 。该接口与 <code>java.util.Random</code>类的功能非常类似。因为在生成下一个随机数时，PRNG 用最新生成的数字作为输入，而且把最后生成的数字作为一个实例变量来维护，其重点在于让更新这个状态的代码段不被其他线程抢占，所以我要用某种形式的锁定来确保这一点。（ <code>java.util.Random</code> 类也可以做到这点。）我们为 <code>PseudoRandom</code> 构建了两个实现；一个使用 syncronized，另一个使用<code>java.util.concurrent.ReentrantLock</code> 。驱动程序生成了大量线程，每个线程都疯狂地争夺时间片，然后计算不同版本每秒能执行多少轮。图 1 和 图 2 总结了不同线程数量的结果。这个评测并不完美，而且只在两个系统上运行了（一个是双 Xeon 运行超线程 Linux，另一个是单处理器 Windows 系统），但是，应当足以表现 <code>synchronized</code> 与 <code>ReentrantLock</code> 相比所具有的伸缩性优势了。</p>
+<p>下图是1个CPU与4个CPU的对比</p>
+<p><img src="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure1.jpg" width="70%"></p>
+<p><img src="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure2.jpg" width="70%"></p>
+<p>图 1 和图 2 中的图表以每秒调用数为单位显示了吞吐率，把不同的实现调整到 1 线程 <code>synchronized</code> 的情况。每个实现都相对迅速地集中在某个稳定状态的吞吐率上，该状态通常要求处理器得到充分利用，把大多数的处理器时间都花在处理实际工作（计算机随机数）上，只有小部分时间花在了线程调度开支上。您会注意到，synchronized 版本在处理任何类型的争用时，表现都相当差，而 <code>Lock</code> 版本在调度的开支上花的时间相当少，从而为更高的吞吐率留下空间，实现了更有效的 CPU 利用。</p>
+<ul>
+<li><strong>(无)少量竞争：轻量级锁最好，其本质是无锁，并无线程阻塞</strong></li>
+<li><strong>竞争激烈</strong><ul>
+<li><strong>reentrantlock在调度算法是在用户态下实现，可以更专注于任务处理，吞吐率较高</strong></li>
+<li><strong>(重量级锁下)synchronized调度算法要借助metux互斥量，时间片很大一部分用在了用户态与内核态的切换上，吞吐率较低</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-2-条件变量"><a href="#2-2-条件变量" class="headerlink" title="2.2 条件变量"></a>2.2 条件变量</h2><p>根类 <code>Object</code> 包含某些特殊的方法，用来在线程的 <code>wait()</code> 、 <code>notify()</code> 和 <code>notifyAll()</code> 之间进行通信。这些是高级的并发性特性，许多开发人员从来没有用过它们 —— 这可能是件好事，因为它们相当微妙，很容易使用不当。幸运的是，随着 JDK 5.0 中引入<code>java.util.concurrent</code> ，开发人员几乎更加没有什么地方需要使用这些方法了。</p>
+<p>通知与锁定之间有一个交互 —— 为了在对象上 <code>wait</code> 或 <code>notify</code> ，您必须持有该对象的锁。就像 <code>Lock</code> 是同步的概括一样， <code>Lock</code> 框架包含了对 <code>wait</code> 和 <code>notify</code> 的概括，这个概括叫作 <code>条件（Condition）</code> 。 <code>Lock</code> 对象则充当绑定到这个锁的条件变量的工厂对象，与标准的 <code>wait</code> 和 <code>notify</code> 方法不同，对于指定的 <code>Lock</code> ，可以有不止一个条件变量与它关联。这样就简化了许多并发算法的开发。例如， <code>条件（Condition）</code> 的 Javadoc 显示了一个有界缓冲区实现的示例，该示例使用了两个条件变量，“not full”和“not empty”，它比每个 lock 只用一个 wait 设置的实现方式可读性要好一些（而且更有效）。 <code>Condition</code> 的方法与 <code>wait</code> 、 <code>notify</code> 和 <code>notifyAll</code> 方法类似，分别命名为 <code>await</code> 、 <code>signal</code> 和 <code>signalAll</code> ，因为它们不能覆盖 <code>Object</code> 上的对应方法。</p>
+<hr>
+<h2 id="2-3-公平锁"><a href="#2-3-公平锁" class="headerlink" title="2.3 公平锁"></a>2.3 公平锁</h2><p>如果查看 Javadoc，您会看到， <code>ReentrantLock</code> 构造器的一个参数是 boolean 值，它允许您选择想要一个 <em>公平（fair）</em>锁，还是一个 <em>不公平（unfair）</em>锁。公平锁使线程按照请求锁的顺序依次获得锁；而不公平锁则允许讨价还价，在这种情况下，线程有时可以比先请求锁的其他线程先得到锁。</p>
+<p>为什么我们不让所有的锁都公平呢？毕竟，公平是好事，不公平是不好的，不是吗？（当孩子们想要一个决定时，总会叫嚷“这不公平”。我们认为公平非常重要，孩子们也知道。）在现实中，公平保证了锁是非常健壮的锁，有很大的性能成本。要确保公平所需要的记帐（bookkeeping）和同步，就意味着被争夺的公平锁要比不公平锁的吞吐率更低。作为默认设置，应当把公平设置为 <code>false</code> ，除非公平对您的算法至关重要，需要严格按照线程排队的顺序对其进行服务。</p>
+<p>那么同步又如何呢？内置的监控器锁是公平的吗？答案令许多人感到大吃一惊，它们是不公平的，而且永远都是不公平的。但是没有人抱怨过线程饥渴，因为 JVM 保证了所有线程最终都会得到它们所等候的锁。确保统计上的公平性，对多数情况来说，这就已经足够了，而这花费的成本则要比绝对的公平保证的低得多。所以，默认情况下 <code>ReentrantLock</code> 是“不公平”的，这一事实只是把同步中一直是事件的东西表面化而已。如果您在同步的时候并不介意这一点，那么在 <code>ReentrantLock</code> 时也不必为它担心。</p>
+<p>图 3 和图 4 包含与 图 1和 图 2 相同的数据，只是添加了一个数据集，用来进行随机数基准检测，这次检测使用了公平锁，而不是默认的协商锁。正如您能看到的，公平是有代价的。如果您需要公平，就必须付出代价，但是请不要把它作为您的默认选择。</p>
+<p>下图是1个CPU与4个CPU的对比</p>
+<p><img src="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure3.jpg" alt="ä½¿ç¨ 4 ä¸ª CPU æ¶çåæ­¥ãååéåå
+¬å¹³éçç¸å¯¹ååç"></p>
+<p><img src="https://www.ibm.com/developerworks/cn/java/j-jtp10264/figure4.jpg" alt="å¾ 4. ä½¿ç¨ 1 ä¸ª CPU æ¶çåæ­¥ãååéåå
+¬å¹³éçç¸å¯¹ååç"></p>
+<hr>
+<h1 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h1><h2 id="3-1-reentrantlock处处都好？"><a href="#3-1-reentrantlock处处都好？" class="headerlink" title="3.1 reentrantlock处处都好？"></a>3.1 reentrantlock处处都好？</h2><p>看起来 <code>ReentrantLock</code> 无论在哪方面都比 <code>synchronized</code> 好 —— 所有 <code>synchronized</code> 能做的，它都能做，它拥有与 <code>synchronized</code> 相同的内存和并发性语义，还拥有 <code>synchronized</code> 所没有的特性，在负荷下还拥有更好的性能。那么，我们是不是应当忘记 <code>synchronized</code> ，不再把它当作已经已经得到优化的好主意呢？或者甚至用 <code>ReentrantLock</code> 重写我们现有的 <code>synchronized</code>代码？实际上，几本 Java 编程方面介绍性的书籍在它们多线程的章节中就采用了这种方法，完全用 <code>Lock</code> 来做示例，只把 synchronized 当作历史。但我觉得这是把好事做得太过了。</p>
+<h2 id="3-2-还不要抛弃-synchronized"><a href="#3-2-还不要抛弃-synchronized" class="headerlink" title="3.2 还不要抛弃 synchronized"></a>3.2 还不要抛弃 synchronized</h2><p>虽然 <code>ReentrantLock</code> 是个非常动人的实现，相对 synchronized 来说，它有一些重要的优势，但是我认为急于把 synchronized 视若敝屣，绝对是个严重的错误。 <em>java.util.concurrent.lock 中的锁定类是用于高级用户和高级情况的工具</em> 。一般来说，除非您对 <code>Lock</code> 的某个高级特性有明确的需要，或者有明确的证据（而不是仅仅是怀疑）表明在特定情况下，同步已经成为可伸缩性的瓶颈，否则还是应当继续使用 synchronized。</p>
+<p>为什么我在一个显然“更好的”实现的使用上主张保守呢？因为对于 <code>java.util.concurrent.lock</code> 中的锁定类来说，synchronized 仍然有一些优势。比如，在使用 synchronized 的时候，不能忘记释放锁；在退出 <code>synchronized</code> 块时，JVM 会为您做这件事。您很容易忘记用 <code>finally</code> 块释放锁，这对程序非常有害。您的程序能够通过测试，但会在实际工作中出现死锁，那时会很难指出原因（这也是为什么根本不让初级开发人员使用 <code>Lock</code> 的一个好理由。）</p>
+<p>另一个原因是因为，当 JVM 用 synchronized 管理锁定请求和释放时，JVM 在生成线程转储时能够包括锁定信息。这些对调试非常有价值，因为它们能标识死锁或者其他异常行为的来源。 <code>Lock</code> 类只是普通的类，JVM 不知道具体哪个线程拥有 <code>Lock</code> 对象。而且，几乎每个开发人员都熟悉 synchronized，它可以在 JVM 的所有版本中工作。在 JDK 5.0 成为标准（从现在开始可能需要两年）之前，使用<code>Lock</code> 类将意味着要利用的特性不是每个 JVM 都有的，而且不是每个开发人员都熟悉的。</p>
+<h2 id="3-3-什么时候选择用-ReentrantLock-代替-synchronized"><a href="#3-3-什么时候选择用-ReentrantLock-代替-synchronized" class="headerlink" title="3.3 什么时候选择用 ReentrantLock 代替 synchronized"></a>3.3 什么时候选择用 ReentrantLock 代替 synchronized</h2><p>既然如此，我们什么时候才应该使用 <code>ReentrantLock</code> 呢？答案非常简单 —— 在确实需要一些 synchronized 所没有的特性的时候，比如时间锁等候、可中断锁等候、无块结构锁、多个条件变量或者锁投票。 <code>ReentrantLock</code> 还具有可伸缩性的好处，应当在高度争用的情况下使用它，但是请记住，大多数 synchronized 块几乎从来没有出现过争用，所以可以把高度争用放在一边。我建议用 synchronized 开发，直到确实证明 synchronized 不合适，而不要仅仅是假设如果使用 <code>ReentrantLock</code> “性能会更好”。请记住，这些是供高级用户使用的高级工具。（而且，真正的高级用户喜欢选择能够找到的最简单工具，直到他们认为简单的工具不适用为止。）。一如既往，首先要把事情做好，然后再考虑是不是有必要做得更快。</p>
+<hr>
+<h1 id="4-结束语"><a href="#4-结束语" class="headerlink" title="4.结束语"></a>4.结束语</h1><p><code>Lock</code> 框架是同步的兼容替代品，它提供了 <code>synchronized</code> 没有提供的许多特性，它的实现在争用下提供了更好的性能。但是，这些明显存在的好处，还不足以成为用 <code>ReentrantLock</code> 代替 <code>synchronized</code> 的理由。相反，应当根据您是否 <em>需要</em> <code>ReentrantLock</code> 的能力来作出选择。大多数情况下，您不应当选择它 —— synchronized 工作得很好，可以在所有 JVM 上工作，更多的开发人员了解它，而且不太容易出错。只有在真正需要 <code>Lock</code> 的时候才用它。在这些情况下，您会很高兴拥有这款工具。</p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/52ba9a1b.html" title="【Java并发编程】锁机制（四）：synchronized 与 Reentrantlock 对比">https://yzhblog.work/posts/52ba9a1b.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/a211362.html" rel="next" title="【Java并发编程】锁机制（二）：synchronized原理&锁膨胀分析">
+                <i class="fa fa-chevron-left"></i> 【Java并发编程】锁机制（二）：synchronized原理&锁膨胀分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/5cf5e053.html" rel="prev" title="【数据结构】栈：LeetCode题 20.有效的括号，155.最小栈，84.柱状图的最大矩形">
+                【数据结构】栈：LeetCode题 20.有效的括号，155.最小栈，84.柱状图的最大矩形 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-简单回顾"><span class="nav-text">1.简单回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-synchronized"><span class="nav-text">1.1 synchronized</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-reentrantlock"><span class="nav-text">1.2 reentrantlock</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-特性对比"><span class="nav-text">2.特性对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-吞吐率"><span class="nav-text">2.1 吞吐率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-条件变量"><span class="nav-text">2.2 条件变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-公平锁"><span class="nav-text">2.3 公平锁</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-总结"><span class="nav-text">3.总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-reentrantlock处处都好？"><span class="nav-text">3.1 reentrantlock处处都好？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-还不要抛弃-synchronized"><span class="nav-text">3.2 还不要抛弃 synchronized</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-什么时候选择用-ReentrantLock-代替-synchronized"><span class="nav-text">3.3 什么时候选择用 ReentrantLock 代替 synchronized</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-结束语"><span class="nav-text">4.结束语</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

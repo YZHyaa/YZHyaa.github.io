@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="1.消息过期时间（TTL）如果我们想设置消息在指定时间内没被消费就过期，有如下种设置方式： 1.1 Queue TTL所有队列中的消息超过时间未被消费时都会过期，通过队列属性设置消息过期时间 1234567// 使用SpringAMQP声明队列@Bean(&quot;ttlQueue&quot;) public Queue queue()&amp;#123;     Map&amp;lt;String,Object&amp;gt; map">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【RabbitMQ】高级使用：消息过期设置、死信队列、延迟队列、流控">
+<meta property="og:url" content="https://yzhblog.work/posts/499c353c.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="1.消息过期时间（TTL）如果我们想设置消息在指定时间内没被消费就过期，有如下种设置方式： 1.1 Queue TTL所有队列中的消息超过时间未被消费时都会过期，通过队列属性设置消息过期时间 1234567// 使用SpringAMQP声明队列@Bean(&quot;ttlQueue&quot;) public Queue queue()&amp;#123;     Map&amp;lt;String,Object&amp;gt; map">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201117100652264.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020111710075436.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201117101835537.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201117102301333.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201117102326303.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201117102416748.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201117102524927.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T17:05:45.940Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【RabbitMQ】高级使用：消息过期设置、死信队列、延迟队列、流控">
+<meta name="twitter:description" content="1.消息过期时间（TTL）如果我们想设置消息在指定时间内没被消费就过期，有如下种设置方式： 1.1 Queue TTL所有队列中的消息超过时间未被消费时都会过期，通过队列属性设置消息过期时间 1234567// 使用SpringAMQP声明队列@Bean(&quot;ttlQueue&quot;) public Queue queue()&amp;#123;     Map&amp;lt;String,Object&amp;gt; map">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201117100652264.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/499c353c.html">
+
+
+
+
+
+  <title>【RabbitMQ】高级使用：消息过期设置、死信队列、延迟队列、流控 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/499c353c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【RabbitMQ】高级使用：消息过期设置、死信队列、延迟队列、流控</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-14T00:00:00+08:00">
+                2020-08-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.2k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-消息过期时间（TTL）"><a href="#1-消息过期时间（TTL）" class="headerlink" title="1.消息过期时间（TTL）"></a>1.消息过期时间（TTL）</h2><p>如果我们想设置消息在指定时间内没被消费就过期，有如下种设置方式：</p>
+<h3 id="1-1-Queue-TTL"><a href="#1-1-Queue-TTL" class="headerlink" title="1.1 Queue TTL"></a>1.1 Queue TTL</h3><p>所有队列中的消息超过时间未被消费时都会过期，通过队列属性设置消息过期时间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用SpringAMQP声明队列</span></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"ttlQueue"</span>) </span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">queue</span><span class="params">()</span></span>&#123; </span><br><span class="line">    Map&lt;String,Object&gt; map = <span class="keyword">new</span> HashMap&lt;String,Object&gt;(); </span><br><span class="line">    map.put(<span class="string">"x-message-ttl"</span>,<span class="number">11000</span>);<span class="comment">// 队列中的消息未被消费 11 秒后过期 </span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Queue(<span class="string">"GP_TTL_QUEUE"</span>,<span class="keyword">true</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,map); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201117100652264.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<a id="more"></a>
+<h3 id="1-2-Message-TTL"><a href="#1-2-Message-TTL" class="headerlink" title="1.2 Message TTL"></a>1.2 Message TTL</h3><p>设置单条消息的过期时间，在发送消息的时候指定消息属性</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SpringAMQP封装的Message</span></span><br><span class="line">MessageProperties messageProperties = <span class="keyword">new</span> MessageProperties();</span><br><span class="line">messageProperties.setExpiration(<span class="string">"4000"</span>); <span class="comment">// 消息的过期属性，单位ms</span></span><br><span class="line">messageProperties.setDeliveryMode(MessageDeliveryMode.PERSISTENT);</span><br><span class="line">Message message = <span class="keyword">new</span> Message(<span class="string">"这条消息4秒后过期"</span>.getBytes(), messageProperties);</span><br><span class="line">rabbitTemplate.send(<span class="string">"GP_TTL_EXCHANGE"</span>, <span class="string">"gupao.ttl"</span>, message);</span><br></pre></td></tr></table></figure>
+<p>如果同时指定了Message TTL和Queue TTL，则小的那个时间生效</p>
+<h2 id="2-死信队列"><a href="#2-死信队列" class="headerlink" title="2.死信队列"></a>2.死信队列</h2><p>消息在某些情况下会变成死信（Dead Letter），比如：</p>
+<ol>
+<li>消息被消费者拒绝并且未设置重回队列：(NACK|| Reject)&amp;&amp;requeue== false</li>
+<li>消息过期</li>
+<li>队列达到最大长度，超过了Maxlength（消息数）或者 Maxlengthbytes（字节数），最先入队的消息会被发送到DLX。</li>
+</ol>
+<p>照理说死信应该是被抛弃的，但是如果定义了死信交换机，当消息成为死信就会进入死信队列</p>
+<ul>
+<li>DLX：死信交换机（Dead Letter Exchange），队列在创建的时候可以指定一个，实际上也是普通的交换机</li>
+<li>DLQ：死信队列（DeadLetterQueue），被死信交换机绑定的队列，实际也是普通队列（例如替补球员也是普通球员）</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2020111710075436.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="2-1-死信队列使用"><a href="#2-1-死信队列使用" class="headerlink" title="2.1 死信队列使用"></a>2.1 死信队列使用</h3><p>1). 原交换机（GP_ORI_USE_EXCHANGE）、原队列（GP_ORI_USE_QUEUE） ，相互绑定。</p>
+<ul>
+<li>设置队列中的消息10秒钟过期，因为没有消费者，会变成死信。</li>
+<li>指定原队列的死信交换机（GP_DEAD_LETTER_EXCHANGE）。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用Spring AMQP进行声明</span></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"oriUseExchange"</span>) <span class="comment">// 原交换机</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DirectExchange <span class="title">exchange</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DirectExchange(<span class="string">"GP_ORI_USE_EXCHANGE"</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">new</span> HashMap&lt;&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"oriUseQueue"</span>) <span class="comment">// 原队列</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">queue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">    <span class="comment">// 10秒钟后成为死信</span></span><br><span class="line">    map.put(<span class="string">"x-message-ttl"</span>, <span class="number">10000</span>); </span><br><span class="line">    <span class="comment">// 死信交换机，当前队列中的消息变成死信后进入死信交换机</span></span><br><span class="line">    map.put(<span class="string">"x-dead-letter-exchange"</span>, <span class="string">"GP_DEAD_LETTER_EXCHANGE"</span>); </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Queue(<span class="string">"GP_ORI_USE_QUEUE"</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, map);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span> <span class="comment">// 绑定原队列到原交换机</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Binding <span class="title">binding</span><span class="params">(@Qualifier(<span class="string">"oriUseQueue"</span>)</span> Queue queue,@<span class="title">Qualifier</span><span class="params">(<span class="string">"oriUseExchange"</span>)</span> </span></span><br><span class="line"><span class="function">                       DirectExchange exchange) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> BindingBuilder.bind(queue).to(exchange).with(<span class="string">"gupao.ori.use"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2). 声明死信交换机 （ GP_DEAD_LETTER_EXCHANGE ） 、 死信队列（GP_DEAD_LETTER_QUEUE），相互绑定</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(<span class="string">"deatLetterExchange"</span>) <span class="comment">// 队列的死信交换机</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> TopicExchange <span class="title">deadLetterExchange</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> TopicExchange(<span class="string">"GP_DEAD_LETTER_EXCHANGE"</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">new</span> HashMap&lt;&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"deatLetterQueue"</span>) <span class="comment">// 死信队列</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">deadLetterQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Queue(<span class="string">"GP_DEAD_LETTER_QUEUE"</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">new</span> HashMap&lt;&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span> <span class="comment">// 绑定死信队列到死信交换机</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Binding <span class="title">bindingDead</span><span class="params">(@Qualifier(<span class="string">"deatLetterQueue"</span>)</span> Queue </span></span><br><span class="line"><span class="function">					queue,@<span class="title">Qualifier</span><span class="params">(<span class="string">"deatLetterExchange"</span>)</span> TopicExchange exchange) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> BindingBuilder.bind(queue).to(exchange).with(<span class="string">"#"</span>); <span class="comment">// 无条件路由</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3). 最终消费者监听死信队列<br>4). 生产者发送消息</p>
+<p><img src="https://img-blog.csdnimg.cn/20201117101835537.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h2 id="3-延迟队列"><a href="#3-延迟队列" class="headerlink" title="3.延迟队列"></a>3.延迟队列</h2><p>我们在实际业务中有一些需要延时发送消息的场景，例如：</p>
+<ol>
+<li>家里有一台智能热水器，需要在30分钟后启动</li>
+<li>未付款的订单，15分钟后关闭</li>
+</ol>
+<p>RabbitMQ本身不支持延迟队列，总的来说有三种实现方案：</p>
+<ol>
+<li>先存储到数据库，用定时任务扫描</li>
+<li>利用RabbitMQ的死信队列（Dead Letter Queue）实现</li>
+<li>利用rabbitmq-delayed-message-exchange插件</li>
+</ol>
+<h3 id="3-1-TTL-DLX"><a href="#3-1-TTL-DLX" class="headerlink" title="3.1 TTL+DLX"></a>3.1 TTL+DLX</h3><p>基于消息TTL，我们来看一下如何利用死信队列（DLQ）实现延迟队列：</p>
+<ol>
+<li>创建一个交换机</li>
+<li>创建一个队列，与上述交换机绑定，并且通过属性指定队列的死信交换机。</li>
+<li>创建一个死信交换机</li>
+<li>创建一个死信队列</li>
+<li>将死信交换机绑定到死信队列</li>
+<li>消费者监听死信队列</li>
+</ol>
+<blockquote>
+<p>消息的流转流程：生产者 –&gt; 原交换机 –&gt; 原队列（超过TTL之后）–&gt; 死信交换机 –&gt; 死信队列 –&gt; 最终消费者</p>
+</blockquote>
+<p>使用死信队列实现延时消息的缺点：</p>
+<ul>
+<li>如果统一用队列来设置消息的 TTL，当梯度非常多的情况下，比如 1 分钟，2分钟，5分钟，10分钟，20分钟，30分钟……需要创建很多交换机和队列来路由消息。</li>
+<li>如果单独设置消息的TTL，则可能会造成队列中的消息阻塞——前一条消息没有出队（没有被消费），后面的消息无法投递（比如第一条消息过期TTL是30min，第二条消息TTL是10min。10分钟后，即使第二条消息应该投递了，但是由于第一条消息还未出队，所以无法投递）。</li>
+<li>可能存在一定的时间误差</li>
+</ul>
+<h3 id="3-2-延迟队列插件"><a href="#3-2-延迟队列插件" class="headerlink" title="3.2 延迟队列插件"></a>3.2 延迟队列插件</h3><p>在 RabbitMQ 3.5.7 及 以后的版 本提供了一个插件（rabbitmq-delayed-message-exchange）来实现延时队列功能。同时插件依赖Erlang/OPT 18.0及以上。</p>
+<blockquote>
+<p>插件源码地址：<a href="https://github.com/rabbitmq/rabbitmq-delayed-message-exchange" target="_blank" rel="noopener">https://github.com/rabbitmq/rabbitmq-delayed-message-exchange</a><br>插件下载地址：<a href="https://bintray.com/rabbitmq/community-plugins/rabbitmq_delayed_message_exchange" target="_blank" rel="noopener">https://bintray.com/rabbitmq/community-plugins/rabbitmq_delayed_message_exchange</a></p>
+</blockquote>
+<p>1). 进入插件目录</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">whereis rabbitmq </span><br><span class="line"><span class="built_in">cd</span>/usr/lib/rabbitmq/lib/rabbitmq_server-3.6.12/plugins</span><br></pre></td></tr></table></figure>
+<p>2). 下载插件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://bintray.com/rabbitmq/community-plugins/download_file?</span><br><span class="line">file_path=rabbitmq_delayed_message_exchange-0.0.1.ez</span><br></pre></td></tr></table></figure>
+<p>如果下载的文件名带问号则需要改名，如图</p>
+<p><img src="https://img-blog.csdnimg.cn/20201117102301333.png#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mv download_file?file_path=rabbitmq_delayed_message_exchange-0.0.1.ez </span><br><span class="line">rabbitmq_delayed_message_exchange-0.0.1.ez</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20201117102326303.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>3). 启用插件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rabbitmq-plugins <span class="built_in">enable</span>  rabbitmq_delayed_message_exchange</span><br></pre></td></tr></table></figure>
+<p>4). 停用插件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rabbitmq-plugins <span class="built_in">disable</span> rabbitmq_delayed_message_exchange</span><br></pre></td></tr></table></figure>
+<p>5). 使用插件</p>
+<p>   通过声明一个x-delayed-message类型的Exchange来使用delayed-messaging特性。 x-delayed-message是插件提供的类型，并不是rabbitmq本身的（区别于direct、topic、fanout、headers）。</p>
+<p>  <img src="https://img-blog.csdnimg.cn/20201117102416748.png#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(<span class="string">"delayExchange"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TopicExchange <span class="title">exchange</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Map&lt;String, Object&gt; argss = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">        argss.put(<span class="string">"x-delayed-type"</span>, <span class="string">"direct"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> TopicExchange(<span class="string">"GP_DELAY_EXCHANGE"</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, argss);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>生产者：消息属性中指定x-delay参数（SpringAMQP)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MessageProperties messageProperties = <span class="keyword">new</span> MessageProperties();</span><br><span class="line"><span class="comment">// 延迟的间隔时间，目标时刻减去当前时刻</span></span><br><span class="line">messageProperties.setHeader(<span class="string">"x-delay"</span>, delayTime.getTime() - now.getTime());</span><br><span class="line">Message message = <span class="keyword">new</span> Message(msg.getBytes(), messageProperties);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不能在本地测试，必须发送消息到安装了插件的服务端</span></span><br><span class="line">rabbitTemplate.send(<span class="string">"GP_DELAY_EXCHANGE"</span>, <span class="string">"#"</span>, message);</span><br></pre></td></tr></table></figure>
+<h2 id="4-服务端流控"><a href="#4-服务端流控" class="headerlink" title="4.服务端流控"></a>4.服务端流控</h2><p>当RabbitMQ生产MQ消息的速度远大于消费消息的速度时，会产生大量的消息堆积，占用系统资源，导致机器的性能下降。我们想要控制服务端接收的消息的数量，应该怎么做呢？</p>
+<h3 id="4-1-长度控制"><a href="#4-1-长度控制" class="headerlink" title="4.1 长度控制"></a>4.1 长度控制</h3><p>队列有两个控制长度的属性：</p>
+<ul>
+<li>x-max-length：队列中最大存储最大消息数，超过这个数量，队头的消息会被丢弃。</li>
+<li>x-max-length-bytes：队列中存储的最大消息容量（单位bytes），超过这个容量，队头的消息会被丢弃。</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20201117102524927.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>需要注意的是，设置队列长度只在消息堆积的情况下有意义，而且会删除先入队的消息，不能真正地实现服务端限流。</p>
+<h3 id="4-2-内存控制"><a href="#4-2-内存控制" class="headerlink" title="4.2 内存控制"></a>4.2 内存控制</h3><p>RabbitMQ 会在启动时检测机器的物理内存数值。默认当 MQ 占用 40% 以上内存时，MQ 会主动抛出一个内存警告并阻塞所有连接（Connections）。可以通过修改rabbitmq.config 文件来调整内存阈值，默认值是 0.4，如下所示： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#123;rabbit,[&#123;vm_memory_high_watermark,0.4&#125;]&#125;].</span><br></pre></td></tr></table></figure>
+<p>也可以用命令动态设置，如果设置成0，则所有的消息都不能发布</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rabbitmqctl set_vm_memory_high_watermark 0.3</span><br></pre></td></tr></table></figure>
+<h3 id="4-3-磁盘控制"><a href="#4-3-磁盘控制" class="headerlink" title="4.3 磁盘控制"></a>4.3 磁盘控制</h3><p>另一种方式是通过磁盘来控制消息的发布。当磁盘空间低于指定的值时（默认50MB），触发流控措施。</p>
+<p>例如：指定为磁盘的30%或者2GB</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">disk_free_limit.relative=3.0 </span><br><span class="line">disk_free_limit.absolute=2GB</span><br></pre></td></tr></table></figure>
+<p>更多相关配置内容可以参考 <a href="https://www.rabbitmq.com/configure.html" target="_blank" rel="noopener">官网</a>…</p>
+<h2 id="5-消费端流控"><a href="#5-消费端流控" class="headerlink" title="5.消费端流控"></a>5.消费端流控</h2><p>默认情况下，如果不进行配置，RabbitMQ会尽可能快速地把队列中的消息发送到消费者。因为消费者会在本地缓存消息，如果消息数量过多，可能会导致OOM或者影响其他进程的正常运行。</p>
+<p>在消费者处理消息的能力有限，例如消费者数量太少，或者单条消息的处理时间过长的情况下，如果我们希望在一定数量的消息消费完之前，不再推送消息过来，就要用到消费端的流量限制措施。</p>
+<p>可以基于Consumer或者channel设置prefetch count的值，含义为Consumer端的最大的unackedmessages数目。当超过这个数值的消息未被确认，RabbitMQ会停止投递新的消息给该消费者。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">channel.basicQos(<span class="number">2</span>);<span class="comment">// 如果超过 2 条消息没有发送 ACK，当前消费者不再接受队列消息 </span></span><br><span class="line">channel.basicConsume(QUEUE_NAME,<span class="keyword">false</span>,consumer);</span><br></pre></td></tr></table></figure>
+<p>Spring Boot配置：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">spring.rabbitmq.listener.simple.prefetch=2</span></span><br></pre></td></tr></table></figure>
+<p>关于Consumer Prefetch 官网也给出了相应<a href="https://www.rabbitmq.com/consumer-prefetch.html" target="_blank" rel="noopener">解释</a>….</p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/499c353c.html" title="【RabbitMQ】高级使用：消息过期设置、死信队列、延迟队列、流控">https://yzhblog.work/posts/499c353c.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/27663eac.html" rel="next" title="【RabbitMQ】原理分析：如何保证消息可靠性投递？">
+                <i class="fa fa-chevron-left"></i> 【RabbitMQ】原理分析：如何保证消息可靠性投递？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/45d5320f.html" rel="prev" title="【RabbitMQ】高级使用：补偿机制、消息幂等性、最终一致性、消息顺序性">
+                【RabbitMQ】高级使用：补偿机制、消息幂等性、最终一致性、消息顺序性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-消息过期时间（TTL）"><span class="nav-text">1.消息过期时间（TTL）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Queue-TTL"><span class="nav-text">1.1 Queue TTL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Message-TTL"><span class="nav-text">1.2 Message TTL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-死信队列"><span class="nav-text">2.死信队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-死信队列使用"><span class="nav-text">2.1 死信队列使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-延迟队列"><span class="nav-text">3.延迟队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-TTL-DLX"><span class="nav-text">3.1 TTL+DLX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-延迟队列插件"><span class="nav-text">3.2 延迟队列插件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-服务端流控"><span class="nav-text">4.服务端流控</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-长度控制"><span class="nav-text">4.1 长度控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-内存控制"><span class="nav-text">4.2 内存控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-磁盘控制"><span class="nav-text">4.3 磁盘控制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-消费端流控"><span class="nav-text">5.消费端流控</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

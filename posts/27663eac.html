@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="RabbitMQ的可靠性投递，也就是在使用RabbitMQ实现异步通信的时候，消息丢了怎么办，消息重复消费怎么办？在RabbitMQ里面提供了很多保证消息可靠投递的机制，这个也是RabbitMQ的一个特性。 在说可靠性投递的时候，必须要明确一个问题，因为效率与可靠性是无法兼得的，如果要保证每一个环节都成功，势必会对消息的收发效率造成影响。所以如果是一些业务实时一致性要求不是特别高的场合，可以牺牲一">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【RabbitMQ】原理分析：如何保证消息可靠性投递？">
+<meta property="og:url" content="https://yzhblog.work/posts/27663eac.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="RabbitMQ的可靠性投递，也就是在使用RabbitMQ实现异步通信的时候，消息丢了怎么办，消息重复消费怎么办？在RabbitMQ里面提供了很多保证消息可靠投递的机制，这个也是RabbitMQ的一个特性。 在说可靠性投递的时候，必须要明确一个问题，因为效率与可靠性是无法兼得的，如果要保证每一个环节都成功，势必会对消息的收发效率造成影响。所以如果是一些业务实时一致性要求不是特别高的场合，可以牺牲一">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020111714475088.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020111718052370.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T17:05:45.972Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【RabbitMQ】原理分析：如何保证消息可靠性投递？">
+<meta name="twitter:description" content="RabbitMQ的可靠性投递，也就是在使用RabbitMQ实现异步通信的时候，消息丢了怎么办，消息重复消费怎么办？在RabbitMQ里面提供了很多保证消息可靠投递的机制，这个也是RabbitMQ的一个特性。 在说可靠性投递的时候，必须要明确一个问题，因为效率与可靠性是无法兼得的，如果要保证每一个环节都成功，势必会对消息的收发效率造成影响。所以如果是一些业务实时一致性要求不是特别高的场合，可以牺牲一">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/2020111714475088.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/27663eac.html">
+
+
+
+
+
+  <title>【RabbitMQ】原理分析：如何保证消息可靠性投递？ | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/27663eac.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【RabbitMQ】原理分析：如何保证消息可靠性投递？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-14T00:00:00+08:00">
+                2020-08-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  20
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>RabbitMQ的可靠性投递，也就是在使用RabbitMQ实现异步通信的时候，消息丢了怎么办，消息重复消费怎么办？在RabbitMQ里面提供了很多保证消息可靠投递的机制，这个也是RabbitMQ的一个特性。</p>
+<p>在说可靠性投递的时候，必须要明确一个问题，因为效率与可靠性是无法兼得的，如果要保证每一个环节都成功，势必会对消息的收发效率造成影响。所以如果是一些业务实时一致性要求不是特别高的场合，可以牺牲一些可靠性来换取效率。比如发送通知或者记录日志的这种场景，如果用户没有收到通知，不会造成业务影响，只要再次发送就可以了。</p>
+<p>下图是RabbitMQ的工作模型，其中标出的是需要保证消息可靠性的地方</p>
+<p><img src="https://img-blog.csdnimg.cn/2020111714475088.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ol>
+<li><p>消息从生产者发送到Broker</p>
+<p>生产者把消息发到Broker之后，怎么知道自己的消息有没有被Broker成功接收？</p>
+</li>
+<li><p>消息从Exchange路由到Queue</p>
+<p>Exchange是一个绑定列表，如果消息没有办法路由到正确的队列，会发生什么事情？应该怎么处理？</p>
+</li>
+<li><p>消息在Queue中存储</p>
+<p>队列是一个独立运行的服务，有自己的数据库（Mnesia），它是真正用来存储消息的。如果还没有消费者来消费，那么消息要一直存储在队列里面。如果队列出了问题，消息肯定会丢失。怎么保证消息在队列稳定地存储呢？</p>
+</li>
+<li><p>消费者订阅Queue并消费消息</p>
+<p>队列的特性是什么？FIFO。队列里面的消息是一条一条的投递的，也就是说，只有上一条消息被消费者接收以后，才能把这一条消息从数据库删掉，继续投递下一条消息。那么问题来了，Broker怎么知道消费者已经接收了消息呢？</p>
+</li>
+</ol>
+<p>下面，我们就从这四个方面来看，RabbitMQ是如何保证消息可靠性的。</p>
+<a id="more"></a>
+<h2 id="1-Producer–-gt-Broker"><a href="#1-Producer–-gt-Broker" class="headerlink" title="1.Producer–&gt;Broker"></a>1.Producer–&gt;Broker</h2><p>第一个环节是生产者发送消息到Broker。可能因为网络或者Broker的问题导致消息发送失败，生产者不能确定Broker有没有正确的接收。 在 RabbitMQ 里面提供了两种机制服务端确认机制，也就是在生产者发送消息给RabbitMQ的服务端的时候，服务端会通过某种方式返回一个应答，只要生产者收到了这个应答，就知道消息发送成功了。</p>
+<p>第一种是Transaction（事务）模式，第二种Confirm（确认）模式。</p>
+<h3 id="1-1-事务模式ACK"><a href="#1-1-事务模式ACK" class="headerlink" title="1.1 事务模式ACK"></a>1.1 事务模式ACK</h3><p>通过<code>channel.txSelect()</code>方法把信道设置成事务模式，然后就可以发布消息给RabbitMQ了</p>
+<ul>
+<li>若<code>channel.txCommit()</code>的方法调用成功，就说明事务提交成功，则消息一定到达了RabbitMQ中。</li>
+<li>如果在事务提交执行之前由于RabbitMQ异常崩溃或者其他原因抛出异常，这个时候便可以将其捕获，进而通过执行<code>channel.txRollback()</code>方法来实现事务回滚。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TransactionProducer</span> </span>&#123; <span class="comment">// 原生API</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String QUEUE_NAME = <span class="string">"ORIGIN_QUEUE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ConnectionFactory factory = <span class="keyword">new</span> ConnectionFactory();</span><br><span class="line">        factory.setUri(ResourceUtil.getKey(<span class="string">"rabbitmq.uri"</span>));</span><br><span class="line">       </span><br><span class="line">        Connection conn = factory.newConnection(); <span class="comment">// 建立连接        </span></span><br><span class="line">        Channel channel = conn.createChannel(); <span class="comment">// 创建消息通道</span></span><br><span class="line"></span><br><span class="line">        String msg = <span class="string">"Hello world, Rabbit MQ"</span>;</span><br><span class="line">        <span class="comment">// 声明队列（默认交换机AMQP default，Direct）</span></span><br><span class="line">        channel.queueDeclare(QUEUE_NAME, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            channel.txSelect(); <span class="comment">// 事务模式</span></span><br><span class="line">            <span class="comment">// 发送消息</span></span><br><span class="line">            <span class="comment">// String exchange, String routingKey, BasicProperties props, byte[] body</span></span><br><span class="line">            channel.basicPublish(<span class="string">""</span>, QUEUE_NAME, <span class="keyword">null</span>, (msg).getBytes());</span><br><span class="line">            <span class="comment">// int i =1/0;</span></span><br><span class="line">            channel.txCommit(); <span class="comment">// 提交，阻塞</span></span><br><span class="line">            System.out.println(<span class="string">"消息发送成功"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            channel.txRollback(); <span class="comment">// 回滚</span></span><br><span class="line">            System.out.println(<span class="string">"消息已经回滚"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        channel.close();</span><br><span class="line">        conn.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在事务模式里面，只有收到了服务端的 Commit-OK的指令，才能提交成功。所以可以解决生产者和服务端确认的问题。但是事务模式有一个缺点，它是<strong>阻塞的</strong>，一条消息没有发送完毕，不能发送下一条消息，它可能会榨干RabbitMQ服务器的性能。所以不建议在生产环境使用。</p>
+<p>使用SpringAMQP时，在构造RabbitTemplate的Bean时设置，因为RabbitTemplate封装了channel</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">rabbitTemplate.setChannelTransacted(true);</span></span><br></pre></td></tr></table></figure>
+<p>那么有没有其他可以保证消息被Broker接收，但是又不大量消耗性能的方式呢？这个就是第二种模式，叫做确认（Confirm）模式。</p>
+<h3 id="1-2-确认模式ACK"><a href="#1-2-确认模式ACK" class="headerlink" title="1.2 确认模式ACK"></a>1.2 确认模式ACK</h3><p>生产者通过调用 channel 的 confirmSelect 方法将 channel 设置为 confirm 模式。该模式下，所有在该信道上发布的消息都会被分派一个唯一的ID(从1开始)，当消息被投递到所有匹配的队列后，broker 就会发送一个(包含消息的唯一 ID 的)确认给发送端，如果 RabbitMQ 因为自身内部错误导致消息丢失，就会发送一条nack消息，发送端的 Confirm Listener 会去监听应答。</p>
+<blockquote>
+<p>broker回传给发送端的确认消息中，包含了 deliver-tag （确认消息的ID） 和 此外 basic.ack 的 multiple 域（表示到这个ID之前的所有消息都已经得到了处理）。</p>
+</blockquote>
+<p>确认模式（Confirm）有三种具体实现：</p>
+<p><strong>1.普通确认模式</strong></p>
+<p>在生产者这边通过调用<code>channel.confirmSelect()</code>方法将信道设置为Confirm模式，然后发送消息。一旦消息被投递到所有匹配的队列后，RabbitMQ就会发送一个确认（Basic.Ack）给生产者，也就是调用 <code>channel.waitForConfirms()</code>返回true，这样生产者就知道消息被服务端接收了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NormalConfirmProducer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String QUEUE_NAME = <span class="string">"ORIGIN_QUEUE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ConnectionFactory factory = <span class="keyword">new</span> ConnectionFactory();</span><br><span class="line">        factory.setUri(ResourceUtil.getKey(<span class="string">"rabbitmq.uri"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 建立连接</span></span><br><span class="line">        Connection conn = factory.newConnection();</span><br><span class="line">        <span class="comment">// 创建消息通道</span></span><br><span class="line">        Channel channel = conn.createChannel();</span><br><span class="line"></span><br><span class="line">        String msg = <span class="string">"Hello world, Rabbit MQ ,Normal Confirm"</span>;</span><br><span class="line">        <span class="comment">// 声明队列（默认交换机AMQP default，Direct）</span></span><br><span class="line">        <span class="comment">// String queue, boolean durable, boolean exclusive, boolean autoDelete, Map&lt;String, Object&gt; arguments</span></span><br><span class="line">        channel.queueDeclare(QUEUE_NAME, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 开启发送方确认模式</span></span><br><span class="line">        channel.confirmSelect();</span><br><span class="line"></span><br><span class="line">        channel.basicPublish(<span class="string">""</span>, QUEUE_NAME, <span class="keyword">null</span>, msg.getBytes());</span><br><span class="line">        <span class="comment">// 普通Confirm，发送一条，确认一条</span></span><br><span class="line">        <span class="keyword">if</span> (channel.waitForConfirms()) &#123;</span><br><span class="line">            System.out.println(<span class="string">"消息发送成功"</span> );</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        channel.close();</span><br><span class="line">        conn.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种发送1条确认1条的方式消息还不是太高，所以还有一种批量确认的方式。</p>
+<p><strong>2.批量确认模式</strong></p>
+<p>批量确认就是在开启Confirm模式后，先发送一批消息。只要<code>channel.waitForConfirmsOrDie()</code>方法没有抛出异常，就代表消息都被服务端接收了。</p>
+<p>批量确认的方式比单条确认的方式效率要高，但是对于不同的业务，到底发送多少条消息确认一次？</p>
+<ul>
+<li>数量太少，效率提升不上去。</li>
+<li>数量多的话，又会带来另一个问题，比如我们发1000条消息才确认一次，如果前面999 条消息都被服务端接收了，如果第1000条消息被拒绝了，那么前面所有的消息都要重发。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BatchConfirmProducer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String QUEUE_NAME = <span class="string">"ORIGIN_QUEUE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ConnectionFactory factory = <span class="keyword">new</span> ConnectionFactory();</span><br><span class="line">        factory.setUri(ResourceUtil.getKey(<span class="string">"rabbitmq.uri"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 建立连接</span></span><br><span class="line">        Connection conn = factory.newConnection();</span><br><span class="line">        <span class="comment">// 创建消息通道</span></span><br><span class="line">        Channel channel = conn.createChannel();</span><br><span class="line"></span><br><span class="line">        String msg = <span class="string">"Hello world, Rabbit MQ ,Batch Confirm"</span>;</span><br><span class="line">        <span class="comment">// 声明队列（默认交换机AMQP default，Direct）</span></span><br><span class="line">        <span class="comment">// String queue, boolean durable, boolean exclusive, boolean autoDelete, Map&lt;String, Object&gt; arguments</span></span><br><span class="line">        channel.queueDeclare(QUEUE_NAME, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            channel.confirmSelect();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">                <span class="comment">// 发送消息</span></span><br><span class="line">                <span class="comment">// String exchange, String routingKey, BasicProperties props, byte[] body</span></span><br><span class="line">                channel.basicPublish(<span class="string">""</span>, QUEUE_NAME, <span class="keyword">null</span>, (msg +<span class="string">"-"</span>+ i).getBytes());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 批量确认结果，ACK如果是Multiple=True，代表ACK里面的Delivery-Tag之前的消息都被确认了</span></span><br><span class="line">            <span class="comment">// 比如5条消息可能只收到1个ACK，也可能收到2个（抓包才看得到）</span></span><br><span class="line">            <span class="comment">// 直到所有信息都发布，只要有一个未被Broker确认就会IOException</span></span><br><span class="line">            channel.waitForConfirmsOrDie();</span><br><span class="line">            System.out.println(<span class="string">"消息发送完毕，批量确认成功"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="comment">// 发生异常，可能需要对所有消息进行重发</span></span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        channel.close();</span><br><span class="line">        conn.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有没有一种方式，可以一边发送一边确认的呢？这个就是异步确认模式</p>
+<p><strong>3.异步确认模式</strong></p>
+<p>异步确认模式需要添加一个 ConfirmListener，并且用一个 SortedSet 来维护没有被确认的消息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncConfirmProducer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String QUEUE_NAME = <span class="string">"ORIGIN_QUEUE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ConnectionFactory factory = <span class="keyword">new</span> ConnectionFactory();</span><br><span class="line">        factory.setUri(ResourceUtil.getKey(<span class="string">"rabbitmq.uri"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 建立连接</span></span><br><span class="line">        Connection conn = factory.newConnection();</span><br><span class="line">        <span class="comment">// 创建消息通道</span></span><br><span class="line">        Channel channel = conn.createChannel();</span><br><span class="line"></span><br><span class="line">        String msg = <span class="string">"Hello world, Rabbit MQ, Async Confirm"</span>;</span><br><span class="line">        <span class="comment">// 声明队列（默认交换机AMQP default，Direct）</span></span><br><span class="line">        <span class="comment">// String queue, boolean durable, boolean exclusive, boolean autoDelete, Map&lt;String, Object&gt; arguments</span></span><br><span class="line">        channel.queueDeclare(QUEUE_NAME, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 用来维护未确认消息的deliveryTag</span></span><br><span class="line">        <span class="keyword">final</span> SortedSet&lt;Long&gt; confirmSet = Collections.synchronizedSortedSet(<span class="keyword">new</span> TreeSet&lt;Long&gt;());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 这里不会打印所有响应的ACK；ACK可能有多个，有可能一次确认多条，也有可能一次确认一条</span></span><br><span class="line">        <span class="comment">// 异步监听确认和未确认的消息</span></span><br><span class="line">        <span class="comment">// 如果要重复运行，先停掉之前的生产者，清空队列</span></span><br><span class="line">        channel.addConfirmListener(<span class="keyword">new</span> ConfirmListener() &#123;</span><br><span class="line">        	<span class="comment">// 处理未确认的消息</span></span><br><span class="line">		    <span class="comment">// deliverTag：交付标签，标识服务端处理到哪条消息了</span></span><br><span class="line">		    <span class="comment">// multiple：是否批量处理模式</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleNack</span><span class="params">(<span class="keyword">long</span> deliveryTag, <span class="keyword">boolean</span> multiple)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                System.out.println(<span class="string">"Broker未确认消息，标识："</span> + deliveryTag);</span><br><span class="line">                <span class="keyword">if</span> (multiple) &#123;</span><br><span class="line">                    <span class="comment">// headSet表示后面参数之前的所有元素，全部删除</span></span><br><span class="line">                    confirmSet.headSet(deliveryTag + <span class="number">1L</span>).clear();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    confirmSet.remove(deliveryTag);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 这里添加重发的方法</span></span><br><span class="line">            &#125;</span><br><span class="line">			</span><br><span class="line">			<span class="comment">// 处理已确认的消息</span></span><br><span class="line">		    <span class="comment">// multiple如果true，表示批量执行了deliveryTag这个值以前（小于deliveryTag的）的所有消息，</span></span><br><span class="line">		    <span class="comment">// 如果为false的话表示单条确认</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleAck</span><span class="params">(<span class="keyword">long</span> deliveryTag, <span class="keyword">boolean</span> multiple)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                <span class="comment">// 如果true表示批量执行了deliveryTag这个值以前（小于deliveryTag的）的所有消息，如果为false的话表示单条确认</span></span><br><span class="line">                System.out.println(String.format(<span class="string">"Broker已确认消息，标识：%d，多个消息：%b"</span>, deliveryTag, multiple));</span><br><span class="line">                <span class="keyword">if</span> (multiple) &#123;</span><br><span class="line">                    <span class="comment">// headSet表示后面参数之前的所有元素，全部删除</span></span><br><span class="line">                    confirmSet.headSet(deliveryTag + <span class="number">1L</span>).clear();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// 只移除一个元素</span></span><br><span class="line">                    confirmSet.remove(deliveryTag);</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(<span class="string">"未确认的消息:"</span>+confirmSet);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 开启发送方确认模式</span></span><br><span class="line">        channel.confirmSelect();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">        	<span class="comment">// 获取消息的唯一ID，之后要加入sortedSet</span></span><br><span class="line">            <span class="keyword">long</span> nextSeqNo = channel.getNextPublishSeqNo();</span><br><span class="line">            <span class="comment">// 发送消息</span></span><br><span class="line">            <span class="comment">// String exchange, String routingKey, BasicProperties props, byte[] body</span></span><br><span class="line">            channel.basicPublish(<span class="string">""</span>, QUEUE_NAME, <span class="keyword">null</span>, (msg +<span class="string">"-"</span>+ i).getBytes());</span><br><span class="line">            confirmSet.add(nextSeqNo);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"所有消息:"</span>+confirmSet);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 这里注释掉的原因是如果先关闭了，可能收不到后面的ACK</span></span><br><span class="line">        <span class="comment">//channel.close();</span></span><br><span class="line">        <span class="comment">//conn.close();</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>比如我们上面发送了10条消息，分别运行了两次，得到的结果如下：<img src="https://img-blog.csdnimg.cn/2020111718052370.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt><br>可以看到第一遍是异步确认了3次，第二遍运行是异步确认了6次。</p>
+<p>上面演示的是amqp-client原生api，Confirm模式是在Channel上开启的；而Spring AMQP中RabbitTemplate对Channel的Confirm回调进行了封装，叫做ConfimrCallback。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构建RabbitTemplate的Bean时配置</span></span><br><span class="line"><span class="meta">@Bean</span> </span><br><span class="line"><span class="function"><span class="keyword">public</span> RabbitTemplate <span class="title">rabbitTemplate</span><span class="params">(ConnectionFactory connectionFactory)</span> </span>&#123;</span><br><span class="line">    RabbitTemplate rabbitTemplate = <span class="keyword">new</span> RabbitTemplate(connectionFactory);</span><br><span class="line"></span><br><span class="line">    rabbitTemplate.setChannelTransacted(<span class="keyword">true</span>);</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 当消息成功到达exchange，但是没有队列与之绑定的时候触发的ack回调</span></span><br><span class="line">    rabbitTemplate.setConfirmCallback(<span class="keyword">new</span> RabbitTemplate.ConfirmCallback() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">confirm</span><span class="params">(CorrelationData correlationData, <span class="keyword">boolean</span> ack, String cause)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (!ack) &#123;</span><br><span class="line">                System.out.println(<span class="string">"发送消息失败："</span> + cause);</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"发送异常："</span> + cause);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> rabbitTemplate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-Exchange–-gt-Queue"><a href="#2-Exchange–-gt-Queue" class="headerlink" title="2.Exchange–&gt;Queue"></a>2.Exchange–&gt;Queue</h2><p>第二个环节就是消息从交换机路由到队列。在什么情况下，消息会无法路由到正确的队列？可能因为路由键错误，或者队列不存在。有两种方式处理无法路由的消息：</p>
+<ul>
+<li>一种就是让服务端回发给生产者</li>
+<li>一种是让交换机路由到另一个备份的交换机</li>
+</ul>
+<h3 id="2-1-消息回发"><a href="#2-1-消息回发" class="headerlink" title="2.1 消息回发"></a>2.1 消息回发</h3><p>消息回发的方式：使用 mandatory 参数和 ReturnListener</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReturnListenerProducer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">    </span><br><span class="line">        ConnectionFactory factory = <span class="keyword">new</span> ConnectionFactory();</span><br><span class="line">        factory.setUri(ResourceUtil.getKey(<span class="string">"rabbitmq.uri"</span>));</span><br><span class="line">        Connection connection = factory.newConnection();</span><br><span class="line">        Channel channel = connection.createChannel();</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 添加监听</span></span><br><span class="line">        channel.addReturnListener(<span class="keyword">new</span> ReturnListener() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleReturn</span><span class="params">(<span class="keyword">int</span> replyCode,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     String replyText,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     String exchange,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     String routingKey,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     AMQP.BasicProperties properties,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     <span class="keyword">byte</span>[] body)</span></span></span><br><span class="line"><span class="function">                    <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                System.out.println(<span class="string">"=========监听器收到了无法路由，被返回的消息============"</span>);</span><br><span class="line">                System.out.println(<span class="string">"replyText:"</span>+replyText);</span><br><span class="line">                System.out.println(<span class="string">"exchange:"</span>+exchange);</span><br><span class="line">                System.out.println(<span class="string">"routingKey:"</span>+routingKey);</span><br><span class="line">                System.out.println(<span class="string">"message:"</span>+<span class="keyword">new</span> String(body));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        AMQP.BasicProperties properties = <span class="keyword">new</span> AMQP.BasicProperties.Builder().deliveryMode(<span class="number">2</span>).</span><br><span class="line">                contentEncoding(<span class="string">"UTF-8"</span>).build();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 发送到了默认的交换机上，由于没有任何队列使用这个关键字跟交换机绑定，所以会被退回</span></span><br><span class="line">        <span class="comment">// 第三个参数是设置的mandatory，如果mandatory是false，消息也会被直接丢弃</span></span><br><span class="line">        channel.basicPublish(<span class="string">""</span>,<span class="string">"mydirect"</span>,<span class="keyword">true</span>, properties,<span class="string">"只为更好的你"</span>.getBytes());</span><br><span class="line"></span><br><span class="line">        TimeUnit.SECONDS.sleep(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">        channel.close();</span><br><span class="line">        connection.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在SpringAMQP中是ReturnCallback</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构建RabbitTemplate的Bean时配置</span></span><br><span class="line"><span class="meta">@Bean</span> </span><br><span class="line"><span class="function"><span class="keyword">public</span> RabbitTemplate <span class="title">rabbitTemplate</span><span class="params">(ConnectionFactory connectionFactory)</span> </span>&#123;</span><br><span class="line">    RabbitTemplate rabbitTemplate = <span class="keyword">new</span> RabbitTemplate(connectionFactory);</span><br><span class="line">    </span><br><span class="line">    rabbitTemplate.setMandatory(<span class="keyword">true</span>);</span><br><span class="line">    <span class="comment">// 当消息成功到达exchange，且无法被路由时触发回调，进行消息回发</span></span><br><span class="line">    rabbitTemplate.setReturnCallback(<span class="keyword">new</span> RabbitTemplate.ReturnCallback()&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">returnedMessage</span><span class="params">(Message message,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">int</span> replyCode,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    String replyText,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    String exchange,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    String routingKey)</span></span>&#123;</span><br><span class="line">            System.out.println(<span class="string">"回发的消息："</span>);</span><br><span class="line">            System.out.println(<span class="string">"replyCode: "</span>+replyCode);</span><br><span class="line">            System.out.println(<span class="string">"replyText: "</span>+replyText);</span><br><span class="line">            System.out.println(<span class="string">"exchange: "</span>+exchange);</span><br><span class="line">            System.out.println(<span class="string">"routingKey: "</span>+routingKey);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> rabbitTemplate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-2-进入备份交换机"><a href="#2-2-进入备份交换机" class="headerlink" title="2.2 进入备份交换机"></a>2.2 进入备份交换机</h3><p>消息路由到备份交换机的方式：在创建交换机的时候，从属性中指定备份交换机。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String,Object&gt; arguments = <span class="keyword">new</span> HashMap&lt;String,Object&gt;(); </span><br><span class="line">arguments.put(<span class="string">"alternate-exchange"</span>,<span class="string">"ALTERNATE_EXCHANGE"</span>);<span class="comment">// 指定交换机的备份交换机</span></span><br><span class="line">channel.exchangeDeclare(<span class="string">"TEST_EXCHANGE"</span>,<span class="string">"topic"</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,arguments); <span class="comment">// 声明交换机</span></span><br></pre></td></tr></table></figure>
+<p>注：备份交换机是对于在消息路由处失败，还没有进入消息队列的消息，而死信是已经入队，但过期或投递失败的</p>
+<h2 id="3-Queue存储消息"><a href="#3-Queue存储消息" class="headerlink" title="3.Queue存储消息"></a>3.Queue存储消息</h2><p>第三个环节是消息在队列存储，如果没有消费者的话，队列一直存在在数据库中。</p>
+<h3 id="3-1-持久化到硬盘"><a href="#3-1-持久化到硬盘" class="headerlink" title="3.1 持久化到硬盘"></a>3.1 持久化到硬盘</h3><p>如果RabbitMQ的服务或者硬件发生故障，比如系统宕机、重启、关闭等等，可能会导致内存中的消息丢失，所以要把消息本身和元数据（队列、交换机、绑定）都保存到磁盘。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(<span class="string">"myQueue"</span>) <span class="comment">// 队列持久化</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">queue</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//queueName,durable,exclusive,autoDelete,Properties </span></span><br><span class="line">    returnnewQueue(<span class="string">"MY_TEST_QUEUE"</span>,<span class="keyword">true</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,newHashMap&lt;&gt;());  <span class="comment">// 配置持久化为true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"myExchange"</span>) <span class="comment">// 交换机持久化</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DirectExchange <span class="title">exchange</span><span class="params">()</span></span>&#123; </span><br><span class="line">    <span class="comment">//exchangeName,durable,exclusive,autoDelete,Properties </span></span><br><span class="line">    <span class="keyword">return</span> newDirectExchange(<span class="string">"JMY_TEST_EXCHANGE"</span>,<span class="keyword">true</span>,<span class="keyword">false</span>,newHashMap&lt;&gt;()); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>另外，在Producer发送消息时还要设置消息为持久化的（注：Message是Spring AMQP封装的）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MessageProperties messageProperties = <span class="keyword">new</span> MessageProperties(); <span class="comment">// 创建消息配置</span></span><br><span class="line">messageProperties.setDeliveryMode(MessageDeliveryMode.PERSISTENT); <span class="comment">// 配置消息持久化</span></span><br><span class="line">Message message = <span class="keyword">new</span> Message(<span class="string">"持久化消息"</span>.getBytes(), messageProperties); <span class="comment">// 创建Message时传入配置</span></span><br><span class="line"></span><br><span class="line">rabbitTemplate.send(<span class="string">"myQueue"</span>, <span class="string">"my"</span>, message); <span class="comment">// 发送消息</span></span><br></pre></td></tr></table></figure>
+<h3 id="3-2-集群模式"><a href="#3-2-集群模式" class="headerlink" title="3.2 集群模式"></a>3.2 集群模式</h3><p>如果只有一个RabbitMQ的节点，即使交换机、队列、消息做了持久化，如果服务崩溃或者硬件发生故障，RabbitMQ的服务一样是不可用的，所以为了提高MQ服务的可用性，保障消息的传输，我们需要有多个RabbitMQ的节点</p>
+<h2 id="4-Queue–-gt-Consumer"><a href="#4-Queue–-gt-Consumer" class="headerlink" title="4.Queue–&gt;Consumer"></a>4.Queue–&gt;Consumer</h2><p>如果消费者收到消息后没来得及处理就发生异常，或者处理过程中发生异常，会导致④失败。服务端应该以某种方式得知消费者对消息的接收情况，并决定是否重新投递这条消息给其他消费者。</p>
+<p>RabbitMQ提供了消费者的消息确认机制（message acknowledgement），消费者可以自动或者手动地发送ACK给服务端没有收到ACK的消息，消费者断开连接后，RabbitMQ会把这条消息发送给其他消费者。如果没有其他消费者，消费者重启后会重新消费这条消息，重复执行业务逻辑。</p>
+<h3 id="4-1-自动ACK"><a href="#4-1-自动ACK" class="headerlink" title="4.1 自动ACK"></a>4.1 自动ACK</h3><p>消费者默认采用的是自动ack（autoAck=true），所以我们可以不断的一条一条接收消息。</p>
+<p>而自动ack的问题在于消息丢失问题，当消息到达Consumer就会给broker返回ack，若Consumer在处理中就宕机，那么当前消息就丢失了</p>
+<p>有没有一种方式，等Consumer处理完消息后，在当前消息的ack发给服务端？手动ACK</p>
+<h3 id="4-2-手动ACK"><a href="#4-2-手动ACK" class="headerlink" title="4.2 手动ACK"></a>4.2 手动ACK</h3><p>RabbitMQ会等待消费者显式地回复确认信号后才从队列中移去消息，而这种方式的问题在于，若服务器未收到消费者的ack时会一直阻塞，最终可能引起消息大量堆积。</p>
+<p>若是采用原生API，消费者在订阅队列时可以指定autoAck=false</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AckConsumer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String QUEUE_NAME = <span class="string">"TEST_ACK_QUEUE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    </span><br><span class="line">        ConnectionFactory factory = <span class="keyword">new</span> ConnectionFactory();</span><br><span class="line">        factory.setUri(ResourceUtil.getKey(<span class="string">"rabbitmq.uri"</span>));</span><br><span class="line">        <span class="comment">// 建立连接</span></span><br><span class="line">        Connection conn = factory.newConnection();</span><br><span class="line">        <span class="comment">// 创建消息通道</span></span><br><span class="line">        <span class="keyword">final</span> Channel channel = conn.createChannel();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 声明队列（默认交换机AMQP default，Direct）</span></span><br><span class="line">        <span class="comment">// String queue, boolean durable, boolean exclusive, boolean autoDelete, Map&lt;String, Object&gt; arguments</span></span><br><span class="line">        channel.queueDeclare(QUEUE_NAME, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">null</span>);</span><br><span class="line">        System.out.println(<span class="string">" Waiting for message...."</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建消费者，并接收消息</span></span><br><span class="line">        Consumer consumer = <span class="keyword">new</span> DefaultConsumer(channel) &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleDelivery</span><span class="params">(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,</span></span></span><br><span class="line"><span class="function"><span class="params">                                       <span class="keyword">byte</span>[] body)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                String msg = <span class="keyword">new</span> String(body, <span class="string">"UTF-8"</span>);</span><br><span class="line">                System.out.println(<span class="string">"Received message : '"</span> + msg + <span class="string">"'"</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (msg.contains(<span class="string">"拒收"</span>))&#123;</span><br><span class="line">                    <span class="comment">// 拒绝消息</span></span><br><span class="line">                    <span class="comment">// requeue：是否重新入队列，true：是；false：直接丢弃，相当于告诉队列可以直接删除掉</span></span><br><span class="line">                    <span class="comment">// TODO 如果只有这一个消费者，requeue 为true 的时候会造成消息重复消费</span></span><br><span class="line">                    channel.basicReject(envelope.getDeliveryTag(), <span class="keyword">false</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (msg.contains(<span class="string">"异常"</span>))&#123;</span><br><span class="line">                    <span class="comment">// 批量拒绝（拒绝deliveryTag之前的消息）</span></span><br><span class="line">                    <span class="comment">// requeue：是否重新入队列</span></span><br><span class="line">                    <span class="comment">// TODO 如果只有这一个消费者，requeue 为true 的时候会造成消息重复消费</span></span><br><span class="line">                    channel.basicNack(envelope.getDeliveryTag(), <span class="keyword">true</span>, <span class="keyword">false</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// 手工应答</span></span><br><span class="line">                    <span class="comment">// 如果不应答，队列中的消息会一直存在，重新连接的时候会重复消费</span></span><br><span class="line">                    channel.basicAck(envelope.getDeliveryTag(), <span class="keyword">true</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 开始获取消息，注意这里开启了手工应答</span></span><br><span class="line">        <span class="comment">// String queue, boolean autoAck, Consumer callback</span></span><br><span class="line">        channel.basicConsume(QUEUE_NAME, <span class="keyword">false</span>, consumer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在Spring AMQP中 MessageListener 相当于消费者，可以在<code>AcknowledgeMode</code>枚举类中看到，关于ack的配置具体有三种选择： </p>
+<ul>
+<li>NONE：自动ACK（默认）</li>
+<li>MANUAL： 手动ACK</li>
+<li>AUTO：如果方法未抛出异常，则发送ack。<ul>
+<li>当抛出 AmqpRejectAndDontRequeueException 异常的时候，则消息会被拒绝，且不重新入队。</li>
+<li>当抛出 ImmediateAcknowledgeAmqpException 异常，则消费者会发送ACK。</li>
+<li>其他的异常，则消息会被拒绝，且 requeue = true会重新入队。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span> <span class="comment">// 构建MessageListenerContainer的Bean时配置</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> SimpleMessageListenerContainer <span class="title">container</span><span class="params">(ConnectionFactory connectionFactory)</span> </span>&#123;</span><br><span class="line">    SimpleMessageListenerContainer container = <span class="keyword">new</span> SimpleMessageListenerContainer(connectionFactory);</span><br><span class="line">    </span><br><span class="line">    container.setQueues(getSecondQueue(),getThirdQueue()); <span class="comment">// 监听的队列 </span></span><br><span class="line">    container.setConcurrentConsumers(<span class="number">1</span>); <span class="comment">// 最小消费者数 </span></span><br><span class="line">    container.setMaxConcurrentConsumers(<span class="number">5</span>); <span class="comment">// 最大的消费者数量 </span></span><br><span class="line">    container.setDefaultRequeueRejected(<span class="keyword">false</span>); <span class="comment">// 是否重回队列 </span></span><br><span class="line">    container.setAcknowledgeMode(AcknowledgeMode.AUTO); <span class="comment">// 签收模式！！！</span></span><br><span class="line">    container.setExposeListenerChannel(<span class="keyword">true</span>); </span><br><span class="line">    container.setConsumerTagStrategy(<span class="keyword">new</span> ConsumerTagStrategy() &#123; <span class="comment">// 消费端的标签策略</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">createConsumerTag</span><span class="params">(String queue)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> container;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>若在SpringBoot的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">spring.rabbitmq.listener.direct.acknowledge-mode=manual  # 默认为NONE,自动ack</span><br><span class="line">spring.rabbitmq.listener.simple.acknowledge-mode=manual</span><br></pre></td></tr></table></figure>
+<p>具体的调用代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@RabbitListener</span>(queues = <span class="string">"SECOND_QUEUE"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SecondConsumer</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@RabbitHandler</span> </span><br><span class="line">    <span class="comment">// 当要手动确认时，参数中要有Channel和Message (注：Channel是rabbitmq.client.Channel不是amqp的)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(String msg,Channel channel,Message message)</span></span>&#123; </span><br><span class="line">        System.out.println(<span class="string">"Second Queue received msg:"</span> + msg); </span><br><span class="line">        channel.basicAck(message.getMessageProperties().getDeliveryTag(),<span class="keyword">false</span>); <span class="comment">// 手动ack</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="4-2-拒绝Reject"><a href="#4-2-拒绝Reject" class="headerlink" title="4.2 拒绝Reject"></a>4.2 拒绝Reject</h3><p>如果消息无法处理或者消费失败，也有两种拒绝的方式，</p>
+<ul>
+<li><code>void basicReject(long deliveryTag, boolean requeue)</code>单条拒绝</li>
+<li><code>void basicNack(long deliveryTag, boolean multiple, boolean requeue)</code>批量拒绝</li>
+</ul>
+<p>如果requeue参数设置为true，可以把这条消息重新存入队列，以便发给下一个消费者（当然，只有一个消费者的时候，这种方式可能会出现无限循环重复消费的情况。可以投递到新的队列中，或者只打印异常日志）。如果requeue为false，当消息投递失败就会丢弃。</p>
+<p>但无论消费者是发送ACK还是NACK，甚至是消费者出现异常，生产者也是完全不知情的。所以，生产者最终确定消费者有没有消费成功的方式：</p>
+<ul>
+<li>消费者收到消息，处理完毕后，调用生产者的API</li>
+<li>消费者收到消息，处理完毕后，发送一条响应消息给生产者</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/27663eac.html" title="【RabbitMQ】原理分析：如何保证消息可靠性投递？">https://yzhblog.work/posts/27663eac.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/f9f73578.html" rel="next" title="【Redis】集群模式（二）：哨兵模式原理分析及代码示例">
+                <i class="fa fa-chevron-left"></i> 【Redis】集群模式（二）：哨兵模式原理分析及代码示例
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/499c353c.html" rel="prev" title="【RabbitMQ】高级使用：消息过期设置、死信队列、延迟队列、流控">
+                【RabbitMQ】高级使用：消息过期设置、死信队列、延迟队列、流控 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Producer–-gt-Broker"><span class="nav-text">1.Producer–&gt;Broker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-事务模式ACK"><span class="nav-text">1.1 事务模式ACK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-确认模式ACK"><span class="nav-text">1.2 确认模式ACK</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Exchange–-gt-Queue"><span class="nav-text">2.Exchange–&gt;Queue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-消息回发"><span class="nav-text">2.1 消息回发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-进入备份交换机"><span class="nav-text">2.2 进入备份交换机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Queue存储消息"><span class="nav-text">3.Queue存储消息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-持久化到硬盘"><span class="nav-text">3.1 持久化到硬盘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-集群模式"><span class="nav-text">3.2 集群模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Queue–-gt-Consumer"><span class="nav-text">4.Queue–&gt;Consumer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-自动ACK"><span class="nav-text">4.1 自动ACK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-手动ACK"><span class="nav-text">4.2 手动ACK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-拒绝Reject"><span class="nav-text">4.2 拒绝Reject</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

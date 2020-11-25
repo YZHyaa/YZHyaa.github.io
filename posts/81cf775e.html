@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="在上一篇 【RabbitMQ】Spring AMQP核心组件解析我们介绍了 Spring AMQP ，那它具体该如何使用呢？ 1.xml配置方式123456&amp;lt;!--配置connection-factory，指定连接rabbit server参数 --&amp;gt;&amp;lt;rabbit:connection-factory id=&quot;connectionFactory&quot; virtual-host=&quot;/">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【RabbitMQ】基本使用：Spring AMQP配置使用及SpringBoot整合">
+<meta property="og:url" content="https://yzhblog.work/posts/81cf775e.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="在上一篇 【RabbitMQ】Spring AMQP核心组件解析我们介绍了 Spring AMQP ，那它具体该如何使用呢？ 1.xml配置方式123456&amp;lt;!--配置connection-factory，指定连接rabbit server参数 --&amp;gt;&amp;lt;rabbit:connection-factory id=&quot;connectionFactory&quot; virtual-host=&quot;/">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-11-25T17:05:45.940Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【RabbitMQ】基本使用：Spring AMQP配置使用及SpringBoot整合">
+<meta name="twitter:description" content="在上一篇 【RabbitMQ】Spring AMQP核心组件解析我们介绍了 Spring AMQP ，那它具体该如何使用呢？ 1.xml配置方式123456&amp;lt;!--配置connection-factory，指定连接rabbit server参数 --&amp;gt;&amp;lt;rabbit:connection-factory id=&quot;connectionFactory&quot; virtual-host=&quot;/">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/81cf775e.html">
+
+
+
+
+
+  <title>【RabbitMQ】基本使用：Spring AMQP配置使用及SpringBoot整合 | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/81cf775e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【RabbitMQ】基本使用：Spring AMQP配置使用及SpringBoot整合</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-12T00:00:00+08:00">
+                2020-08-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.1k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  10
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在上一篇 <a href="https://blog.csdn.net/weixin_43935927/article/details/109737660" target="_blank" rel="noopener">【RabbitMQ】Spring AMQP核心组件解析</a>我们介绍了 Spring AMQP ，那它具体该如何使用呢？</p>
+<h2 id="1-xml配置方式"><a href="#1-xml配置方式" class="headerlink" title="1.xml配置方式"></a>1.xml配置方式</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--配置connection-factory，指定连接rabbit server参数 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:connection-factory</span> <span class="attr">id</span>=<span class="string">"connectionFactory"</span> <span class="attr">virtual-host</span>=<span class="string">"/"</span> <span class="attr">username</span>=<span class="string">"guest"</span> </span></span><br><span class="line"><span class="tag">                           <span class="attr">password</span>=<span class="string">"guest"</span> <span class="attr">host</span>=<span class="string">"127.0.0.1"</span> <span class="attr">port</span>=<span class="string">"5672"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:admin</span> <span class="attr">id</span>=<span class="string">"connectAdmin"</span> <span class="attr">connection-factory</span>=<span class="string">"connectionFactory"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h3 id="1-1-Direct-Exchange"><a href="#1-1-Direct-Exchange" class="headerlink" title="1.1 Direct Exchange"></a>1.1 Direct Exchange</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--定义queue --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:queue</span> <span class="attr">name</span>=<span class="string">"MY_FIRST_QUEUE"</span> <span class="attr">durable</span>=<span class="string">"true"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span> <span class="attr">exclusive</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">              <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--定义direct exchange，绑定MY_FIRST_QUEUE --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:direct-exchange</span> <span class="attr">name</span>=<span class="string">"MY_DIRECT_EXCHANGE"</span> <span class="attr">durable</span>=<span class="string">"true"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">                        <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rabbit:binding</span> <span class="attr">queue</span>=<span class="string">"MY_FIRST_QUEUE"</span> <span class="attr">key</span>=<span class="string">"FirstKey"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">rabbit:binding</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:direct-exchange</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--定义rabbit template用于数据的接收和发送 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:template</span> <span class="attr">id</span>=<span class="string">"amqpTemplate"</span> <span class="attr">connection-factory</span>=<span class="string">"connectionFactory"</span> </span></span><br><span class="line"><span class="tag">                 <span class="attr">exchange</span>=<span class="string">"MY_DIRECT_EXCHANGE"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--消息接收者 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"messageReceiver"</span> <span class="attr">class</span>=<span class="string">"com.mymq.consumer.FirstConsumer"</span>&gt;</span><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--queue listener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:listener-container</span> <span class="attr">connection-factory</span>=<span class="string">"connectionFactory"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:listener</span> <span class="attr">queues</span>=<span class="string">"MY_FIRST_QUEUE"</span> <span class="attr">ref</span>=<span class="string">"messageReceiver"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:listener-container</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--定义queue --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:queue</span> <span class="attr">name</span>=<span class="string">"MY_SECOND_QUEUE"</span> <span class="attr">durable</span>=<span class="string">"true"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span> <span class="attr">exclusive</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">              <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 将已经定义的Exchange绑定到MY_SECOND_QUEUE，注意关键词是key --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:direct-exchange</span> <span class="attr">name</span>=<span class="string">"MY_DIRECT_EXCHANGE"</span> <span class="attr">durable</span>=<span class="string">"true"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">                        <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rabbit:binding</span> <span class="attr">queue</span>=<span class="string">"MY_SECOND_QUEUE"</span> <span class="attr">key</span>=<span class="string">"SecondKey"</span>&gt;</span><span class="tag">&lt;/<span class="name">rabbit:binding</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:direct-exchange</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 消息接收者 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"receiverSecond"</span> <span class="attr">class</span>=<span class="string">"com.mymq.consumer.SecondConsumer"</span>&gt;</span><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:listener-container</span> <span class="attr">connection-factory</span>=<span class="string">"connectionFactory"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:listener</span> <span class="attr">queues</span>=<span class="string">"MY_SECOND_QUEUE"</span> <span class="attr">ref</span>=<span class="string">"receiverSecond"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:listener-container</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="1-2-Topic-Exchange"><a href="#1-2-Topic-Exchange" class="headerlink" title="1.2 Topic Exchange"></a>1.2 Topic Exchange</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--定义queue --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:queue</span> <span class="attr">name</span>=<span class="string">"MY_THIRD_QUEUE"</span> <span class="attr">durable</span>=<span class="string">"true"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span> <span class="attr">exclusive</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">              <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 定义topic exchange，绑定MY_THIRD_QUEUE，注意关键词是pattern --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:topic-exchange</span> <span class="attr">name</span>=<span class="string">"MY_TOPIC_EXCHANGE"</span> <span class="attr">durable</span>=<span class="string">"true"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">                       <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rabbit:binding</span> <span class="attr">queue</span>=<span class="string">"MY_THIRD_QUEUE"</span> <span class="attr">pattern</span>=<span class="string">"#.Third.#"</span>&gt;</span><span class="tag">&lt;/<span class="name">rabbit:binding</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:topic-exchange</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--定义rabbit template用于数据的接收和发送 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:template</span> <span class="attr">id</span>=<span class="string">"amqpTemplate2"</span> <span class="attr">connection-factory</span>=<span class="string">"connectionFactory"</span> </span></span><br><span class="line"><span class="tag">                 <span class="attr">exchange</span>=<span class="string">"MY_TOPIC_EXCHANGE"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 消息接收者 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"receiverThird"</span> <span class="attr">class</span>=<span class="string">"com.mymq.consumer.ThirdConsumer"</span>&gt;</span><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:listener-container</span> <span class="attr">connection-factory</span>=<span class="string">"connectionFactory"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:listener</span> <span class="attr">queues</span>=<span class="string">"MY_THIRD_QUEUE"</span> <span class="attr">ref</span>=<span class="string">"receiverThird"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:listener-container</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="1-3-Fanout-Exchange"><a href="#1-3-Fanout-Exchange" class="headerlink" title="1.3 Fanout Exchange"></a>1.3 Fanout Exchange</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--定义queue --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:queue</span> <span class="attr">name</span>=<span class="string">"MY_FOURTH_QUEUE"</span> <span class="attr">durable</span>=<span class="string">"true"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span> <span class="attr">exclusive</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">              <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 定义fanout exchange，绑定MY_FIRST_QUEUE 和 MY_FOURTH_QUEUE --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:fanout-exchange</span> <span class="attr">name</span>=<span class="string">"MY_FANOUT_EXCHANGE"</span> <span class="attr">auto-delete</span>=<span class="string">"false"</span> <span class="attr">durable</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">                        <span class="attr">declared-by</span>=<span class="string">"connectAdmin"</span> &gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rabbit:binding</span> <span class="attr">queue</span>=<span class="string">"MY_FIRST_QUEUE"</span>&gt;</span><span class="tag">&lt;/<span class="name">rabbit:binding</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rabbit:binding</span> <span class="attr">queue</span>=<span class="string">"MY_FOURTH_QUEUE"</span>&gt;</span><span class="tag">&lt;/<span class="name">rabbit:binding</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">rabbit:bindings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:fanout-exchange</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 消息接收者 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"receiverFourth"</span> <span class="attr">class</span>=<span class="string">"com.mymq.consumer.FourthConsumer"</span>&gt;</span><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rabbit:listener-container</span> <span class="attr">connection-factory</span>=<span class="string">"connectionFactory"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rabbit:listener</span> <span class="attr">queues</span>=<span class="string">"MY_FOURTH_QUEUE"</span> <span class="attr">ref</span>=<span class="string">"receiverFourth"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">rabbit:listener-container</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="2-SpringBoot整合"><a href="#2-SpringBoot整合" class="headerlink" title="2.SpringBoot整合"></a>2.SpringBoot整合</h2><p>使用了SpringBoot后，我们不再需要些上面那么多的配置，因为在<code>RabbitAutoConfiguration</code>中已经对Bean做了自动配置。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-amqp<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="2-1-定义队列、交换机"><a href="#2-1-定义队列、交换机" class="headerlink" title="2.1 定义队列、交换机"></a>2.1 定义队列、交换机</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RabbitConfig</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 声明Queue、Exchange、Binding.......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>1.定义交换机</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(<span class="string">"directExchange"</span>) <span class="comment">// 定义的name会在绑定时用到</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DirectExchange <span class="title">getDirectExchange</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DirectExchange(<span class="string">"DIRECT_EXCHANGE"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"topicExchange"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> TopicExchange <span class="title">getTopicExchange</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> TopicExchange(<span class="string">"TOPIC_EXCHANGE"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"fanoutExchange"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> FanoutExchange <span class="title">getFanoutExchange</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span>  <span class="keyword">new</span> FanoutExchange(<span class="string">"FANOUT_EXCHANGE"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>2.定义队列</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(<span class="string">"firstQueue"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">getFirstQueue</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Map&lt;String, Object&gt; args = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">    args.put(<span class="string">"x-message-ttl"</span>,<span class="number">6000</span>); <span class="comment">// 设置超时</span></span><br><span class="line">    Queue queue = <span class="keyword">new</span> Queue(<span class="string">"FIRST_QUEUE"</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, args);</span><br><span class="line">    <span class="keyword">return</span> queue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"secondQueue"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">getSecondQueue</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Queue(<span class="string">"SECOND_QUEUE"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span>(<span class="string">"thirdQueue"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">getThirdQueue</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Queue(<span class="string">"THIRD_QUEUE"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>3.定义绑定</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Binding <span class="title">bindFirst</span><span class="params">(@Qualifier(<span class="string">"firstQueue"</span>)</span> Queue queue, <span class="comment">// 队列</span></span></span><br><span class="line"><span class="function">                          @<span class="title">Qualifier</span><span class="params">(<span class="string">"directExchange"</span>)</span> TopicExchange exchange)</span>&#123; <span class="comment">// 交换机</span></span><br><span class="line">    <span class="keyword">return</span> BindingBuilder.bind(queue).to(exchange).with(<span class="string">"my"</span>); <span class="comment">// 路由键</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Binding <span class="title">bindSecond</span><span class="params">(@Qualifier(<span class="string">"secondQueue"</span>)</span> Queue queue, </span></span><br><span class="line"><span class="function">                          @<span class="title">Qualifier</span><span class="params">(<span class="string">"topicExchange"</span>)</span> TopicExchange exchange)</span>&#123; </span><br><span class="line">    <span class="keyword">return</span> BindingBuilder.bind(queue).to(exchange).with(<span class="string">"#.my.#"</span>); <span class="comment">// 路由键有通配符</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Binding <span class="title">bindThird</span><span class="params">(@Qualifier(<span class="string">"thirdQueue"</span>)</span> Queue queue,</span></span><br><span class="line"><span class="function">                         @<span class="title">Qualifier</span><span class="params">(<span class="string">"fanoutExchange"</span>)</span> FanoutExchange exchange)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> BindingBuilder.bind(queue).to(exchange); <span class="comment">// fanout没有路由键</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-2-Producer"><a href="#2-2-Producer" class="headerlink" title="2.2 Producer"></a>2.2 Producer</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">convertAndSend</span><span class="params">(String exchange, String routingKey, Object message)</span> <span class="keyword">throws</span> AmqpException</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyProvider</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    AmqpTemplate amqpTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">// 发送4条消息        </span></span><br><span class="line">        amqpTemplate.convertAndSend(<span class="string">"DIRCET_EXCHANGE"</span>,<span class="string">"my"</span>,<span class="string">"a direct msg"</span>); </span><br><span class="line"></span><br><span class="line">        amqpTemplate.convertAndSend(<span class="string">"TOPIC_EXCHANGE"</span>, <span class="string">"msg"</span>, <span class="string">"a topic msg1"</span>);</span><br><span class="line">        amqpTemplate.convertAndSend(<span class="string">"TOPIC_EXCHANGE"</span>, <span class="string">"a.my.b"</span>, <span class="string">"a topic msg2"</span>);</span><br><span class="line"></span><br><span class="line">        amqpTemplate.convertAndSend(<span class="string">"FANOUT_EXCHANGE"</span>,<span class="string">""</span>,<span class="string">"a fanout msg"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-3-Consumer"><a href="#2-3-Consumer" class="headerlink" title="2.3 Consumer"></a>2.3 Consumer</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@RabbitListener</span>(queues = <span class="string">"FIRST_QUEUE"</span>) <span class="comment">// 指定监听的队列，</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FirstConsumer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RabbitHandler</span> <span class="comment">// 有消息时，就会自动调用当前方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(String msg)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">" first queue received msg : "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@RabbitListener</span>(queues = &#123;<span class="string">"SECOND_QUEUE"</span>,<span class="string">"THIRD_QUEUE"</span>&#125;) <span class="comment">// 配置一个消费者监听多个队列</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SecondConsumer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RabbitHandler</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(String msg)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">" second queue received msg : "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-4-配置文件"><a href="#2-4-配置文件" class="headerlink" title="2.4 配置文件"></a>2.4 配置文件</h3><p>全部配置总体上分成三大类：连接类、消息发送类、消息消费类。</p>
+<p><strong>1.连接配置</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># rabbitmq连接基本配置</span><br><span class="line">spring.rabbitmq.addresses=43.105.136.120:5672</span><br><span class="line">spring.rabbitmq.username=guest</span><br><span class="line">spring.rabbitmq.password=guest</span><br><span class="line">spring.rabbitmq.virtual-host=/</span><br><span class="line">spring.rabbitmq.connection-timeout=15000</span><br><span class="line"></span><br><span class="line"># 开启confirm机制</span><br><span class="line">spring.rabbitmq.publisher-confirms=true</span><br><span class="line"># 开启return模式</span><br><span class="line">spring.rabbitmq.publisher-returns=true</span><br><span class="line"># 配合return机制使用，表示接收路由不可达的消息</span><br><span class="line">spring.rabbitmq.template.mandatory=true</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性值</th>
+<th style="text-align:left">说明</th>
+<th style="text-align:left">默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">address</td>
+<td style="text-align:left">客户端连接的地址，有多个的时候用逗号分隔<br>改地址可以IP与port的结合</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">host</td>
+<td style="text-align:left">RabbitMQ的主机地址</td>
+<td style="text-align:left">localhost</td>
+</tr>
+<tr>
+<td style="text-align:left">port</td>
+<td style="text-align:left">RabbitMQ的端口号</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">virtual-host</td>
+<td style="text-align:left">连接到RabbitMQ的虚拟主机</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">username</td>
+<td style="text-align:left">登录到RabbitMQ的用户名</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">password</td>
+<td style="text-align:left">登录到RabbitMQ的密码</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">ssl.enabled</td>
+<td style="text-align:left">启用SSL支持</td>
+<td style="text-align:left">false</td>
+</tr>
+<tr>
+<td style="text-align:left">ssl.key-store</td>
+<td style="text-align:left">保存SSL证书的地址</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">ssl.key-store-password</td>
+<td style="text-align:left">访问SSL证书的地址使用的密码</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">ssl.trust-store</td>
+<td style="text-align:left">SSL的可信地址</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">ssl.trust-store-password</td>
+<td style="text-align:left">访问SSL的可信地址的密码</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">ssl.algorithm</td>
+<td style="text-align:left">SSL算法，默认使用Rabbit的客户端算法库</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">cache.channel.checkout-timeout</td>
+<td style="text-align:left">当缓存已满时，获取Channel的等待时间，单位为毫秒</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">cache.channel.size</td>
+<td style="text-align:left">缓存中保持的Channe丨数量</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">cache.connection.mode</td>
+<td style="text-align:left">连接缓存的模式</td>
+<td style="text-align:left">CHANNEL</td>
+</tr>
+<tr>
+<td style="text-align:left">cache.connection.size</td>
+<td style="text-align:left">缓存的连接数</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">connnection-timeout</td>
+<td style="text-align:left">连接超时参数单位为毫秒：设置为“0”代表无穷大</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">dynamic</td>
+<td style="text-align:left">默认创建—个AmqpAdmin的Beantrue</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注：Producer与Consumer都需要先配置RabbitMQ连接信息。</p>
+</blockquote>
+<p><strong>2.消息发送配置（Producer）</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 开启confirm机制</span><br><span class="line">spring.rabbitmq.publisher-confirms=true</span><br><span class="line"># 开启return模式</span><br><span class="line">spring.rabbitmq.publisher-returns=true</span><br><span class="line"># 配合return机制使用，表示接收路由不可达的消息</span><br><span class="line">spring.rabbitmq.template.mandatory=true</span><br></pre></td></tr></table></figure></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性值</th>
+<th style="text-align:left">说明</th>
+<th style="text-align:left">默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">publisher-confirms</td>
+<td style="text-align:left">开启 Publisher Confirm 机制</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">publisher-returns</td>
+<td style="text-align:left">开启 Publisher Return 机制</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">template.mandatory</td>
+<td style="text-align:left">启用强制信息</td>
+<td style="text-align:left">false</td>
+</tr>
+<tr>
+<td style="text-align:left">template.receive-timeout</td>
+<td style="text-align:left">receive()方法的超时时间</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">template.reply-timeout</td>
+<td style="text-align:left">sendAndReceive()方法的超时时间</td>
+<td style="text-align:left">5000</td>
+</tr>
+<tr>
+<td style="text-align:left">template.retry.enabled</td>
+<td style="text-align:left">设置为true的时候RabbitTemplate能够实现重试</td>
+<td style="text-align:left">false</td>
+</tr>
+<tr>
+<td style="text-align:left">template.retry.initial-interval</td>
+<td style="text-align:left">第一次与第二次发布消息的时间间隔</td>
+<td style="text-align:left">1000</td>
+</tr>
+<tr>
+<td style="text-align:left">template.retry.max-attempts</td>
+<td style="text-align:left">尝试发布消息的最大数量</td>
+<td style="text-align:left">3</td>
+</tr>
+<tr>
+<td style="text-align:left">template.retry.max-interval</td>
+<td style="text-align:left">尝试发布消息的最大时间间隔</td>
+<td style="text-align:left">10000</td>
+</tr>
+<tr>
+<td style="text-align:left">template.retry.multiplier</td>
+<td style="text-align:left">上一次尝试时间间隔的乘数</td>
+<td style="text-align:left">1.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>3.消息消费配置（Consumer）</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 设置签收模式：AUTO(自动签收)、MANUAL(手工签收)、NONE(不签收，没有任何操作)</span><br><span class="line">spring.rabbitmq.listener.simple.acknowledge-mode=MANUAL</span><br><span class="line"># 设置当前消费者数量(线程数)</span><br><span class="line">spring.rabbitmq.listener.simple.concurrency=5</span><br><span class="line"># 设置消费者最大并发数量</span><br><span class="line">spring.rabbitmq.listener.simple.max-concurrency=10</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性值</th>
+<th style="text-align:left">说明</th>
+<th style="text-align:left">默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">listener.simple.acknowledge-mode</td>
+<td style="text-align:left">容器的acknowledge模式</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.auto-startup</td>
+<td style="text-align:left">肩动时自动启动容器</td>
+<td style="text-align:left">true</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.concurrency</td>
+<td style="text-align:left">消费者的最小数量</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.default-requeue-rejected</td>
+<td style="text-align:left">投递失败时是否重新排队</td>
+<td style="text-align:left">true</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.max-concurrency</td>
+<td style="text-align:left">消费者的最大数量</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.missing-queues-fatal</td>
+<td style="text-align:left">容器上声明的队列不可用时是否失敗</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.prefetch</td>
+<td style="text-align:left">在单个请求中处理的消息个数，他应该大于等于事务数量</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.retry.enabled</td>
+<td style="text-align:left">不论是不是重试的发布</td>
+<td style="text-align:left">false</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.retry.initial-interval</td>
+<td style="text-align:left">第一次与第二次投递尝试的时间间隔</td>
+<td style="text-align:left">1000ms</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.retry.max-attempts</td>
+<td style="text-align:left">尝试投递消息的最大数量</td>
+<td style="text-align:left">3</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.retry.max-interval</td>
+<td style="text-align:left">两次尝试的最大时间间隔</td>
+<td style="text-align:left">10000ms</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.retry.multiplier</td>
+<td style="text-align:left">上一次尝试时间间隔的乘数</td>
+<td style="text-align:left">1.0</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.retry.stateless</td>
+<td style="text-align:left">重试是有状态的还是无状态的</td>
+<td style="text-align:left">true</td>
+</tr>
+<tr>
+<td style="text-align:left">listener.simple.transaction-size</td>
+<td style="text-align:left">在一个事务中处理的消息数量 = 为了获得最佳效果， <br>该值应设罝为小于等于每个请求中处理的消息个数，即 listener.prefetch 的值</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/81cf775e.html" title="【RabbitMQ】基本使用：Spring AMQP配置使用及SpringBoot整合">https://yzhblog.work/posts/81cf775e.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/4a69a051.html" rel="next" title="【RabbitMQ】基本特性、工作模型、路由方式">
+                <i class="fa fa-chevron-left"></i> 【RabbitMQ】基本特性、工作模型、路由方式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/ce5e49bb.html" rel="prev" title="【RabbitMQ】基本使用：Java操作RabbitMQ--Spring AMQP核心组件解析">
+                【RabbitMQ】基本使用：Java操作RabbitMQ--Spring AMQP核心组件解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-xml配置方式"><span class="nav-text">1.xml配置方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Direct-Exchange"><span class="nav-text">1.1 Direct Exchange</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Topic-Exchange"><span class="nav-text">1.2 Topic Exchange</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-Fanout-Exchange"><span class="nav-text">1.3 Fanout Exchange</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SpringBoot整合"><span class="nav-text">2.SpringBoot整合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-定义队列、交换机"><span class="nav-text">2.1 定义队列、交换机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Producer"><span class="nav-text">2.2 Producer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Consumer"><span class="nav-text">2.3 Consumer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-配置文件"><span class="nav-text">2.4 配置文件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">450.3k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
