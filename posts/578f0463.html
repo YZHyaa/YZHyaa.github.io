@@ -91,26 +91,33 @@
 
 
 
-<meta name="description" content="优化器就是对我们的SQL语句进行分析，生成执行计划。 问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 slow query log    .">
+<meta name="description" content="我们说到性能调优，大部分时候想要实现的目标是让我们的查询更快。一个查询的动作又是由很多个环节组成的，每个环节都会消耗时间，我们在【MySQL】查询sql的执行过程及MySQL架构分析分析过了。我们要减少查询所消耗的时间，就要从每一个环节入手。   【MySQL】性能调优（一）：建立连接。配置优化及架构优化 【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL">
 <meta name="keywords" content="学习ing,开发组件">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">
-<meta property="og:url" content="https://yzhblog.work/posts/81e16d68.html">
+<meta property="og:title" content="【MySQL】性能调优（一）：建立连接。配置优化及架构优化">
+<meta property="og:url" content="https://yzhblog.work/posts/578f0463.html">
 <meta property="og:site_name" content="Running | 在路上">
-<meta property="og:description" content="优化器就是对我们的SQL语句进行分析，生成执行计划。 问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 slow query log    .">
+<meta property="og:description" content="我们说到性能调优，大部分时候想要实现的目标是让我们的查询更快。一个查询的动作又是由很多个环节组成的，每个环节都会消耗时间，我们在【MySQL】查询sql的执行过程及MySQL架构分析分析过了。我们要减少查询所消耗的时间，就要从每一个环节入手。   【MySQL】性能调优（一）：建立连接。配置优化及架构优化 【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103221300455.png#pic_center">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103223445436.png#pic_center">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/202011032240068.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103225423871.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/2020110323092670.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103231618955.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103231947669.png#pic_center">
-<meta property="og:updated_time" content="2020-11-25T15:11:13.316Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103162749152.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103164621388.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103170239353.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103170315466.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103170737251.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103173047421.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103174645540.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103184506718.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103211104617.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103212038115.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103213541683.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020110321414515.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103214216437.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201103214640917.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-25T17:28:39.608Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">
-<meta name="twitter:description" content="优化器就是对我们的SQL语句进行分析，生成执行计划。 问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 slow query log    .">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201103221300455.png#pic_center">
+<meta name="twitter:title" content="【MySQL】性能调优（一）：建立连接。配置优化及架构优化">
+<meta name="twitter:description" content="我们说到性能调优，大部分时候想要实现的目标是让我们的查询更快。一个查询的动作又是由很多个环节组成的，每个环节都会消耗时间，我们在【MySQL】查询sql的执行过程及MySQL架构分析分析过了。我们要减少查询所消耗的时间，就要从每一个环节入手。   【MySQL】性能调优（一）：建立连接。配置优化及架构优化 【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201103162749152.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
 
 
 
@@ -148,13 +155,13 @@
 
 
 
-  <link rel="canonical" href="https://yzhblog.work/posts/81e16d68.html">
+  <link rel="canonical" href="https://yzhblog.work/posts/578f0463.html">
 
 
 
 
 
-  <title>【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议 | Running | 在路上</title>
+  <title>【MySQL】性能调优（一）：建立连接。配置优化及架构优化 | Running | 在路上</title>
   
 
 
@@ -323,7 +330,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/81e16d68.html">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/578f0463.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="A minor">
@@ -340,7 +347,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议</h1>
+          <h1 class="post-title" itemprop="name headline">【MySQL】性能调优（一）：建立连接。配置优化及架构优化</h1>
         
 
         <div class="post-meta">
@@ -352,8 +359,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-10T00:00:00+08:00">
-                2019-10-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-07T00:00:00+08:00">
+                2019-10-07
               </time>
             
 
@@ -408,7 +415,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.6k
+                  4.4k
                 </span>
               
 
@@ -424,7 +431,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  9
+                  15
                 </span>
               
             </div>
@@ -445,141 +452,134 @@
       
 
       
-        <p>优化器就是对我们的SQL语句进行分析，生成执行计划。</p>
-<p>问题：在我们做项目的时候，如何找到那些耗时比较长的查询语句呢？我们的服务层每天执行了这么多SQL语句，它怎么知道哪些SQL语句比较慢呢？第一步，我们要把SQL执行情况记录下来 ⇒ 慢查询日志 <a href="https://dev.mysql.com/doc/refman/5.7/en/slow-query-log.html" target="_blank" rel="noopener">slow query log</a>    .</p>
-<a id="more"></a>
-<h2 id="1-开启慢日志"><a href="#1-开启慢日志" class="headerlink" title="1.开启慢日志"></a>1.开启慢日志</h2><p>因为开启慢查询日志是有代价的（跟bin log、optimizer-trace一样），所以它默认是关闭的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;slow_query%&apos;;</span><br><span class="line">set GLOBAL slow_query_log=&quot;ON&quot;;</span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/20201103221300455.png#pic_center" alt="在这里插入图片描述"></p>
-<p>除了这个开关，还有一个参数，控制执行超过多长时间的SQL才记录到慢日志，默认是10秒。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;%long_query%&apos;;  -- 默认10s</span><br><span class="line"></span><br><span class="line">-- 可以直接动态修改参数（重启后失效）：</span><br><span class="line">set @@ global.slow_query_log=1; -- 1 开启，0 关闭，重启后失效 </span><br><span class="line">set @@ global.long_query_time=3; -- mysql 默认的慢查询时间是 10 秒，另开一个窗口后才会查到最新值 ​ </span><br><span class="line"></span><br><span class="line">show variables like &apos;%long_query%&apos;;</span><br><span class="line">show variables like &apos;%slow_query%&apos;;</span><br></pre></td></tr></table></figure>
-<p>或者修改配置文件my.cnf。以下配置定义了慢查询日志的开关、慢查询的时间、日志文件的存放路径。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">slow_query_log=ON </span><br><span class="line">long_query_time=2 </span><br><span class="line">slow_query_log_file=/var/lib/mysql/localhost-slow.log</span><br></pre></td></tr></table></figure>
-<h2 id="2-慢日志分析"><a href="#2-慢日志分析" class="headerlink" title="2.慢日志分析"></a>2.慢日志分析</h2><p>模拟慢查询：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT SLEEP(10); -- 过10s后再查询，所以后面的sql语句都会进入慢查询日志</span><br><span class="line">SELECT * FROM user_innodb WHERE name=&apos;张三&apos;;</span><br></pre></td></tr></table></figure>
-<h3 id="2-1-日志内容"><a href="#2-1-日志内容" class="headerlink" title="2.1 日志内容"></a>2.1 日志内容</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show global status like &apos;slow_queries&apos;; -- 查看有多少慢查询 </span><br><span class="line">show variables like &apos;%slow_query%&apos;; -- 获取慢日志目录</span><br></pre></td></tr></table></figure>
-<p>然后在服务器上打开相应日志文件<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /var/lib/mysql/bab8d9419ec6-slow.log</span><br></pre></td></tr></table></figure></p>
-<p><img src="https://img-blog.csdnimg.cn/20201103223445436.png#pic_center" alt="在这里插入图片描述"></p>
-<p>有了慢查询日志，怎么去分析统计呢？比如SQL语句的出现的慢查询次数最多，平均每次执行了多久？</p>
-<h3 id="2-2-分析工具：mysqldumpslow"><a href="#2-2-分析工具：mysqldumpslow" class="headerlink" title="2.2 分析工具：mysqldumpslow"></a>2.2 分析工具：<a href="https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html" target="_blank" rel="noopener">mysqldumpslow</a></h3><p>MySQL提供了mysqldumpslow 的工具，在MySQL的bin目录下。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldumpslow --help</span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/202011032240068.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<p>例如：查询用时最多的20条慢SQL：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldumpslow -s t -t 20 -g &apos;select&apos; /var/lib/mysql/bab8d9419ec6-slow.log &gt; /data/slow.log</span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/20201103225423871.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" width="70%"></p>
-<table>
-<thead>
-<tr>
-<th>参数</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Count</td>
-<td>代表这个SQL执行了多少次</td>
-</tr>
-<tr>
-<td>Time</td>
-<td>代表执行的时间，括号里面是累计时间</td>
-</tr>
-<tr>
-<td>Lock</td>
-<td>表示锁定的时间，括号是累计</td>
-</tr>
-<tr>
-<td>Rows</td>
-<td>表示返回的记录数，括号是累计</td>
-</tr>
-</tbody>
-</table>
-<p>除了慢查询日志之外，还有一个 SHOW PROFILE工具可以使用。</p>
-<h3 id="2-3-分析工具：SHOW-PROFILE"><a href="#2-3-分析工具：SHOW-PROFILE" class="headerlink" title="2.3 分析工具：SHOW PROFILE"></a>2.3 分析工具：<a href="https://dev.mysql.com/doc/refman/5.7/en/show-profile.html" target="_blank" rel="noopener">SHOW PROFILE</a></h3><p>SHOW PROFILE 是谷歌高级架构师JeremyCole贡献给MySQL社区的，可以查看SQL语句执行的时候使用的资源，比如CPU、IO的消耗情况。在SQL中输入help profile可以得到详细的帮助信息。</p>
+        <p>我们说到性能调优，大部分时候想要实现的目标是让我们的查询更快。一个查询的动作又是由很多个环节组成的，每个环节都会消耗时间，我们在<a href="https://blog.csdn.net/weixin_43935927/article/details/109324057" target="_blank" rel="noopener">【MySQL】查询sql的执行过程及MySQL架构分析</a>分析过了。我们要减少查询所消耗的时间，就要从每一个环节入手。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201103162749152.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
 <ol>
-<li>查看是否开启</li>
+<li><a href="https://blog.csdn.net/weixin_43935927/article/details/109468716" target="_blank" rel="noopener">【MySQL】性能调优（一）：建立连接。配置优化及架构优化</a></li>
+<li><a href="https://blog.csdn.net/weixin_43935927/article/details/109468716" target="_blank" rel="noopener">【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议</a></li>
+<li><a href="https://blog.csdn.net/weixin_43935927/article/details/109489478" target="_blank" rel="noopener">【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解</a></li>
+<li><a href="https://blog.csdn.net/weixin_43935927/article/details/109490207" target="_blank" rel="noopener">【MySQL】性能调优（四）：存储引擎。建表一些细节及Sever层优化</a></li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select @@profiling;</span><br><span class="line">set @@profiling=1;</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>查看 profile 统计 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show profiles; -- 命令最后带一个s</span><br><span class="line">show profile;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<hr>
+<p>第一个环节是客户端连接到服务端，连接这一块有可能会出现什么样的性能问题？</p>
+<h2 id="1-配置优化"><a href="#1-配置优化" class="headerlink" title="1.配置优化"></a>1.配置优化</h2><p>在连接这个环节，有可能出现服务端连接数不够导致应用程序获取不到连接的问题。比如报了一个 Mysql: error1040: Too many connections 的错误。</p>
+<p>我们可以从两个方面来解决连接数不够的问题：</p>
+<h3 id="1-1-服务端：配置连接数"><a href="#1-1-服务端：配置连接数" class="headerlink" title="1.1 服务端：配置连接数"></a>1.1 服务端：配置连接数</h3><p>从服务端来说，我们可以增加服务端的可用连接数。如果有多个应用或者很多请求同时访问数据库，连接数不够的时候，我们可以：</p>
+<ul>
+<li>修改配置参数增加可用连接数，修改max_connections的大小：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;max_connections&apos;; -- 查看最大连接数（默认1000）</span><br><span class="line">set GLOBAL MAX_CONNECTIONS = 1200;-- 修改最大连接数（这是个全局变量），当有多个应用连接的时候</span><br></pre></td></tr></table></figure>
+<ul>
+<li>或者，或者及时释放不活动的连接。交互式和非交互式的客户端的默认超时时间都是28800秒，8小时，我们可以把这个值调小。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show global variables like &apos;wait_timeout&apos;; -- 及时释放不活动的连接，注意不要释放连接池还在使用的连接</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-客户端：使用连接池"><a href="#1-2-客户端：使用连接池" class="headerlink" title="1.2 客户端：使用连接池"></a>1.2 客户端：使用连接池</h3><p>从客户端来说，可以减少从服务端获取的连接数，如果我们想要不是每一次执行SQL都创建一个新的连接，应该怎么做？这个时候我们可以引入连接池，实现连接的重用。</p>
+<p><strong>问题一</strong>：我们可以在哪些层面使用连接池？</p>
+<ul>
+<li>ORM层面（MyBatis自带了一个连接池）</li>
+<li>或者使用专用的连接池工具（阿里的Druid、Spring Boot 2.x版本默认的连接池Hikari、老牌的DBCP和C3P0）</li>
+</ul>
+<p><strong>问题二</strong>：当客户端改成从连接池获取连接之后，连接池的大小应该怎么设置呢？</p>
+<p>大家可能会有一个误解，觉得连接池的最大连接数越大越好，这样在高并发的情况下客户端可以获取的连接数更多，不需要排队。实际情况并不是这样。连接池并不是越大越好，只要维护一定数量大小的连接池，其他的客户端排队等待获取连接就可以了。有的时候连接池越大，效率反而越低。Druid的默认最大连接池大小是8。Hikari的默认最大连接池大小是10。</p>
+<p><strong>问题三</strong>：为什么连接池默认值都是这么小呢？</p>
+<p>在 Hikari 的<a href="https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing" target="_blank" rel="noopener">github文档</a>中，给出了一个PostgreSQL数据库建议的设置连接池大小的公式：  它的建议是机器核数乘以2加1。也就是说，4 核的机器，连接池维护9个连接就够了。这个公式从一定程度上来说对其他数据库也是适用的。这里面还有一个减少连接池大小实现提升并发度和吞吐量的案例。</p>
+<p><strong>问题四</strong>：为什么有的情况下，减少连接数反而会提升吞吐量呢？为什么建议设置的连接池大小要跟CPU的核数相关呢？</p>
+<p>每一个连接，服务端都需要创建一个线程去处理它。连接数越多，服务端创建的线程数就会越多。</p>
+<p><strong>问题五</strong>：CPU是怎么同时执行远远超过它的核数大小的任务的？</p>
+<p>时间片。上下文切换。而CPU的核数是有限的，频繁的上下文切换会造成比较大的性能开销。</p>
+<blockquote>
+<p>我们这里说到了从数据库配置的层面去优化数据库。不管是数据库本身的配置，还是安装这个数据库服务的操作系统的配置，对于配置进行优化，最终的目标都是为了更好地发挥硬件本身的性能，包括CPU、内存、磁盘、网络。</p>
+<p><br>在不同的硬件环境下，操作系统和MySQL的参数的配置是不同的，没有标准的配置。在<a href="https://blog.csdn.net/weixin_43935927/category_10513244.html" target="_blank" rel="noopener">前面的文章</a>里也提到了很多MySQL和InnoDB的配置参数，包括各种开关和数值的配置，大多数参数都提供了一个默认值，比如默认的buffer_pool_size，默认的页大小，InnoDB并发线程数等等。这些默认配置可以满足大部分情况的需求，除非有特殊的需求，在清楚参数的含义的情况下再去修改它。修改配置的工作一般由专业的DBA完成。</p>
+<p><br>至于硬件本身的选择，比如使用固态硬盘，搭建磁盘阵列，选择特定的CPU型号这些，更不是我们开发人员关注的重点，这个就不做过多的介绍了。如果想要了解一些特定的参数的含义，<a href="https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html" target="_blank" rel="noopener">官网</a>有一份系统的参数列表可以参考。</p>
+</blockquote>
+<p>除了合理设置服务端的连接数和客户端的连接池大小之外，我们还有哪些减少客户端跟数据库服务端的连接数的方案呢？我们可以引入缓存。</p>
+<h2 id="2-架构优化"><a href="#2-架构优化" class="headerlink" title="2.架构优化"></a>2.架构优化</h2><h3 id="2-1-引入缓存"><a href="#2-1-引入缓存" class="headerlink" title="2.1 引入缓存"></a>2.1 引入缓存</h3><p>在应用系统的并发数非常大的情况下，如果没有缓存，会造成两个问题：一方面是会给数据库带来很大的压力。另一方面，从应用的层面来说，操作数据的速度也会受到影响。我们可以用第三方的缓存服务来解决这个问题，例如Redis。<br><img src="https://img-blog.csdnimg.cn/20201103164621388.png#pic_center" alt="在这里插入图片描述"></p>
+<p>运行独立的缓存服务，属于<strong>架构层面的优化</strong>。为了减少单台数据库服务器的读写压力，在架构层面我们还可以做其他哪些优化措施？</p>
+<h3 id="2-2-主从复制"><a href="#2-2-主从复制" class="headerlink" title="2.2 主从复制"></a>2.2 主从复制</h3><p>如果单台数据库服务满足不了访问需求，那我们可以做数据库的集群方案。集群的话必然会面临一个问题，就是不同的节点之间数据一致性的问题。如果同时读写多台数据库节点，怎么让所有的节点数据保持一致？</p>
+<p>这个时候我们需要用到复制技术（replication），被复制的节点称为master，复制的节点称为slave。slave本身也可以作为其他节点的数据来源，这个叫做级联复制。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201103170239353.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>主从复制是怎么实现的呢？更新语句会记录 <strong>binlog</strong>，它是一种逻辑日志。有了这个binlog，从服务器会获取主服务器的 binlog文件，然后解析里面的 SQL语句，在从服务器上面执行一遍，保持主从的数据一致。</p>
+<blockquote>
+<p>PS：这里面涉及到三个线程：</p>
+<ol>
+<li>log dump线程：Master节点上有一个log dump线程，是用来发送binlog给slave的。</li>
+<li>I/O线程：连接到master获取binlog，并且解析binlog写入relay log（中继日志）。</li>
+<li>SQL线程：从库的SQL线程，是用来读取relay log，把数据写入到数据库。</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/20201103170315466.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</blockquote>
+<p>做了主从复制的方案之后，我们只把数据写入master节点，而读的请求可以分担到slave节点。我们把这种方案叫做<strong>读写分离</strong>。</p>
+<blockquote>
+<p>PS：主从复制与读写分离什么关系？ mysql的主从复制和mysql的读写分离两者有紧密的联系。</p>
+<ol>
+<li>首先要部署主从复制，只有主从复制完成了，才能再此基础上进行数据的读写分离。</li>
+<li>一般通过主从复制的方式来同步数据后，再通过读写分离来提升数据库的并发负载能力。 </li>
+</ol>
+<p>读写分离就是只在mysql主服务器上写，只在mysql从服务器上读。基本原理是让主数据库处理事务性查询，而从数据库处理select查询。数据库复制被用来把事务性查询导致的变更同步到集群中的数据库。</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20201103170737251.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>读写分离可以一定程度低减轻数据库服务器的访问压力，但是需要特别注意主从数据一致性的问题。如果我们在master写入了，马上到slave查询，而这个时候slave的数据还没有同步过来，怎么办？</p>
+<blockquote>
+<p>PS：主从复制到底慢在哪里？在早期的MySQL中，<strong>slave的SQL线程是单线程</strong>。master可以支持SQL语句的并行执行，配置了多少的最大连接数就是最多同时多少个SQL并行执行。而slave的SQL却只能单线程排队执行，在主库并发量很大的情况下，同步数据肯定会出现延迟。</p>
+<p><br>为什么从库上的SQL Thread不能并行执行呢？举个例子，主库执行了多条SQL语句，首先用户发表了一条评论，然后修改了内容，最后把这条评论删除了。这三条语句在从库上的执行顺序肯定是不能颠倒的。·<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;insert into user_comments(10000009,&apos;nice&apos;); </span><br><span class="line">&gt;update user_comments set content =&apos;verygood&apos; where id=10000009; </span><br><span class="line">&gt;delete from user_comments where id=10000009;</span><br><span class="line">&gt;怎么解决这个问题，即如何减少主从复制的延迟？</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p><strong>1.主从连接方式：异步与同步</strong></p>
+<p>首先我们需要知道，在主从复制的过程中，MySQL默认是异步复制的。也就是说，对于主节点来说，写入binlog，事务结束，就返回给客户端了。对于slave来说，接收到binlog，就完事儿了，master不关心slave的数据有没有写入成功。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201103173047421.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>如果要减少主从复制的延迟，是不是可以等待全部从库的事务执行完毕，才返回给客户端呢？这样的方式叫做全同步复制。从库写完数据，主库才返会给客户端。这种方式虽然可以保证在读之前，数据已经同步成功了，但是带来的副作用大家应该能想到，事务执行的时间会变长，它会导致master节点性能下降。</p>
+<p>有没有更好的办法呢？既减少slave写入的延迟，又不会明显增加master返回给客户端的时间？</p>
+<p><strong>2.主从连接方式：半同步复制</strong></p>
+<p>介于异步复制和全同步复制之间，还有一种半同步复制的方式。半同步复制是什么样的呢？</p>
+<p>主库在执行完客户端提交的事务后不是立刻返回给客户端，而是等待至少一个从库接收到 binlog 并写到 relay log 中才返回给客户端。master 不会等待很长的时间，但是返回给客户端的时候，数据就即将写入成功了，因为它只剩最后一步了：就是读取relay log，写入从库。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201103174645540.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>如果我们要在数据库里面用半同步复制，必须安装一个插件，这个是谷歌的一位工程师贡献的。这个插件在mysql的插件目录下已经有提供：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/lib64/mysql/plugin/</span><br></pre></td></tr></table></figure>
+<p>主库和从库是不同的插件，安装之后需要启用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-- 主库执行 </span><br><span class="line">INSTALL PLUGIN rpl_semi_sync_master SONAME &apos;semisync_master.so&apos;;</span><br><span class="line">set global rpl_semi_sync_master_enabled=1; </span><br><span class="line">show variables like &apos;%semi_sync%&apos;;</span><br><span class="line"></span><br><span class="line">-- 从库执行 </span><br><span class="line">INSTALL PLUGIN rpl_semi_sync_slave SONAME&apos;semisync_slave.so&apos;; </span><br><span class="line">set global rpl_semi_sync_slave_enabled=1;</span><br><span class="line">show global variables like &apos;%semi%&apos;;</span><br></pre></td></tr></table></figure>
+<p>相对于异步复制，半同步复制提高了数据的安全性，同时它也造成了一定程度的延迟，它需要等待一个slave写入中继日志，这里多了一个网络交互的过程，所以，半同步复制最好在低延时的网络中使用。</p>
+<p>这个是从主库和从库连接的角度，来保证slave数据的写入。另一个思路，如果要减少主从同步的延迟，减少SQL执行造成的等待的时间，那有没有办法在从库上，让多个SQL语句可以并行执行，而不是排队执行呢？</p>
+<p><strong>3.多库并行复制：异步复制之 GTID 复制</strong></p>
+<p>怎么实现并行复制呢？设想一下，如果3条语句是在三个数据库执行，操作各自的数据库，是不是肯定不会产生并发的问题呢？执行的顺序也没有要求。当然是，所以如果是操作三个数据库，这三个数据库的从库的SQL线程可以并发执行。这是MySQL5.6版本里面支持的多库并行复制。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201103184506718.png#pic_center" alt="在这里插入图片描述"><br>但是在大部分的情况下，我们都是单库多表的情况，在一个数据库里面怎么实现并行复制呢？或者说，我们知道，数据库本身就是支持多个事务同时操作的；为什么这些事务在主库上面可以并行执行，却不会出现问题呢？</p>
+<p>因为他们本身就是互相不干扰的，比如这些事务是操作不同的表，或者操作不同的行，不存在资源的竞争和数据的干扰。那在主库上并行执行的事务，在从库上肯定也是可以并行执行，是不是？比如在master上有三个事务同时分别操作三张表，这三个事务是不是在slave上面也可以并行执行呢？ </p>
+<p>所以，我们可以把那些在主库上并行执行的事务，分为一个组，并且给他们编号，这一个组的事务在从库上面也可以并行执行。这个编号，我们把它叫做 <strong>GTID</strong>（GlobalTransaction Identifiers），这种主从复制的方式，我们把它叫做基于GTID的复制。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201103211104617.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>如果我们要使用GTID复制，我们可以通过修改配置参数打开它，默认是关闭的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show global variables like &apos;gtid_mode&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>无论是优化master和slave的连接方式，还是让从库可以并行执行SQL，都是从数据库的层面去解决主从复制延迟的问题。</p>
+<p><br>除了数据库本身的层面之外，在应用层面，我们也有一些减少主从同步延迟的方法。我们在做了主从复制之后，如果单个 master 节点或者单张表存储的数据过大的时候，比如一张表有上亿的数据，单表的查询性能还是会下降，我们要进一步对单台数据库节点的数据分型拆分，这个就是分库分表。</p>
+</blockquote>
+<h3 id="2-3-分库分表"><a href="#2-3-分库分表" class="headerlink" title="2.3 分库分表"></a>2.3 分库分表</h3><blockquote>
+<p>垂直分库，减少并发压力。水平分表，解决存储瓶颈。</p>
+</blockquote>
+<ul>
+<li>垂直分库的做法，把一个数据库按照业务拆分成不同的数据库：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20201103212038115.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ul>
+<li>水平分库分表的做法，把单张表的数据按照一定的规则分布到多个数据库。</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20201103213541683.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<hr>
+<p>通过主从或者分库分表可以减少单个数据库节点的访问压力和存储压力，达到提升数据库性能的目的，但是如果master节点挂了，怎么办？所以，高可用（High Available）也是高性能的基础。</p>
+<p><strong>=&gt; 实现高可用的方案</strong></p>
+<ol>
+<li>主从复制：传统的HAProxy + keepalived的方案，基于主从复制。 </li>
+<li>NDB Cluster：基于NDB集群存储引擎的MySQL Cluster。<a href="https://dev.mysql.com/doc/mysql-cluster-excerpt/5.7/en/mysql-cluster-overview.html" target="_blank" rel="noopener">参考链接</a>..<br><img src="https://img-blog.csdnimg.cn/2020110321414515.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
+<li>Galera：一种多主同步复制的集群方案。<br><img src="https://img-blog.csdnimg.cn/20201103214216437.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
+<li><p>MHA/MMM：MMM（Master-Master replication manager for MySQL），一种多主的高可用架构，是一个日本人开发的，像美团这样的公司早期也有大量使用MMM。MHA（MySQL Master High Available）。</p>
+<p> MMM和MHA都是对外提供一个虚拟IP，并且监控主节点和从节点，当主节点发生故障的时候，需要把一个从节点提升为主节点，并且把从节点里面比主节点缺少的数据补上，把VIP指向新的主节点。 <a href="https://tech.meituan.com/2017/06/29/database-availability-architecture.html" target="_blank" rel="noopener">参考链接…</a></p>
+</li>
+<li><p>MGR：MySQL 5.7.17 版本推出的 InnoDB Cluster，也叫 MySQL Group Replicatioin（MGR），这个套件里面包括了mysql shell 和 mysql-route。<a href="https://dev.mysql.com/doc/refman/5.7/en/group-replication.html" target="_blank" rel="noopener">参考链接1</a>，<a href="https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html" target="_blank" rel="noopener">参考链接2</a></p>
 </li>
 </ol>
-<p><img src="https://img-blog.csdnimg.cn/2020110323092670.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>5.7E-5，小数点左移5位，代表0.000057秒。也可以根据ID查看执行详细信息，在后面带上for query + ID。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show profile for query 1;</span><br></pre></td></tr></table></figure>
-<p>除了慢日志和show profile，如果要分析出当前数据库中执行的慢的SQL，还可以通过查看运行线程状态和服务器运行信息、存储引擎信息来分析。</p>
-<h2 id="3-其他系统命令"><a href="#3-其他系统命令" class="headerlink" title="3.其他系统命令"></a>3.其他系统命令</h2><h3 id="3-1-查看运行线程：show-processlist"><a href="#3-1-查看运行线程：show-processlist" class="headerlink" title="3.1 查看运行线程：show processlist"></a>3.1 查看运行线程：<a href="https://dev.mysql.com/doc/refman/5.7/en/show-processlist.html" target="_blank" rel="noopener">show processlist</a></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show processlist;</span><br></pre></td></tr></table></figure>
-<p>这是很重要的一个命令，用于显示用户运行线程。可以根据id号kill线程。也可以查表，效果一样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from information_schema.processlist;</span><br></pre></td></tr></table></figure></p>
-<p><img src="https://img-blog.csdnimg.cn/20201103231618955.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<table>
-<thead>
-<tr>
-<th>列</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Id</td>
-<td>线程的唯一标志，可以根据它 kill 线程</td>
-</tr>
-<tr>
-<td>User</td>
-<td>启动这个线程的用户，普通用户只能看到自己的线程</td>
-</tr>
-<tr>
-<td>Host</td>
-<td>哪个 IP 端口发起的连接</td>
-</tr>
-<tr>
-<td>db</td>
-<td>操作的数据库</td>
-</tr>
-<tr>
-<td>Command</td>
-<td>线程的命令 <a href="https://dev.mysql.com/doc/refman/5.7/en/thread-commands.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/thread-commands.html</a></td>
-</tr>
-<tr>
-<td>Time</td>
-<td>操作持续时间，单位秒</td>
-</tr>
-<tr>
-<td>State</td>
-<td>线程状态，比如查询可能有 copyingtotmptable，Sortingresult，Sendingdata <a href="https://dev.mysql.com/doc/refman/5.7/en/general-thread-states.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/general-thread-states.html</a></td>
-</tr>
-<tr>
-<td>Info</td>
-<td>SQL 语句的前 100 个字符，如果要查看完整的 SQL 语句，用 SHOW FULL PROCESSLIST</td>
-</tr>
-</tbody>
-</table>
-<h3 id="3-2-服务器运行状态：show-status"><a href="#3-2-服务器运行状态：show-status" class="headerlink" title="3.2 服务器运行状态：show status"></a>3.2 服务器运行状态：show status</h3><p>SHOW STATUS 用于查看 MySQL 服务器运行状态（重启后会清空），有 session 和 global 两种作用域，格式：参数-值。可以用like带通配符过滤。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW GLOBAL STATUS LIKE &apos;com_select&apos;;-- 查看 select 次数</span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/20201103231947669.png#pic_center" alt="在这里插入图片描述"></p>
-<h3 id="3-3-存储引擎运行信息：show-engine"><a href="#3-3-存储引擎运行信息：show-engine" class="headerlink" title="3.3 存储引擎运行信息：show engine "></a>3.3 存储引擎运行信息：<a href="https://dev.mysql.com/doc/refman/5.7/en/show-engine.html" target="_blank" rel="noopener">show engine </a></h3><p>show engine用来显示存储引擎的当前运行信息，包括事务持有的表锁、行锁信息；事务的锁等待情况；线程信号量等待；文件IO请求；buffer pool统计信息。</p>
-<p>例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show engine innodb status;</span><br></pre></td></tr></table></figure>
-<p>如果需要将监控信息输出到错误信息error log中（15秒钟一次），可以开启输出。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;innodb_status_output%&apos;; -- 开启输出：</span><br><span class="line">SET GLOBAL innodb_status_output=ON; </span><br><span class="line">SET GLOBALinnodb_status_output_locks=ON;</span><br></pre></td></tr></table></figure>
-<p>我们现在已经知道了这么多分析服务器状态、存储引擎状态、线程运行信息的命令，如果让你去写一个数据库监控系统，你会怎么做？其实很多开源的慢查询日志监控工具，他们的原理其实也都是读取的系统的变量和状态。现在我们已经知道哪些SQL慢了，为什么慢呢？慢在哪里？</p>
-<p>MySQL提供了一个执行计划的工具（优化器最终生成的就是一个执行计划），其他数据库，例如Oracle也有类似的功能。通过EXPLAIN 我们可以模拟优化器执行SQL 查询语句的过程，来知道 MySQL 是怎么处理一条SQL语句的。通过这种方式我们可以分析语句或者表的性能瓶颈。关于EXPLAIN请看<a href>下一篇</a>..</p>
-<h2 id="4-SQL优化建议"><a href="#4-SQL优化建议" class="headerlink" title="4.SQL优化建议"></a>4.SQL优化建议</h2><p>当我们的SQL语句比较复杂，有多个关联和子查询的时候，就要分析SQL语句有没有改写的方法。举个简单的例子，一模一样的数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-- 大偏移量的 limit</span><br><span class="line">SELECT * FROM user_innodb LIMIT 900000,10;</span><br><span class="line">​</span><br><span class="line">-- 改成先过滤 ID，再 limit </span><br><span class="line">SELECT * FROM user_innodb WHERE id&gt;=900000 LIMIT 10;</span><br></pre></td></tr></table></figure></p>
-<p>对于具体的 SQL 语句的优化，MySQL官网也提供了很多建议。所以，下面就简单列举工作中可能会用到的几条。</p>
-<h3 id="4-1-使用预编译"><a href="#4-1-使用预编译" class="headerlink" title="4.1 使用预编译"></a>4.1 使用预编译</h3><p>程序中通常是根据用户的输入来动态执行SQL，这时应该尽量使用参数化SQL,这样不仅可以避免SQL注入漏洞 攻击，最重要数据库会对这些参数化SQL进行预编译，这样第一次执行的时候DBMS会为这个SQL语句进行查询优化 并且执行预编译，这样以后再执行这个SQL的时候就直接使用预编译的结果，这样可以大大提高执行的速度。</p>
-<h3 id="4-2-使用表别名"><a href="#4-2-使用表别名" class="headerlink" title="4.2 使用表别名"></a>4.2 使用表别名</h3><p>当在SQL语句中连接多个表时，请使用表的别名并把别名前缀于每个列名上。这样就可以减少解析的时间并减少哪些有列名歧义引起的语法错误。</p>
-<h3 id="4-3-多条SQL语句压缩到一句SQL中"><a href="#4-3-多条SQL语句压缩到一句SQL中" class="headerlink" title="4.3  多条SQL语句压缩到一句SQL中"></a>4.3  多条SQL语句压缩到一句SQL中</h3><p>每次执行SQL的时候都要建立网络连接、进行权限校验、进行SQL语句的查询优化、发送执行结果，这个过程是非常耗时的，因此应该尽量避免过多的执行SQL语句，能够压缩到一句SQL执行的语句就不要用多条来执行。</p>
-<h3 id="4-4-关于in和exists"><a href="#4-4-关于in和exists" class="headerlink" title="4.4 关于in和exists"></a>4.4 关于in和exists</h3><p>在A表中查出所有B表的记录，<code>in</code> 和 <code>exists</code>（注：<code>exists</code>返回的是true / false）都可以实现，但一般需要根据两表大小关系判断具体使用哪个：</p>
-<ul>
-<li>A &gt; B : <code>select * from A where id in (select id from B)</code></li>
-<li>A &lt; B : <code>select * from A where exists(select 1 from B.id = A.id)</code></li>
-</ul>
-<h3 id="4-5-union-all-替换-union"><a href="#4-5-union-all-替换-union" class="headerlink" title="4.5 union all 替换 union"></a>4.5 union all 替换 union</h3><p>当SQL语句需要union两个查询结果集合时，即使检索结果中不会有重复的记录，如果使用union这两个结果集，同样会尝试进行合并，然后在输出最终结果前进行排序。</p>
-<p>因此如果可以判断检索结果中不会有重复的记录时候，应该用union all，这样效率就会因此得到提高。</p>
-<h3 id="4-6-where-替换-having"><a href="#4-6-where-替换-having" class="headerlink" title="4.6 where 替换 having"></a>4.6 where 替换 having</h3><p>避免使用HAVING字句，因为HAVING只会在检索出所有记录之后才对结果集进行过滤，而where则是在聚合前刷选记录，如果能通过where字句限制记录的数目，那就能减少这方面的开销。</p>
-<p>HAVING中的条件一般用于聚合函数的过滤，除此之外，应该将条件写在where字句中。</p>
-<h3 id="4-7-只在必要的情况下才使用事务begin-transaction"><a href="#4-7-只在必要的情况下才使用事务begin-transaction" class="headerlink" title="4.7 只在必要的情况下才使用事务begin transaction"></a>4.7 只在必要的情况下才使用事务begin transaction</h3><p>SQL Server中<strong>一句SQL语句默认就是一个事务</strong>，在该语句执行完成后也是默认commit的。其实，这就是begin tran的一个最小化的形式，好比在每句语句开头隐含了一个begin tran，结束时隐含了一个commit。 </p>
-<p>有些情况下，我们需要显式声明begin tran，比如做“插、删、改”操作需要同时修改几个表，要求要么几个表都修改成功，要么都不成功。begin tran 可以起到这样的作用，它可以把若干SQL语句套在一起执行，最后再一起commit。 好处是保证了数据的一致性，但任何事情都不是完美无缺的。Begin tran付出的代价是在提交之前，所有SQL语句锁住的资源都不能释放，直到commit掉。 </p>
-<p>可见，如果Begin tran套住的SQL语句太多，那数据库的性能就糟糕了。在该大事务提交之前，必然会阻塞别的语句，造成block很多。 </p>
-<p>Begin tran使用的原则是，在保证数据一致性的前提下，begin tran 套住的SQL语句越少越好！有些情况下可以采用触发器同步数据，不一定要用begin tran。</p>
-<h3 id="4-8-考虑使用“临时表”暂存中间结果"><a href="#4-8-考虑使用“临时表”暂存中间结果" class="headerlink" title="4.8 考虑使用“临时表”暂存中间结果"></a>4.8 考虑使用“临时表”暂存中间结果</h3><p>简化SQL语句的重要方法就是采用临时表暂存中间结果，但是，临时表的好处远远不止这些，将临时结果暂存在临时表，后面的查询就在tempdb中了，这可以避免程序中多次扫描主表，也大大减少了程序执行中“共享锁”阻塞“更新锁”，减少了阻塞，提高了并发性能。但是也得避免频繁创建和删除临时表，以减少系统表资源的消耗。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201103214640917.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt=","></p>
+<blockquote>
+<p>总结一下：高可用HA方案需要解决的问题都是当一个master节点宕机的时候，如何提升一个数据最新的slave成为master。如果同时运行多个master，又必须要解决master之间数据复制，以及对于客户端来说连接路由的问题。不同的方案，实施难度不一样，运维管理的成本也不一样。</p>
+</blockquote>
+<p>以上是架构层面的优化，可以用缓存，主从，分库分表。</p>
+<p>执行一条查询语句的第三步是解析器，词法和语法分析，主要保证语句的正确性，语句不出错就没问题。由Sever自己处理，跳过。第四步是优化器，那这里有什么数据库优化的道道呢？请看<a href>下一篇</a>…</p>
 
       
     </div>
@@ -602,7 +602,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://yzhblog.work/posts/81e16d68.html" title="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">https://yzhblog.work/posts/81e16d68.html</a>
+    <a href="https://yzhblog.work/posts/578f0463.html" title="【MySQL】性能调优（一）：建立连接。配置优化及架构优化">https://yzhblog.work/posts/578f0463.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>许可协议： </strong>
@@ -632,8 +632,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/578f0463.html" rel="next" title="【MySQL】性能调优（一）：建立连接。配置优化及架构优化">
-                <i class="fa fa-chevron-left"></i> 【MySQL】性能调优（一）：建立连接。配置优化及架构优化
+              <a href="/posts/2eac1fe9.html" rel="next" title="【MySQL】事务与锁（四）：并发控制方案（LBCC、MVCC）及死锁问题分析">
+                <i class="fa fa-chevron-left"></i> 【MySQL】事务与锁（四）：并发控制方案（LBCC、MVCC）及死锁问题分析
               </a>
             
           </div>
@@ -642,8 +642,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/posts/9155ad63.html" rel="prev" title="【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解">
-                【MySQL】性能调优（三）：执行引擎。EXPLAIN执行计划详解 <i class="fa fa-chevron-right"></i>
+              <a href="/posts/81e16d68.html" rel="prev" title="【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议">
+                【MySQL】性能调优（二）：查询优化器。慢查询日志(slow query log)及SQL优化建议 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -852,7 +852,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-开启慢日志"><span class="nav-text">1.开启慢日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-慢日志分析"><span class="nav-text">2.慢日志分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-日志内容"><span class="nav-text">2.1 日志内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-分析工具：mysqldumpslow"><span class="nav-text">2.2 分析工具：mysqldumpslow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-分析工具：SHOW-PROFILE"><span class="nav-text">2.3 分析工具：SHOW PROFILE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-其他系统命令"><span class="nav-text">3.其他系统命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-查看运行线程：show-processlist"><span class="nav-text">3.1 查看运行线程：show processlist</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-服务器运行状态：show-status"><span class="nav-text">3.2 服务器运行状态：show status</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-存储引擎运行信息：show-engine"><span class="nav-text">3.3 存储引擎运行信息：show engine </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-SQL优化建议"><span class="nav-text">4.SQL优化建议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-使用预编译"><span class="nav-text">4.1 使用预编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-使用表别名"><span class="nav-text">4.2 使用表别名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-多条SQL语句压缩到一句SQL中"><span class="nav-text">4.3  多条SQL语句压缩到一句SQL中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-关于in和exists"><span class="nav-text">4.4 关于in和exists</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-union-all-替换-union"><span class="nav-text">4.5 union all 替换 union</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-where-替换-having"><span class="nav-text">4.6 where 替换 having</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-只在必要的情况下才使用事务begin-transaction"><span class="nav-text">4.7 只在必要的情况下才使用事务begin transaction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-考虑使用“临时表”暂存中间结果"><span class="nav-text">4.8 考虑使用“临时表”暂存中间结果</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-配置优化"><span class="nav-text">1.配置优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-服务端：配置连接数"><span class="nav-text">1.1 服务端：配置连接数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-客户端：使用连接池"><span class="nav-text">1.2 客户端：使用连接池</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-架构优化"><span class="nav-text">2.架构优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-引入缓存"><span class="nav-text">2.1 引入缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-主从复制"><span class="nav-text">2.2 主从复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-分库分表"><span class="nav-text">2.3 分库分表</span></a></li></ol></li></ol></div>
             
 
           </div>
