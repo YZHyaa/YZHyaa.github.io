@@ -104,7 +104,7 @@
 <meta property="og:image" content="https://img-service.csdnimg.cn/img_convert/4fdebbbbb595dd8d422e53e6f61a588a.png">
 <meta property="og:image" content="https://img-service.csdnimg.cn/img_convert/52f16da0876cf0deacf681614e3b9af7.png">
 <meta property="og:image" content="https://img-service.csdnimg.cn/img_convert/347aa44472a7376dd689b9bee62dd022.png">
-<meta property="og:updated_time" content="2020-11-25T10:39:56.125Z">
+<meta property="og:updated_time" content="2020-11-26T18:03:24.355Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【Java并发编程】操作系统基础（三）：进程调度">
 <meta name="twitter:description" content="1.调度时机 在创建一个新进程之后，需要决定是运行父进程还是运行子进程。由于这两种进程都处于就绪状态，所以这是一种正常的调度决策，可以任意决定。 在一个进程退出时必须做出调度决策。一个进程不再运行，所以必须从就绪进程集中选择另外某个进程。如果没有就绪的进程，通常会运行一个系统提供的空闲进程。 当一个进程在阻塞I/O和信号量上或由于其他原因阻塞时，必须选择另一个进程运行。 在一个I/O中断发生时，必">
@@ -406,7 +406,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.8k
+                  3.1k
                 </span>
               
 
@@ -422,7 +422,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  9
+                  10
                 </span>
               
             </div>
@@ -453,6 +453,9 @@
 <a id="more"></a>
 <h2 id="2-调度模型"><a href="#2-调度模型" class="headerlink" title="2.调度模型"></a>2.调度模型</h2><h3 id="2-1-抢占式"><a href="#2-1-抢占式" class="headerlink" title="2.1 抢占式"></a>2.1 抢占式</h3><p>线程在拥有CPU时可以被CPU结束或者被别的线程将CPU抢占过去，一般是通过时间片来决定是否抢占</p>
 <p>抢占式调度指的是每条<strong>线程执行的时间、线程的切换都由系统控制</strong>，系统控制指的是在系统某种运行机制下，可能每条线程都分同样的执行时间片，也可能是某些线程执行的时间片较长，甚至某些线程得不到执行的时间片。如果在该时段结束时，该进程仍在运行，它就被挂起，而调度程序挑选另一个进程运行（如果存在一个就绪进程）。</p>
+<blockquote>
+<p>举个例子，比如调度机采用的是抢占式短作业优先算法，此刻作业A（PS：A剩余执行时间为10s）正在执行，现在有另一个作业B（PS：B的执行时间为3s）来了，那么调度机就会将作业A中断并挂起，然后让作业B执行，待B执行完了再执行A的剩余10s。相当于作业B抢占了作业A的CPU。</p>
+</blockquote>
 <p>在这种机制下，一个线程的堵塞不会导致整个进程堵塞。</p>
 <ul>
 <li>时间片小：假如进程切换需要5毫秒，最大值为20毫秒，那么在做完20毫秒有用的工作之后，CPU将花费5毫秒来进行进程切换，在100毫秒内CPU时间就有20%被浪费在了进程切换上。</li>
@@ -489,14 +492,14 @@
 </ul>
 <p>有必要指出，只有在所有作业都可同时运行的情形下，最短作业优先算法才是最优化的。作为一个反例，考虑5个作业，从A到E，运行时间分别是2、4、1、1和1。它们的到达时间是0、0、3、3和3。 开始只能选择A或B，因为其他三个作业还没有到达。使用最短作业优先，将按照A、B、C、D、E的顺序运行作业，其平均等待时间是4.6。但是，按照B、C、D、E、A的顺序运行作业，其平均等待时间则是4.4。</p>
 <h3 id="3-3-最高响应比优先（HRP、非抢占式）"><a href="#3-3-最高响应比优先（HRP、非抢占式）" class="headerlink" title="3.3 最高响应比优先（HRP、非抢占式）"></a>3.3 最高响应比优先（HRP、非抢占式）</h3><ul>
-<li>进程开始获取CPU一直<strong>运行直到完成或由于某事件被阻塞放弃CPU</strong>，运行结束从当前就绪队列<strong>选择最高响应比的进程</strong>投入运行。<ul>
-<li>响应比=（响应时间+运行时间）/运行时间</li>
+<li>进程开始获取CPU一直运行直到完成或由于某事件被阻塞放弃CPU，运行结束从当前就绪队列<strong>选择最高响应比的进程</strong>投入运行。<ul>
+<li>响应比 =（等待时间+运行时间）/运行时间 = 1 + 等待时间 / 运行时间（PS：等待时间是指，进程到达时可能需要等待前一进程先执行完）</li>
 <li>在响应时间固定的情况下，利于短进程。长进程随着等待时间变长，响应比会提高，因此长进程也能在足够长的时间被调度。</li>
 </ul>
 </li>
-<li>优缺点：利用短进程、长进程不会被饿死。</li>
+<li>优缺点：利于短进程、长进程不会被饿死。</li>
 </ul>
-<h3 id="3-4-最短剩余时间（SRT、抢占）"><a href="#3-4-最短剩余时间（SRT、抢占）" class="headerlink" title="3.4 最短剩余时间（SRT、抢占）"></a>3.4 最短剩余时间（SRT、抢占）</h3><ul>
+<h3 id="3-4-最短剩余时间（SRT、抢占式）"><a href="#3-4-最短剩余时间（SRT、抢占式）" class="headerlink" title="3.4 最短剩余时间（SRT、抢占式）"></a>3.4 最短剩余时间（SRT、抢占式）</h3><ul>
 <li>使用这个算法，调度程序总是<strong>选择剩余运行时间最短</strong>的那个进程运行。<ul>
 <li>有关的运行时间必须提前掌握。当一个新的作业到达时，其整个时间同当前进程剩余时间做比较。</li>
 <li>如果新的进程比当前运行进程需要更少的时间，当前进程就被挂起，而运行新的进程。</li>
@@ -504,8 +507,7 @@
 </li>
 <li>优缺点：利于短进程，开销大，不利于长进程。</li>
 </ul>
-<p>3.5 轮转调度</p>
-<ul>
+<h3 id="3-5-轮转调度（RR、抢占式）"><a href="#3-5-轮转调度（RR、抢占式）" class="headerlink" title="3.5 轮转调度（RR、抢占式）"></a>3.5 轮转调度（RR、抢占式）</h3><ul>
 <li>每个进程被分配一个时间段，称为<strong>时间片</strong>，即允许该进程在该时间段中运行。<ul>
 <li>如果在时间片结束时该进程还在运行，则将剥夺CPU并分配给另一个进程。</li>
 <li>如果该进程在时间片结束前阻塞或结束，则CPU立即进行切换。</li>
@@ -514,14 +516,17 @@
 </li>
 </ul>
 <h3 id="3-6-优先级调度（Java）"><a href="#3-6-优先级调度（Java）" class="headerlink" title="3.6 优先级调度（Java）"></a>3.6 优先级调度（Java）</h3><ul>
-<li><p><strong>轮转调度做了一个隐含的假设，即所有的进程同等重要</strong>，而拥有和操作多用户计算机系统的人对此有不同的看法。这种将外部因素考虑在内的需要就导致了优先级调度。其基本思想很清楚：<strong>每个进程被赋予一个优先级，允许优先级最高的可运行进程先运行</strong>。</p>
-<ul>
+<li><strong>轮转调度做了一个隐含的假设，即所有的进程同等重要</strong>，而拥有和操作多用户计算机系统的人对此有不同的看法。这种将外部因素考虑在内的需要就导致了优先级调度。其基本思想很清楚：<strong>每个进程被赋予一个优先级，允许优先级最高的可运行进程先运行</strong>。<ul>
 <li>为了防止高优先级进程一直获取CPU，调度程序可以在每个时钟滴答（即每个时钟中断）<strong>降低当前进程的优先级</strong>。如果这个动作导致该进程的优先级低于次高优先级的进程，则进行进程切换。</li>
 <li>每个进程可以被赋予一个允许运行的最大时间片，当这个时间片用完，下一个次高优先级的进程获得机会运行。<br>在有些操作系统内中，优先级越高的进（线）程会分到更大的时间片<br>可以很方便地将一组进程按优先级分成若干类，并且在各类之间采用优先级调度，而在各类进程的内部采用轮转调度。如图：<br><img src="https://img-service.csdnimg.cn/img_convert/347aa44472a7376dd689b9bee62dd022.png" alt="img"></li>
 </ul>
 </li>
-<li><p>其调度算法如下</p>
+</ul>
+<blockquote>
+<p>注意，执行进程不一定是可运行进程中优先级最高的的。因为如果采用非抢占式调度，某个进程正在执行的过程中，来了一个优先权更高的进程进入就绪队列，由于不进行CPU抢占，则执行进程便不再是进程中优先级最高的。</p>
+</blockquote>
 <ul>
+<li>其调度算法如下<ul>
 <li>只要存在优先级为第4类的可运行进程，就按照轮转法为每个进程运行一个时间片，此时不理会较低先级的进程</li>
 <li>若第4类进程为空，则按照轮转法运行第3类进程。</li>
 <li>若第4类和第3类均为空，则按轮转法运行第2类进程。</li>
@@ -582,8 +587,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/c1c76b7c.html" rel="next" title="【Java并发编程】操作系统基础（一）：进程与线程&线程模型">
-                <i class="fa fa-chevron-left"></i> 【Java并发编程】操作系统基础（一）：进程与线程&线程模型
+              <a href="/posts/11e50a75.html" rel="next" title="【Java并发编程】操作系统基础（二）：内核态&用户态">
+                <i class="fa fa-chevron-left"></i> 【Java并发编程】操作系统基础（二）：内核态&用户态
               </a>
             
           </div>
@@ -592,8 +597,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/posts/11e50a75.html" rel="prev" title="【Java并发编程】操作系统基础（二）：内核态&用户态">
-                【Java并发编程】操作系统基础（二）：内核态&用户态 <i class="fa fa-chevron-right"></i>
+              <a href="/posts/126d2e82.html" rel="prev" title="【Java并发编程】操作系统基础（五）：Java线程模型&线程调度">
+                【Java并发编程】操作系统基础（五）：Java线程模型&线程调度 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -676,7 +681,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-count">222</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -802,7 +807,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-调度时机"><span class="nav-text">1.调度时机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-调度模型"><span class="nav-text">2.调度模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-抢占式"><span class="nav-text">2.1 抢占式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-非抢占式"><span class="nav-text">2.2 非抢占式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-调度策略"><span class="nav-text">3.调度策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-先来先服务（FCFS、非抢占式）"><span class="nav-text">3.1 先来先服务（FCFS、非抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-最短作业优先（SJF、非抢占式）"><span class="nav-text">3.2 最短作业优先（SJF、非抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-最高响应比优先（HRP、非抢占式）"><span class="nav-text">3.3 最高响应比优先（HRP、非抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-最短剩余时间（SRT、抢占）"><span class="nav-text">3.4 最短剩余时间（SRT、抢占）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-优先级调度（Java）"><span class="nav-text">3.6 优先级调度（Java）</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-调度时机"><span class="nav-text">1.调度时机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-调度模型"><span class="nav-text">2.调度模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-抢占式"><span class="nav-text">2.1 抢占式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-非抢占式"><span class="nav-text">2.2 非抢占式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-调度策略"><span class="nav-text">3.调度策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-先来先服务（FCFS、非抢占式）"><span class="nav-text">3.1 先来先服务（FCFS、非抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-最短作业优先（SJF、非抢占式）"><span class="nav-text">3.2 最短作业优先（SJF、非抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-最高响应比优先（HRP、非抢占式）"><span class="nav-text">3.3 最高响应比优先（HRP、非抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-最短剩余时间（SRT、抢占式）"><span class="nav-text">3.4 最短剩余时间（SRT、抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-轮转调度（RR、抢占式）"><span class="nav-text">3.5 轮转调度（RR、抢占式）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-优先级调度（Java）"><span class="nav-text">3.6 优先级调度（Java）</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -836,7 +841,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">450.3k</span>
+    <span title="Site words total count">456.1k</span>
   
 </div>
 

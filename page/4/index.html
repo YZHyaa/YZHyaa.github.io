@@ -683,7 +683,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/8420c3ae.html">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/7cfe2519.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="A minor">
@@ -702,7 +702,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/posts/8420c3ae.html" itemprop="url">【分布式事务】XOpenDTP事务模型、CAP Base理论</a></h1>
+                <a class="post-title-link" href="/posts/7cfe2519.html" itemprop="url">【分布式事务】最终一致性解决方案</a></h1>
         
 
         <div class="post-meta">
@@ -770,7 +770,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.2k
+                  930
                 </span>
               
 
@@ -786,7 +786,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  7
+                  3
                 </span>
               
             </div>
@@ -808,18 +808,19 @@
 
       
         
-          <blockquote>
-<p>在看分布式事务之前，我们必须先要清楚的知道事务是什么。事务就是把很多事情当做一件事情来处理，要么一起失败要么一起成功。特别注意一，事务的概念是对数据库而言，比如Spring的@Transactional 本质上就是封装了对数据库事务的一系列操作。关于事务更详细的内容请参考 <a href="https://blog.csdn.net/weixin_43935927/article/details/109408504" target="_blank" rel="noopener">【MySQL】事务与锁（一）：详解数据库事务及并发时可能出现的问题</a>…<br>
+          <p>对于分布式事务一般采用的都是<strong>最终一致性方案</strong>，而不是强一致性。而在使用最终一致性的方案时，一定要提到的一个概念是状态机。</p>
+<p>什么是状态机？是一种特殊的组织代码的方式，用这种方式能够确保你的对象随时都知道自己所处的状态以及所能做的操作。它也是一种用来进行对象行为建模的工具，用于描述对象在它的生命周期内所经 历的状态序列，以及如何响应来自外界的各种事件。</p>
+<p>状态机这个概念大家都不陌生，比如TCP协议的状态机。同时我们在编写相关业务逻辑的时候经常也会需要处理各种事件和状态的切换，比如switch、if/else。所以我们其实一直在跟状态机打交道，只是可能没有意识到而已。在处理一些业务逻辑比较复杂的需求时，可以先看看是否适合用一个有限状态机来描述，如果可以把业务模型抽象成一个有限状态机，那么代码就会逻辑特别清晰，结构特别规整。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/8420c3ae.html#more" rel="contents">
+            <a class="btn" href="/posts/7cfe2519.html#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
           <!--/noindex-->
         
       
-    </p></blockquote></div>
+    </div>
     
     
     
@@ -1067,7 +1068,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/7cfe2519.html">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/8420c3ae.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="A minor">
@@ -1086,7 +1087,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/posts/7cfe2519.html" itemprop="url">【分布式事务】最终一致性解决方案</a></h1>
+                <a class="post-title-link" href="/posts/8420c3ae.html" itemprop="url">【分布式事务】XOpenDTP事务模型、CAP Base理论</a></h1>
         
 
         <div class="post-meta">
@@ -1154,7 +1155,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  930
+                  2.2k
                 </span>
               
 
@@ -1170,7 +1171,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  3
+                  7
                 </span>
               
             </div>
@@ -1192,19 +1193,18 @@
 
       
         
-          <p>对于分布式事务一般采用的都是<strong>最终一致性方案</strong>，而不是强一致性。而在使用最终一致性的方案时，一定要提到的一个概念是状态机。</p>
-<p>什么是状态机？是一种特殊的组织代码的方式，用这种方式能够确保你的对象随时都知道自己所处的状态以及所能做的操作。它也是一种用来进行对象行为建模的工具，用于描述对象在它的生命周期内所经 历的状态序列，以及如何响应来自外界的各种事件。</p>
-<p>状态机这个概念大家都不陌生，比如TCP协议的状态机。同时我们在编写相关业务逻辑的时候经常也会需要处理各种事件和状态的切换，比如switch、if/else。所以我们其实一直在跟状态机打交道，只是可能没有意识到而已。在处理一些业务逻辑比较复杂的需求时，可以先看看是否适合用一个有限状态机来描述，如果可以把业务模型抽象成一个有限状态机，那么代码就会逻辑特别清晰，结构特别规整。</p>
+          <blockquote>
+<p>在看分布式事务之前，我们必须先要清楚的知道事务是什么。事务就是把很多事情当做一件事情来处理，要么一起失败要么一起成功。特别注意一，事务的概念是对数据库而言，比如Spring的@Transactional 本质上就是封装了对数据库事务的一系列操作。关于事务更详细的内容请参考 <a href="https://blog.csdn.net/weixin_43935927/article/details/109408504" target="_blank" rel="noopener">【MySQL】事务与锁（一）：详解数据库事务及并发时可能出现的问题</a>…<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/7cfe2519.html#more" rel="contents">
+            <a class="btn" href="/posts/8420c3ae.html#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
           <!--/noindex-->
         
       
-    </div>
+    </p></blockquote></div>
     
     
     
@@ -2032,6 +2032,193 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/56906f54.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/posts/56906f54.html" itemprop="url">【Zookeeper】应用场景：实现Leader选举（LeaderLatch与LeaderSelector）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-24T00:00:00+08:00">
+                2020-06-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/服务治理/" itemprop="url" rel="index">
+                    <span itemprop="name">服务治理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  826
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>在分布式计算中，leader election 是很重要的一个功能， 这个选举过程是这样子的</p>
+<ol>
+<li>指派一个进程作为组织者，将任务分发给各节点。在任务开始前，哪个节点都不知道谁是 leader 或者 coordinator</li>
+<li>当选举算法开始执行后，每个节点最终会得到一个唯一的节点作为任务 leader。</li>
+<li>除此之外，选举还经常会发生在leader意外宕机的情况下，新的leader要被选举出来。 </li>
+</ol>
+<p>Curator 有两种选举 recipe（Leader Latch 和 Leader Election ）</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/posts/56906f54.html#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/a283504c.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2223,7 +2410,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/56906f54.html">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/4b7e71a5.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="A minor">
@@ -2242,7 +2429,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/posts/56906f54.html" itemprop="url">【Zookeeper】应用场景：实现Leader选举（LeaderLatch与LeaderSelector）</a></h1>
+                <a class="post-title-link" href="/posts/4b7e71a5.html" itemprop="url">【必备算法】字符串（匹配问题）：1.暴力匹配，2.Rabin-Karp，3.KMP</a></h1>
         
 
         <div class="post-meta">
@@ -2254,8 +2441,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-24T00:00:00+08:00">
-                2020-06-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-23T00:00:00+08:00">
+                2020-06-23
               </time>
             
 
@@ -2277,8 +2464,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/服务治理/" itemprop="url" rel="index">
-                    <span itemprop="name">服务治理</span>
+                  <a href="/categories/必备算法/" itemprop="url" rel="index">
+                    <span itemprop="name">必备算法</span>
                   </a>
                 </span>
 
@@ -2310,7 +2497,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  826
+                  1.3k
                 </span>
               
 
@@ -2326,7 +2513,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  3
+                  5
                 </span>
               
             </div>
@@ -2348,16 +2535,11 @@
 
       
         
-          <p>在分布式计算中，leader election 是很重要的一个功能， 这个选举过程是这样子的</p>
-<ol>
-<li>指派一个进程作为组织者，将任务分发给各节点。在任务开始前，哪个节点都不知道谁是 leader 或者 coordinator</li>
-<li>当选举算法开始执行后，每个节点最终会得到一个唯一的节点作为任务 leader。</li>
-<li>除此之外，选举还经常会发生在leader意外宕机的情况下，新的leader要被选举出来。 </li>
-</ol>
-<p>Curator 有两种选举 recipe（Leader Latch 和 Leader Election ）</p>
+          <h2 id="1-暴力匹配"><a href="#1-暴力匹配" class="headerlink" title="1.暴力匹配"></a>1.暴力匹配</h2><p>暴力匹配即列出所有子串进行比较</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">forceSearch</span><span class="params">(String txt, String pat)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 遍历内容串txt，选取起点</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, j = <span class="number">0</span>; i &lt; txt.length(); i++) &#123;</span><br><span class="line">    	<span class="comment">// 从起点开始与模式串pat对比</span></span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; pat.length(); j++) </span><br><span class="line">            <span class="keyword">if</span> (pat.charAt(j) != txt.charAt(j)) <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> (j == pat.length()) <span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/56906f54.html#more" rel="contents">
+            <a class="btn" href="/posts/4b7e71a5.html#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -2583,193 +2765,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/4b7e71a5.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="A minor">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/head.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Running | 在路上">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/4b7e71a5.html" itemprop="url">【必备算法】字符串（匹配问题）：1.暴力匹配，2.Rabin-Karp，3.KMP</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-23T00:00:00+08:00">
-                2020-06-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/必备算法/" itemprop="url" rel="index">
-                    <span itemprop="name">必备算法</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                  <span class="post-meta-divider">|</span>
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  1.3k
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  5
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="1-暴力匹配"><a href="#1-暴力匹配" class="headerlink" title="1.暴力匹配"></a>1.暴力匹配</h2><p>暴力匹配即列出所有子串进行比较</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">forceSearch</span><span class="params">(String txt, String pat)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 遍历内容串txt，选取起点</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, j = <span class="number">0</span>; i &lt; txt.length(); i++) &#123;</span><br><span class="line">    	<span class="comment">// 从起点开始与模式串pat对比</span></span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; pat.length(); j++) </span><br><span class="line">            <span class="keyword">if</span> (pat.charAt(j) != txt.charAt(j)) <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> (j == pat.length()) <span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/posts/4b7e71a5.html#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-	
-	
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2820,7 +2820,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-count">222</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2964,7 +2964,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">450.3k</span>
+    <span title="Site words total count">456.1k</span>
   
 </div>
 

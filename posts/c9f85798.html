@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="在上一篇【Git】介绍、与SVN对比、支持的通信协议 我们介绍了 Git 及它支持的通信协议，这篇我们就来看看如何使用Git。 1.Git 核心命令 git 客户端安装（无脑下一步就行）：  官方客户端： httpsd://git-scm.com/downloads  其它客户端：https://tortoisegit.org/download/    1.1 配置管理 在刚装完git的需要配置">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Git】基本使用：核心命令总结（附SourceTree）">
+<meta property="og:url" content="https://yzhblog.work/posts/c9f85798.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="在上一篇【Git】介绍、与SVN对比、支持的通信协议 我们介绍了 Git 及它支持的通信协议，这篇我们就来看看如何使用Git。 1.Git 核心命令 git 客户端安装（无脑下一步就行）：  官方客户端： httpsd://git-scm.com/downloads  其它客户端：https://tortoisegit.org/download/    1.1 配置管理 在刚装完git的需要配置">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201128213119503.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2020-11-28T13:40:51.136Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Git】基本使用：核心命令总结（附SourceTree）">
+<meta name="twitter:description" content="在上一篇【Git】介绍、与SVN对比、支持的通信协议 我们介绍了 Git 及它支持的通信协议，这篇我们就来看看如何使用Git。 1.Git 核心命令 git 客户端安装（无脑下一步就行）：  官方客户端： httpsd://git-scm.com/downloads  其它客户端：https://tortoisegit.org/download/    1.1 配置管理 在刚装完git的需要配置">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201128213119503.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/c9f85798.html">
+
+
+
+
+
+  <title>【Git】基本使用：核心命令总结（附SourceTree） | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/c9f85798.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Git】基本使用：核心命令总结（附SourceTree）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-10T00:00:00+08:00">
+                2019-02-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/项目管理/" itemprop="url" rel="index">
+                    <span itemprop="name">项目管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在上一篇<a href="https://blog.csdn.net/weixin_43935927/article/details/110290550" target="_blank" rel="noopener">【Git】介绍、与SVN对比、支持的通信协议</a> 我们介绍了 Git 及它支持的通信协议，这篇我们就来看看如何使用Git。</p>
+<h2 id="1-Git-核心命令"><a href="#1-Git-核心命令" class="headerlink" title="1.Git 核心命令"></a>1.Git 核心命令</h2><blockquote>
+<p>git 客户端安装（无脑下一步就行）：</p>
+<ul>
+<li><p>官方客户端： <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">httpsd://git-scm.com/downloads</a></p>
+</li>
+<li><p>其它客户端：<a href="https://tortoisegit.org/download/" target="_blank" rel="noopener">https://tortoisegit.org/download/</a></p>
+</li>
+</ul>
+</blockquote>
+<h3 id="1-1-配置管理"><a href="#1-1-配置管理" class="headerlink" title="1.1 配置管理"></a>1.1 配置管理</h3><blockquote>
+<p>在刚装完git的需要配置 email 和 name，然后才能使用 Git，那怎么配置呢？</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看所有配置信息</span></span><br><span class="line">git config -l</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看系统级别配置（git安装目录下etc）</span></span><br><span class="line">git config --system --list</span><br><span class="line"><span class="comment">#查看全局级别配置（当前用户之下表示的是全局级别的）</span></span><br><span class="line">git config --global --list</span><br><span class="line"><span class="comment">#查看仓库级别配置（当前仓库级别下的.git&gt;config文件）</span></span><br><span class="line">git config --<span class="built_in">local</span> --list</span><br><span class="line"></span><br><span class="line"><span class="comment">#添加配置</span></span><br><span class="line">git config --global user.name <span class="string">"yourusername"</span></span><br><span class="line">git config --global user.email <span class="string">"youremail@email.com"</span></span><br><span class="line"><span class="comment">#删除配置</span></span><br><span class="line">git config --<span class="built_in">unset</span> user.name</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注：覆盖优先级为local &gt; global &gt; system。优先读取local，其次是global，最后是system。</p>
+</blockquote>
+<h3 id="1-2-本地初始化Git仓库"><a href="#1-2-本地初始化Git仓库" class="headerlink" title="1.2 本地初始化Git仓库"></a>1.2 本地初始化Git仓库</h3><blockquote>
+<p>如何初始化一个 Git 本地仓库 ？</p>
+</blockquote>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#当前目录初始化为 git 本地仓库（在同级目录下会出现一个隐藏的.git文件）</span><br><span class="line">git init  &lt;directory&gt;</span><br><span class="line"></span><br><span class="line">#基于远程仓库克隆至本地</span><br><span class="line">git clone &lt;remote_url</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-本地添加"><a href="#1-3-本地添加" class="headerlink" title="1.3 本地添加"></a>1.3 本地添加</h3><blockquote>
+<p>如何将工作空间的文件添加到暂存区？</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加指定文件到暂存区</span></span><br><span class="line">git add &lt;fileName&gt;</span><br><span class="line"><span class="comment">#添加指定目录至暂存区</span></span><br><span class="line">git add &lt;directory&gt;</span><br><span class="line"><span class="comment">#添加所有</span></span><br><span class="line">git add -A</span><br><span class="line"></span><br><span class="line"><span class="comment">#将指定目录及子目录移除出暂存区（注：本地文件还在）</span></span><br><span class="line">git rm --cached &lt;target&gt; -r</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看提交状态。如果还未提交到暂存区的文件会标红，在暂存区的文件会标绿。</span></span><br><span class="line">git status </span><br><span class="line"></span><br><span class="line"><span class="comment">#添加勿略配置文件 .gitignore</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果我们不想让某个文件被git管理起来，所以如何让 git 忽略这个文件呢？</p>
+<p>在仓库的根目录下创建一个.gitignore 文件，写入不想让git管理的文件。两点注意</p>
+<ol>
+<li>.gitignore本身就需要忽略，所以此文件也要写进去</li>
+<li>.gitignore 文件中可以使用“#”字符开头表示注释，文件夹路径是用“/”字符，文件名可以使用通配符“<em>”，另外还可以使用“!”字符表示排除。比如 </em> .class</li>
+<li>.gitignore只能忽略那些原来没有被追踪的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未被追踪状态），然后再提交</li>
+<li>每一个文件夹沟可以创建自己的“.gitignore”文件，如果它上层的文件夹也有“.gitignore”文件，这个文件夹也会受到它的影响</li>
+</ol>
+</blockquote>
+<h3 id="1-4-本地提交"><a href="#1-4-本地提交" class="headerlink" title="1.4 本地提交"></a>1.4 本地提交</h3><blockquote>
+<p>如何将暂存区的文件提交到本地仓库？</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#提交指定文件到本地仓库</span></span><br><span class="line">git commit &lt;fileName&gt;</span><br><span class="line"><span class="comment">#全部提交</span></span><br><span class="line">git commit -a </span><br><span class="line"><span class="comment">#-m编写提交注释（注：如果在commit命令中指定了-m，那么就不会再弹出vim让写提交注释了）</span></span><br><span class="line">git commit &lt;fileName&gt; -m &lt;注释&gt;</span><br><span class="line"><span class="comment">#快捷提交至本地仓库</span></span><br><span class="line">git commit -am <span class="string">'快添加与提交全部暂存区文件'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#版本回退（这个id可以根据git log查看日志信息去找到）</span></span><br><span class="line">git reset --hard commitid</span><br></pre></td></tr></table></figure>
+<h3 id="1-5-日志管理"><a href="#1-5-日志管理" class="headerlink" title="1.5 日志管理"></a>1.5 日志管理</h3><blockquote>
+<p>如何查看我当前库的历史提交信息？</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看当前分支下所有提交日志</span></span><br><span class="line">git <span class="built_in">log</span></span><br><span class="line"><span class="comment">#查看当前分支下所有提交日志</span></span><br><span class="line">git <span class="built_in">log</span> &#123;branch&#125;</span><br><span class="line"><span class="comment"># 单行显示日志</span></span><br><span class="line">git <span class="built_in">log</span> --oneline</span><br><span class="line"><span class="comment"># 比较两个版本的区别</span></span><br><span class="line">git <span class="built_in">log</span> master..experiment</span><br><span class="line"></span><br><span class="line"><span class="comment">#以图表的方式显示提交合并网络</span></span><br><span class="line">git <span class="built_in">log</span> --pretty=format:<span class="string">'%h %s'</span> --graph</span><br></pre></td></tr></table></figure>
+<h3 id="1-7-分支管理"><a href="#1-7-分支管理" class="headerlink" title="1.7 分支管理"></a>1.7 分支管理</h3><blockquote>
+<p>如果我现在有多个开发人员，开发不同模块，都在master上写吗？</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看当前分支, -avv查看远程分支</span></span><br><span class="line">git branch [-avv]</span><br><span class="line"></span><br><span class="line"><span class="comment">#基于当前分支新建分支</span></span><br><span class="line">git branch &lt;branch name&gt;</span><br><span class="line"><span class="comment">#基于提交新建分支</span></span><br><span class="line">git branch &lt;branch name&gt; &lt;commit id&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">#切换分支</span></span><br><span class="line">git checkout &lt;branch name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">#删除分支（注：删除时必须在其他分支上）</span></span><br><span class="line">git branch -d &#123;dev&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#合并分支（比如将要将dev分支的内容合并到master分支，那么要在master分支执行该命令）</span></span><br><span class="line"><span class="comment">#注: 如果因冲突导致自动合并失败，此时 status 为mergeing 状态。需要手动修改后重新提交（commit） </span></span><br><span class="line">git merge &lt;merge target&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分支规范：</p>
+<ul>
+<li><p>master分支：主分支。保持稳定</p>
+<ul>
+<li>不允许直接往这个分支提交代码，只允许往这个分支发起 merge request</li>
+<li>只允许 release 分支和 hotfix 分支进行合流 , 所有在 Master 分支上的 Commit 应该Tag</li>
+</ul>
+</li>
+<li><p>develop分支：开发分支。相对稳定的分支，用于日常开发，包括代码优化、功能性开发。</p>
+</li>
+<li><p>feature分支：特性分支。</p>
+<ul>
+<li>从develop分支拉取，用于下个迭代版本的功能特性开发。</li>
+<li>功能开发完毕合并到develop 分支, 合并完分支后一般会删点这个Feature分支，但是我们也可以保留。</li>
+</ul>
+</li>
+<li><p>release分支：发布分支。</p>
+<ul>
+<li><p>从develop分支拉取，用于回归测试，bug修复</p>
+</li>
+<li><p>发布完成后打tag并合入master和develop， (注：一旦打了Release分支之后不要从Develop分支上合并新的改动到Release分支)</p>
+</li>
+</ul>
+</li>
+<li><p>hotfix分支：热更新分支。</p>
+<ul>
+<li><p>从develop分支拉取，用于紧急修复上线版本的问题</p>
+</li>
+<li><p>修复后打tag并合入master和develop</p>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3 id="1-8-tag-管理"><a href="#1-8-tag-管理" class="headerlink" title="1.8 tag 管理"></a>1.8 tag 管理</h3><blockquote>
+<p>Commitid不容易记住，能不能用一种比较独特的方式去记住每个版本？答：Commitid相当于IP，Tag相当于域名。</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看当前仓库的标签列表</span></span><br><span class="line">git tag</span><br><span class="line"><span class="comment">#创建分支</span></span><br><span class="line">git tag &lt;tag name&gt; &lt;branch name&gt;</span><br><span class="line"><span class="comment">#删除分支</span></span><br><span class="line">git tag -d &lt;tag name&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="1-9-远程仓库"><a href="#1-9-远程仓库" class="headerlink" title="1.9 远程仓库"></a>1.9 远程仓库</h3><blockquote>
+<p>本地仓库说完了，那如果我不同地区的人要合作开发怎么搞？答：远程仓库，GitHub或Gitee。</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看远程配置</span></span><br><span class="line">git remote [-v]</span><br><span class="line"><span class="comment">#添加远程仓库地址（注：远程仓库一般命名为origin，不同的远程仓库需要配置不同的名字; url一般多采用http协议）</span></span><br><span class="line">git remote add &lt;github name&gt; &lt;url&gt;</span><br><span class="line"><span class="comment">#删除远程地址</span></span><br><span class="line">git remote remove &lt;github name&gt; </span><br><span class="line"></span><br><span class="line"><span class="comment">#上传新分支至远程</span></span><br><span class="line">git push -u &lt;github name&gt; &lt;branch name&gt;</span><br><span class="line"><span class="comment">#将本地分支与远程建立关联</span></span><br><span class="line">git branch --track --<span class="built_in">set</span>-upstream-to=&lt;github name&gt;/&lt;remote branch&gt; &lt;<span class="built_in">local</span> branch&gt;</span><br><span class="line"><span class="comment">#直接使用git push 时只会上传的到一个远程仓库的一个分支，是上面 --track 设置的仓库和相应分支</span></span><br><span class="line">git push </span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取代码到本地</span></span><br><span class="line">git <span class="built_in">clone</span> &lt;url&gt;</span><br><span class="line">git <span class="built_in">clone</span> &lt;url&gt; &lt;filepath&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">#提取远程仓库(如果服务器有修改，不会到本地)</span></span><br><span class="line">git fetch</span><br><span class="line"><span class="comment">#合并冲突(如果只是本地或远程一端修改的话，就不会冲突)</span></span><br><span class="line">git merge</span><br><span class="line"><span class="comment"># git pull(更新拉取) = git fetch + git merge</span></span><br><span class="line">git pull &lt;url&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>无论是推送还是拉代码，需要有这样一个权限，也就是说你目前使用的这台电脑是否安全，如果不安全，人家不会让你去推送，而github采用的是RAS加密方式通讯：</p>
+<ol>
+<li><p>在本地中生成一个 ssh key。<code>ssh-keygen -t rsa -C youremail.com</code>，输入后一直回车即可完成。</p>
+</li>
+<li><p>把这个key告诉github/码云。Settings -&gt; SSH and GPG keys –&gt; New SSH key –&gt; 将公钥粘贴并保存</p>
+</li>
+</ol>
+</blockquote>
+<p>把常用命令再画个图来总结一下：<br><img src="https://img-blog.csdnimg.cn/20201128213119503.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="2-工具使用-Git"><a href="#2-工具使用-Git" class="headerlink" title="2.工具使用 Git"></a>2.工具使用 Git</h2><p>一般我们在实际开发更多是用现成IDE自带的GIT工具或者图形化工具去操作Git</p>
+<ul>
+<li>IDEA操作GIT：<a href="https://juejin.cn/post/6844903926576185358" target="_blank" rel="noopener">IDEA中的Git操作，看这一篇就够了！</a></li>
+<li>可视化工具 SourceTree：这里放上我自己用的破解版（链接：<a href="https://pan.baidu.com/s/1i82Fkeb5ZzuLtdarWSlVDw" target="_blank" rel="noopener">https://pan.baidu.com/s/1i82Fkeb5ZzuLtdarWSlVDw</a> 提取码：rubp）</li>
+</ul>
+<blockquote>
+<p>后面博主有时间了会再出一篇搭建 Git 私服的教程（先挖个坑）…</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/c9f85798.html" title="【Git】基本使用：核心命令总结（附SourceTree）">https://yzhblog.work/posts/c9f85798.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/a22183ed.html" rel="next" title="【数据结构】数组特性浅析">
+                <i class="fa fa-chevron-left"></i> 【数据结构】数组特性浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/be1e0ff5.html" rel="prev" title="【数据结构】二叉树：LeetCode题（三）226. 翻转二叉树，104.二叉树的最大深度，111.二叉树的最小深度">
+                【数据结构】二叉树：LeetCode题（三）226. 翻转二叉树，104.二叉树的最大深度，111.二叉树的最小深度 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">222</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Git-核心命令"><span class="nav-text">1.Git 核心命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-配置管理"><span class="nav-text">1.1 配置管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-本地初始化Git仓库"><span class="nav-text">1.2 本地初始化Git仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-本地添加"><span class="nav-text">1.3 本地添加</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-本地提交"><span class="nav-text">1.4 本地提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-日志管理"><span class="nav-text">1.5 日志管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-分支管理"><span class="nav-text">1.7 分支管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-tag-管理"><span class="nav-text">1.8 tag 管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-9-远程仓库"><span class="nav-text">1.9 远程仓库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-工具使用-Git"><span class="nav-text">2.工具使用 Git</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">456.1k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

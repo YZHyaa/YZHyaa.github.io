@@ -1274,6 +1274,194 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/38221343.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/posts/38221343.html" itemprop="url">【RocketMQ】原理分析：消息的可靠性原则</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-22T00:00:00+08:00">
+                2020-08-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  663
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>在实际使用RocketMQ的时候我们并不能保证每次发送的消息都刚好能被消费者一次性正常消费成功， 可能会存在需要多次消费才能成功或者一直消费失败的情况，Broker该如何处理呢？ </p>
+<h2 id="1-消息消费端的确认机制"><a href="#1-消息消费端的确认机制" class="headerlink" title="1.消息消费端的确认机制"></a>1.消息消费端的确认机制</h2><p>RocketMQ提供了ack机制（默认是手动ack），以保证消息能够被正常消费。为了保证消息肯定消费成功，只有使用方明确表示消费成功，RocketMQ才会认为消息消费成功，然后删除消息。中途断电，抛出异常等都不会认为成功</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DefaultMQPushConsumer consumer = <span class="keyword">new</span> DefaultMQPushConsumer(<span class="string">"my_consumer_group"</span>);</span><br><span class="line">consumer.registerMessageListener((MessageListenerConcurrently) (list, consumeOrderlyContext) -&gt; &#123;</span><br><span class="line">    list.stream().forEach(messageExt -&gt; System.out.println(<span class="keyword">new</span> String(messageExt.getBody()))); </span><br><span class="line">    <span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS; <span class="comment">// 签收，即手动ack</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>所有消费者在设置监听的时候会提供一个回调，业务实现消费回调的时候</p>
+<ul>
+<li>当回调方法中返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS，RocketMQ才会认为这批消息（默认是1条）是消费完成的。</li>
+<li>如果这时候消息消费失败，例如数据库异常，余额不足扣款失败等一切业务认为消息需要重试的场景，只要返回ConsumeConcurrentlyStatus.RECONSUME_LATER，RocketMQ就会认为这批消息消费失败了 </li>
+</ul>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/posts/38221343.html#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/2ca4ccc0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1474,7 +1662,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/38221343.html">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/4731858c.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="A minor">
@@ -1493,7 +1681,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/posts/38221343.html" itemprop="url">【RocketMQ】原理分析：消息的可靠性原则</a></h1>
+                <a class="post-title-link" href="/posts/4731858c.html" itemprop="url">【RocketMQ】原理分析：Broker集群模式、队列分区</a></h1>
         
 
         <div class="post-meta">
@@ -1505,8 +1693,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-22T00:00:00+08:00">
-                2020-08-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-21T00:00:00+08:00">
+                2020-08-21
               </time>
             
 
@@ -1561,7 +1749,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  663
+                  1.3k
                 </span>
               
 
@@ -1577,7 +1765,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  2
+                  4
                 </span>
               
             </div>
@@ -1599,17 +1787,16 @@
 
       
         
-          <p>在实际使用RocketMQ的时候我们并不能保证每次发送的消息都刚好能被消费者一次性正常消费成功， 可能会存在需要多次消费才能成功或者一直消费失败的情况，Broker该如何处理呢？ </p>
-<h2 id="1-消息消费端的确认机制"><a href="#1-消息消费端的确认机制" class="headerlink" title="1.消息消费端的确认机制"></a>1.消息消费端的确认机制</h2><p>RocketMQ提供了ack机制（默认是手动ack），以保证消息能够被正常消费。为了保证消息肯定消费成功，只有使用方明确表示消费成功，RocketMQ才会认为消息消费成功，然后删除消息。中途断电，抛出异常等都不会认为成功</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DefaultMQPushConsumer consumer = <span class="keyword">new</span> DefaultMQPushConsumer(<span class="string">"my_consumer_group"</span>);</span><br><span class="line">consumer.registerMessageListener((MessageListenerConcurrently) (list, consumeOrderlyContext) -&gt; &#123;</span><br><span class="line">    list.stream().forEach(messageExt -&gt; System.out.println(<span class="keyword">new</span> String(messageExt.getBody()))); </span><br><span class="line">    <span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS; <span class="comment">// 签收，即手动ack</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>所有消费者在设置监听的时候会提供一个回调，业务实现消费回调的时候</p>
-<ul>
-<li>当回调方法中返回 ConsumeConcurrentlyStatus.CONSUME_SUCCESS，RocketMQ才会认为这批消息（默认是1条）是消费完成的。</li>
-<li>如果这时候消息消费失败，例如数据库异常，余额不足扣款失败等一切业务认为消息需要重试的场景，只要返回ConsumeConcurrentlyStatus.RECONSUME_LATER，RocketMQ就会认为这批消息消费失败了 </li>
-</ul>
+          <h2 id="1-Broker集群模式（宏观）"><a href="#1-Broker集群模式（宏观）" class="headerlink" title="1.Broker集群模式（宏观）"></a>1.Broker集群模式（宏观）</h2><p>RocketMQ天生对集群的支持非常友好，天然支持高可用，它可以支持<strong>多主多从</strong>的部署架构，这也是和kafka大区别之一。</p>
+<p><img src="https://img-blog.csdnimg.cn/2020111819163045.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>那为什么要将这么多broker组织成多主多从，而不是采用一主多从然后主节点down机后再选举啊？因为。。。RocketMQ中并没有master选举功能，在RocketMQ集群中，1台机器只能要么是Master，要么是Slave，这个在初始的机器配置里面，就定死了。不会像kafka那样存在master动态选举的功能，所以通过配置多个master节点来保证rocketMQ的高可用。</p>
+<blockquote>
+<p>其中Master的broker id = 0，Slave 的broker id &gt; 0。 有点类似于mysql的主从概念，master挂了以后，slave仍然可以提供读服务，但是由于有多主的存在，当一个master挂了以后，可以写到其他的master上。 </p>
+</blockquote>
+<p>和所有的集群角色定位一样，master节点负责接受事务请求、slave节点只负责接收读请求，并且接收master同步过来的数据和slave保持一致。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/38221343.html#more" rel="contents">
+            <a class="btn" href="/posts/4731858c.html#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -2033,7 +2220,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/4731858c.html">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/1cdc2110.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="A minor">
@@ -2052,7 +2239,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/posts/4731858c.html" itemprop="url">【RocketMQ】原理分析：Broker集群模式、队列分区</a></h1>
+                <a class="post-title-link" href="/posts/1cdc2110.html" itemprop="url">【RocketMQ】基本使用：安装、使用、可视控制台（阿里云搭建踩坑记录）</a></h1>
         
 
         <div class="post-meta">
@@ -2064,8 +2251,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-21T00:00:00+08:00">
-                2020-08-21
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-20T00:00:00+08:00">
+                2020-08-20
               </time>
             
 
@@ -2120,7 +2307,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1.3k
+                  745
                 </span>
               
 
@@ -2136,7 +2323,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  4
+                  2
                 </span>
               
             </div>
@@ -2158,16 +2345,14 @@
 
       
         
-          <h2 id="1-Broker集群模式（宏观）"><a href="#1-Broker集群模式（宏观）" class="headerlink" title="1.Broker集群模式（宏观）"></a>1.Broker集群模式（宏观）</h2><p>RocketMQ天生对集群的支持非常友好，天然支持高可用，它可以支持<strong>多主多从</strong>的部署架构，这也是和kafka大区别之一。</p>
-<p><img src="https://img-blog.csdnimg.cn/2020111819163045.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<p>那为什么要将这么多broker组织成多主多从，而不是采用一主多从然后主节点down机后再选举啊？因为。。。RocketMQ中并没有master选举功能，在RocketMQ集群中，1台机器只能要么是Master，要么是Slave，这个在初始的机器配置里面，就定死了。不会像kafka那样存在master动态选举的功能，所以通过配置多个master节点来保证rocketMQ的高可用。</p>
-<blockquote>
-<p>其中Master的broker id = 0，Slave 的broker id &gt; 0。 有点类似于mysql的主从概念，master挂了以后，slave仍然可以提供读服务，但是由于有多主的存在，当一个master挂了以后，可以写到其他的master上。 </p>
-</blockquote>
-<p>和所有的集群角色定位一样，master节点负责接受事务请求、slave节点只负责接收读请求，并且接收master同步过来的数据和slave保持一致。</p>
+          <h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h2><p>1).下载安装包</p>
+<p>下载地址：<a href="http://rocketmq.apache.org/dowloading/releases/" target="_blank" rel="noopener">http://rocketmq.apache.org/dowloading/releases/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/20201118134212642.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>2). 解压</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip rocketmq-all-4.5.0-bin-release.zip</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/posts/4731858c.html#more" rel="contents">
+            <a class="btn" href="/posts/1cdc2110.html#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -2586,196 +2771,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/1cdc2110.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="A minor">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/head.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Running | 在路上">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/1cdc2110.html" itemprop="url">【RocketMQ】基本使用：安装、使用、可视控制台（阿里云搭建踩坑记录）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-20T00:00:00+08:00">
-                2020-08-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                  <span class="post-meta-divider">|</span>
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  745
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1.安装"></a>1.安装</h2><p>1).下载安装包</p>
-<p>下载地址：<a href="http://rocketmq.apache.org/dowloading/releases/" target="_blank" rel="noopener">http://rocketmq.apache.org/dowloading/releases/</a></p>
-<p><img src="https://img-blog.csdnimg.cn/20201118134212642.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<p>2). 解压</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip rocketmq-all-4.5.0-bin-release.zip</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/posts/1cdc2110.html#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-	
-	
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2826,7 +2826,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">219</span>
+                  <span class="site-state-item-count">222</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2970,7 +2970,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">450.3k</span>
+    <span title="Site words total count">456.1k</span>
   
 </div>
 
