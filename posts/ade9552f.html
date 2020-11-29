@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Minion_reading_cartoon_128px_1119242_easyicon.net.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="学习ing,开发组件,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Running | 在路上" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="本篇主要记录一下更换NexT主题，及后来美化，配置域名的过程。  我的 Hexo博客：www.yzhblog.work。  1.更换主题为 NexT更换主题其实很简单，就是两步：  git clone 下来到博客的 themes 目录下     修改_config.yml 的 theme 为 next    修改完了后就可以本地启动 hexo server 或者 hexo d -g 远程启动看以下">
+<meta name="keywords" content="学习ing,开发组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Hexo】记录NexT主题美化及域名配置（图示详解）">
+<meta property="og:url" content="https://yzhblog.work/posts/ade9552f.html">
+<meta property="og:site_name" content="Running | 在路上">
+<meta property="og:description" content="本篇主要记录一下更换NexT主题，及后来美化，配置域名的过程。  我的 Hexo博客：www.yzhblog.work。  1.更换主题为 NexT更换主题其实很简单，就是两步：  git clone 下来到博客的 themes 目录下     修改_config.yml 的 theme 为 next    修改完了后就可以本地启动 hexo server 或者 hexo d -g 远程启动看以下">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129201819210.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202149951.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202218504.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202235222.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020112920230261.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202320444.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020112920243217.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202459596.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202521916.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202544704.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202617635.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202659508.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/202011292028045.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129202838894.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203058724.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203121681.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203210352.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203245315.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203316992.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203704538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203733238.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203751260.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203810429.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203831401.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203927976.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129203957480.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204034676.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020112920410097.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020112920414975.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204234952.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204313351.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204348556.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204403868.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204421253.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204435995.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204455389.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204511837.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204533371.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204550233.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201129204605370.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-11-29T13:00:50.818Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Hexo】记录NexT主题美化及域名配置（图示详解）">
+<meta name="twitter:description" content="本篇主要记录一下更换NexT主题，及后来美化，配置域名的过程。  我的 Hexo博客：www.yzhblog.work。  1.更换主题为 NexT更换主题其实很简单，就是两步：  git clone 下来到博客的 themes 目录下     修改_config.yml 的 theme 为 next    修改完了后就可以本地启动 hexo server 或者 hexo d -g 远程启动看以下">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20201129201819210.png#pic_center">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+	(function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yzhblog.work/posts/ade9552f.html">
+
+
+
+
+
+  <title>【Hexo】记录NexT主题美化及域名配置（图示详解） | Running | 在路上</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Running | 在路上</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Still waters run deep.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            文章标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档整理
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于作者
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            站内搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yzhblog.work/posts/ade9552f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="A minor">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Running | 在路上">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Hexo】记录NexT主题美化及域名配置（图示详解）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-03T00:00:00+08:00">
+                2019-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/项目管理/" itemprop="url" rel="index">
+                    <span itemprop="name">项目管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  919
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇主要记录一下更换NexT主题，及后来美化，配置域名的过程。</p>
+<blockquote>
+<p>我的 Hexo博客：<a href="www.yzhblog.work">www.yzhblog.work</a>。</p>
+</blockquote>
+<h2 id="1-更换主题为-NexT"><a href="#1-更换主题为-NexT" class="headerlink" title="1.更换主题为 NexT"></a>1.更换主题为 NexT</h2><p>更换主题其实很简单，就是两步：</p>
+<ol>
+<li><p>git clone 下来到博客的 themes 目录下</p>
+<p><img src="https://img-blog.csdnimg.cn/20201129201819210.png#pic_center" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<ol start="2">
+<li><p>修改_config.yml 的 theme 为 next</p>
+<p><img src="https://img-blog.csdnimg.cn/20201129202149951.png#pic_center" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<p>修改完了后就可以本地启动 <code>hexo server</code> 或者 <code>hexo d -g</code> 远程启动看以下效果了！</p>
+<a id="more"></a>
+<hr>
+<p>这里再记录一下我在拉取主题和部署时碰见的两个错误：</p>
+<p>1). 错误一：<code>git clone</code> 拉取主题时失败</p>
+<ul>
+<li>报错 ：<code>Failed to connect to github.com port 443: Timed out</code></li>
+<li>解决方案：在代理设置里查看具体代理端口，然后设置到 Git 的代理端口 <code>git config --global https.proxy http://127.0.0.1:10809</code>和 <code>git config --global http.proxy http://127.0.0.1:10809</code>。</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20201129202218504.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>2). 错误二：部署 Hexo <code>hexo d -g</code> 失败</p>
+<ul>
+<li>报错：<code>ssh connect to host github.com port 22 Connection timed out</code></li>
+<li>解决方案：修改hexo根目录 _config.yml 的连接方式为 http协议</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20201129202235222.png#pic_center" alt="在这里插入图片描述"></p>
+<h2 id="2-内容设置"><a href="#2-内容设置" class="headerlink" title="2.内容设置"></a>2.内容设置</h2><blockquote>
+<p>内容设置就是添加一些必备组件</p>
+</blockquote>
+<h3 id="设置菜单栏显示什么：首页-标签-分类"><a href="#设置菜单栏显示什么：首页-标签-分类" class="headerlink" title="设置菜单栏显示什么：首页/标签/分类"></a>设置菜单栏显示什么：首页/标签/分类</h3><p><img src="https://img-blog.csdnimg.cn/2020112920230261.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="设置语言：英语-汉语"><a href="#设置语言：英语-汉语" class="headerlink" title="设置语言：英语/汉语"></a>设置语言：英语/汉语</h3><p><img src="https://img-blog.csdnimg.cn/20201129202320444.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="设置标签文字内容"><a href="#设置标签文字内容" class="headerlink" title="设置标签文字内容"></a>设置标签文字内容</h3><p><img src="https://img-blog.csdnimg.cn/2020112920243217.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="主题样式"><a href="#主题样式" class="headerlink" title="主题样式"></a>主题样式</h3><p><img src="https://img-blog.csdnimg.cn/20201129202459596.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="标题、作者名、头像"><a href="#标题、作者名、头像" class="headerlink" title="标题、作者名、头像"></a>标题、作者名、头像</h3><p><img src="https://img-blog.csdnimg.cn/20201129202521916.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="rss订阅图标"><a href="#rss订阅图标" class="headerlink" title="rss订阅图标"></a>rss订阅图标</h3><p><img src="https://img-blog.csdnimg.cn/20201129202544704.png#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-generator-feed --save</span><br></pre></td></tr></table></figure>
+<h3 id="外链接：github、推特"><a href="#外链接：github、推特" class="headerlink" title="外链接：github、推特"></a>外链接：github、推特</h3><p><img src="https://img-blog.csdnimg.cn/20201129202617635.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="近期文章"><a href="#近期文章" class="headerlink" title="近期文章"></a>近期文章</h3><p><img src="https://img-blog.csdnimg.cn/20201129202659508.png#pic_center" alt="在这里插入图片描述"></p>
+<p>修改<code>themes/next/layout/_macro/sidebar.swig</code> 。找到<code>theme.social</code>板块代码，在该板块最后的endif后隔一行添加如下代码。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&#123;# recent posts #&#125;</span><br><span class="line">&#123;% <span class="keyword">if</span> theme.recent_posts %&#125;</span><br><span class="line">  &lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"links-of-blogroll motion-element &#123;&#123; "</span>links-<span class="keyword">of</span>-blogroll-<span class="string">" + theme.recent_posts_layout  &#125;&#125;"</span>&gt;</span><br><span class="line">    &lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"links-of-blogroll-title"</span>&gt;</span><br><span class="line">      &lt;!-- modify icon to fire by szw --&gt;</span><br><span class="line">      &lt;i <span class="class"><span class="keyword">class</span></span>=<span class="string">"fa fa-history fa-&#123;&#123; theme.recent_posts_icon | lower &#125;&#125;"</span> aria-hidden=<span class="string">"true"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">i</span>&gt;</span></span></span><br><span class="line">      &#123;&#123; theme.recent_posts_title &#125;&#125;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    &lt;ul class="links-of-blogroll-list"&gt;</span></span><br><span class="line"><span class="regexp">      &#123;% set posts = site.posts.sort('-date') %&#125;</span></span><br><span class="line"><span class="regexp">      &#123;% for post in posts.slice('0', '5') %&#125; </span></span><br><span class="line"><span class="regexp">        &lt;li class="recent_posts_li"&gt;</span></span><br><span class="line"><span class="regexp">          &lt;a href="&#123;&#123; url_for(post.path) &#125;&#125;" title="&#123;&#123; post.title &#125;&#125;" target="_blank"&gt;&#123;&#123; post.title &#125;&#125;&lt;/</span>a&gt;</span><br><span class="line">        &lt;<span class="regexp">/li&gt;</span></span><br><span class="line"><span class="regexp">      &#123;% endfor %&#125;</span></span><br><span class="line"><span class="regexp">    &lt;/u</span>l&gt;</span><br><span class="line">  &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">&#123;% endif %&#125;</span></span><br></pre></td></tr></table></figure>
+<p>编辑<code>themes/next/source/css/_common/components/sidebar/sidebar-blogroll.styl</code></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">li</span><span class="selector-class">.recent_posts_li</span> &#123;</span><br><span class="line">    <span class="attribute">text-align</span>: cengter;</span><br><span class="line">    <span class="attribute">display</span>: block;</span><br><span class="line">    <span class="attribute">word-break</span>: keep-all;</span><br><span class="line">    <span class="attribute">white-space</span>: nowrap;</span><br><span class="line">    <span class="attribute">overflow</span>: hidden;</span><br><span class="line">    <span class="attribute">text-overflow</span>: ellipsis;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="站内搜索"><a href="#站内搜索" class="headerlink" title="站内搜索"></a>站内搜索</h3><p><img src="https://img-blog.csdnimg.cn/202011292028045.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br></pre></td></tr></table></figure>
+<h2 id="3-页面美化"><a href="#3-页面美化" class="headerlink" title="3.页面美化"></a>3.页面美化</h2><blockquote>
+<p>页面美化就是对NexT做一些视觉上的优化</p>
+</blockquote>
+<h3 id="标题颜色"><a href="#标题颜色" class="headerlink" title="标题颜色"></a>标题颜色</h3><p><img src="https://img-blog.csdnimg.cn/20201129202838894.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="背景图片"><a href="#背景图片" class="headerlink" title="背景图片"></a>背景图片</h3><p><img src="https://img-blog.csdnimg.cn/20201129203058724.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="主题透明度"><a href="#主题透明度" class="headerlink" title="主题透明度"></a>主题透明度</h3><p><img src="https://img-blog.csdnimg.cn/20201129203121681.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="人物挂件"><a href="#人物挂件" class="headerlink" title="人物挂件"></a>人物挂件</h3><p><img src="https://img-blog.csdnimg.cn/20201129203210352.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -save hexo-helper-live2d</span><br><span class="line"><span class="comment">#npm install --save live2d-widget-model-&lt;模型&gt;</span></span><br><span class="line">npm install --save live2d-widget-model-tororo</span><br></pre></td></tr></table></figure>
+<h3 id="网站图标"><a href="#网站图标" class="headerlink" title="网站图标"></a>网站图标</h3><p><img src="https://img-blog.csdnimg.cn/20201129203245315.png#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="阅读全文样式"><a href="#阅读全文样式" class="headerlink" title="阅读全文样式"></a>阅读全文样式</h3><p><img src="https://img-blog.csdnimg.cn/20201129203316992.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="加载动画"><a href="#加载动画" class="headerlink" title="加载动画"></a>加载动画</h3><p><img src="https://img-blog.csdnimg.cn/20201129203704538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="3D动态特效"><a href="#3D动态特效" class="headerlink" title="3D动态特效"></a>3D动态特效</h3><p><img src="https://img-blog.csdnimg.cn/20201129203733238.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="头像旋转"><a href="#头像旋转" class="headerlink" title="头像旋转"></a>头像旋转</h3><p><img src="https://img-blog.csdnimg.cn/20201129203751260.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="点头像返回主页"><a href="#点头像返回主页" class="headerlink" title="点头像返回主页"></a>点头像返回主页</h3><p><img src="https://img-blog.csdnimg.cn/20201129203810429.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="去页脚"><a href="#去页脚" class="headerlink" title="去页脚"></a>去页脚</h3><p><img src="https://img-blog.csdnimg.cn/20201129203831401.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="修改标签-为图标"><a href="#修改标签-为图标" class="headerlink" title="修改标签#为图标"></a>修改标签#为图标</h3><p><img src="https://img-blog.csdnimg.cn/20201129203927976.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h2 id="4-文章设置"><a href="#4-文章设置" class="headerlink" title="4.文章设置"></a>4.文章设置</h2><h3 id="页面文章数"><a href="#页面文章数" class="headerlink" title="页面文章数"></a>页面文章数</h3><p><img src="https://img-blog.csdnimg.cn/20201129203957480.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-generator-category --save</span><br><span class="line">npm install hexo-generator-tag --save</span><br><span class="line">npm install hexo-generator-generator --save</span><br></pre></td></tr></table></figure>
+<h3 id="文章排序规则"><a href="#文章排序规则" class="headerlink" title="文章排序规则"></a>文章排序规则</h3><p><img src="https://img-blog.csdnimg.cn/20201129204034676.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="修改文章url（唯一ID）"><a href="#修改文章url（唯一ID）" class="headerlink" title="修改文章url（唯一ID）"></a>修改文章url（唯一ID）</h3><p><img src="https://img-blog.csdnimg.cn/2020112920410097.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-abbrlink --save</span><br></pre></td></tr></table></figure>
+<h3 id="前显字数"><a href="#前显字数" class="headerlink" title="前显字数"></a>前显字数</h3><p><img src="https://img-blog.csdnimg.cn/2020112920414975.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>但是我们更推荐使用 <code>&lt;!-- more --&gt;</code> 标识文章摘要。</p>
+<h3 id="字数统计、阅读时长"><a href="#字数统计、阅读时长" class="headerlink" title="字数统计、阅读时长"></a>字数统计、阅读时长</h3><p><img src="https://img-blog.csdnimg.cn/20201129204234952.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="去除自带标号"><a href="#去除自带标号" class="headerlink" title="去除自带标号"></a>去除自带标号</h3><p><img src="https://img-blog.csdnimg.cn/20201129204313351.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="版权声明"><a href="#版权声明" class="headerlink" title="版权声明"></a>版权声明</h3><p><img src="https://img-blog.csdnimg.cn/20201129204348556.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="代码主题"><a href="#代码主题" class="headerlink" title="代码主题"></a>代码主题</h3><p><img src="https://img-blog.csdnimg.cn/20201129204403868.png#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="加密访问"><a href="#加密访问" class="headerlink" title="加密访问"></a>加密访问</h3><p><img src="https://img-blog.csdnimg.cn/20201129204421253.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h3 id="SEO"><a href="#SEO" class="headerlink" title="SEO"></a>SEO</h3><p><img src="https://img-blog.csdnimg.cn/20201129204435995.png#pic_center" alt="在这里插入图片描述"></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-generator-sitemap --save</span><br><span class="line">npm install hexo-generator-baidu-sitemap --save</span><br></pre></td></tr></table></figure>
+<h3 id="文章结束语"><a href="#文章结束语" class="headerlink" title="文章结束语"></a>文章结束语</h3><p><img src="https://img-blog.csdnimg.cn/20201129204455389.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<h2 id="5-绑定域名"><a href="#5-绑定域名" class="headerlink" title="5.绑定域名"></a>5.绑定域名</h2><p>绑域名其实很简单，就步</p>
+<ol>
+<li><p>在阿里云或者腾讯云或者华为云申请个域名</p>
+</li>
+<li><p>将 GitHub 的原生域名绑定到自定义域名上</p>
+<p><img src="https://img-blog.csdnimg.cn/20201129204511837.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<blockquote>
+<p>查看 Git Page 的IP：<code>ping  youname.github.io</code></p>
+</blockquote>
+<p>   <img src="https://img-blog.csdnimg.cn/20201129204533371.png#pic_center" alt="在这里插入图片描述"></p>
+<ol start="3">
+<li><p>创建一个 CNAME 文件，写入申请的域名（注：CNAME是没有后缀的）</p>
+<p><img src="https://img-blog.csdnimg.cn/20201129204550233.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<ol start="4">
+<li><p>在 GitHub 的配置中修改域名</p>
+<p><img src="https://img-blog.csdnimg.cn/20201129204605370.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzkzNTkyNw==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<blockquote>
+<p>参考链接：</p>
+<ul>
+<li><a href="https://blog.csdn.net/as480133937/article/details/100138838" target="_blank" rel="noopener">Hexo-Next 主题博客个性化配置超详细，超全面(两万字)</a></li>
+<li><a href="https://blog.csdn.net/weixin_42905141/article/details/102677424" target="_blank" rel="noopener">hexo4.0 - Next7.2.4 主题优化配置</a></li>
+<li><a href="https://blog.csdn.net/weixin_45682081/article/details/104775270" target="_blank" rel="noopener">Hexo-个人之博客主题美化</a></li>
+<li><a href="https://www.zywvvd.com/2020/03/20/next/14_add_rss/next-add-rss/" target="_blank" rel="noopener">Next -14- 为Hexo Next7.7.1 添加RSS （带按钮）</a></li>
+</ul>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+	
+	
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    A minor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://yzhblog.work/posts/ade9552f.html" title="【Hexo】记录NexT主题美化及域名配置（图示详解）">https://yzhblog.work/posts/ade9552f.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>许可协议： </strong>
+    本博客均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 转载请保留原文链接及作者
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习ing/" rel="tag"><i class="fa fa-tag"></i> 学习ing</a>
+          
+            <a href="/tags/开发组件/" rel="tag"><i class="fa fa-tag"></i> 开发组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/7765ce2b.html" rel="next" title="【Git】原理分析：存储对象、树对象、提交对象">
+                <i class="fa fa-chevron-left"></i> 【Git】原理分析：存储对象、树对象、提交对象
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/9cbf576.html" rel="prev" title="【Hexo】五个问题说明白Hexo基础使用">
+                【Hexo】五个问题说明白Hexo基础使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+			  <a href="/">
+			   <img class="site-author-image" itemprop="image" src="/images/head.jpg" alt="A minor">
+			 </a>
+
+            
+              <p class="site-author-name" itemprop="name">A minor</p>
+              <p class="site-description motion-element" itemprop="description">随性，自由</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">224</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/YZHyaa" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/weixin_43935927" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:3132266573@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/Frank90377104" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+		  
+		  
+			
+			  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+				<div class="links-of-blogroll-title">
+				  <!-- modify icon to fire by szw -->
+				  <i class="fa fa-history fa-" aria-hidden="true"></i>
+				  近期文章
+				</div>
+				<ul class="links-of-blogroll-list">
+				  
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/255a4d73.html" title="【数据结构】LRU，从O(n)复杂度到O(1)" target="_blank">【数据结构】LRU，从O(n)复杂度到O(1)</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/7570a0f2.html" title="【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角" target="_blank">【数据结构】数组：二维数组填数问题，蛇形填数三变式及杨辉三角</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/4f0ffb79.html" title="【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案" target="_blank">【Redis】缓存穿透，缓存击穿，缓存雪崩及解决方案</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/d0a037fb.html" title="【Redis】开发规范与性能优化建议" target="_blank">【Redis】开发规范与性能优化建议</a>
+					</li>
+				  
+					<li class="recent_posts_li">
+					  <a href="/posts/73e8bd68.html" title="【RocketMQ】高级使用：四个问题详解事务消息" target="_blank">【RocketMQ】高级使用：四个问题详解事务消息</a>
+					</li>
+				  
+				</ul>
+			  </div>
+			
+
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-更换主题为-NexT"><span class="nav-text">1.更换主题为 NexT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-内容设置"><span class="nav-text">2.内容设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置菜单栏显示什么：首页-标签-分类"><span class="nav-text">设置菜单栏显示什么：首页/标签/分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置语言：英语-汉语"><span class="nav-text">设置语言：英语/汉语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置标签文字内容"><span class="nav-text">设置标签文字内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主题样式"><span class="nav-text">主题样式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标题、作者名、头像"><span class="nav-text">标题、作者名、头像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rss订阅图标"><span class="nav-text">rss订阅图标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#外链接：github、推特"><span class="nav-text">外链接：github、推特</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#近期文章"><span class="nav-text">近期文章</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#站内搜索"><span class="nav-text">站内搜索</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-页面美化"><span class="nav-text">3.页面美化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标题颜色"><span class="nav-text">标题颜色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#背景图片"><span class="nav-text">背景图片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主题透明度"><span class="nav-text">主题透明度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#人物挂件"><span class="nav-text">人物挂件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网站图标"><span class="nav-text">网站图标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阅读全文样式"><span class="nav-text">阅读全文样式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载动画"><span class="nav-text">加载动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3D动态特效"><span class="nav-text">3D动态特效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#头像旋转"><span class="nav-text">头像旋转</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#点头像返回主页"><span class="nav-text">点头像返回主页</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#去页脚"><span class="nav-text">去页脚</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改标签-为图标"><span class="nav-text">修改标签#为图标</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-文章设置"><span class="nav-text">4.文章设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#页面文章数"><span class="nav-text">页面文章数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文章排序规则"><span class="nav-text">文章排序规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改文章url（唯一ID）"><span class="nav-text">修改文章url（唯一ID）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#前显字数"><span class="nav-text">前显字数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字数统计、阅读时长"><span class="nav-text">字数统计、阅读时长</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#去除自带标号"><span class="nav-text">去除自带标号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#版权声明"><span class="nav-text">版权声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码主题"><span class="nav-text">代码主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加密访问"><span class="nav-text">加密访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SEO"><span class="nav-text">SEO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文章结束语"><span class="nav-text">文章结束语</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-绑定域名"><span class="nav-text">5.绑定域名</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">A minor</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">457.8k</span>
+  
+</div>
+
+<!--
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+-->
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":180,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
